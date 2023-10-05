@@ -1,57 +1,85 @@
-{ stdenv
-, lib
+{ lib
+, stdenv
 , buildPythonPackage
 , click
 , fetchFromGitHub
 , mock
+, prettytable
 , prompt-toolkit
 , ptable
 , pygments
 , pytestCheckHook
 , pythonOlder
 , requests
+, rich
 , sphinx
 , testtools
 , tkinter
 , urllib3
+, zeep
 }:
 
 buildPythonPackage rec {
   pname = "softlayer";
-  version = "5.9.9";
-  disabled = pythonOlder "3.5";
+  version = "6.1.9";
+  format = "setuptools";
+
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = "softlayer-python";
-    rev = "v${version}";
-    sha256 = "sha256-LskPz5KXOi7olb3+DUP9uEFESQeo6ec/ZLx9B/w6Ni0=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-mYezVJSBtZuNT6mG544dJhRFh26M4nN4nE3tUVB3cZQ=";
   };
+
+  postPatch = ''
+    substituteInPlace setup.py \
+        --replace "rich ==" "rich >="
+  '';
 
   propagatedBuildInputs = [
     click
+    prettytable
     prompt-toolkit
     ptable
     pygments
     requests
+    rich
     urllib3
   ];
 
-  checkInputs = [
+  __darwinAllowLocalNetworking = true;
+
+  nativeCheckInputs = [
     mock
     pytestCheckHook
     sphinx
     testtools
     tkinter
+    zeep
   ];
 
-  pythonImportsCheck = [ "SoftLayer" ];
+  # Otherwise soap_tests.py will fail to create directory
+  # Permission denied: '/homeless-shelter'
+  preCheck = ''
+    export HOME=$(mktemp -d)
+  '';
+
+  disabledTestPaths = [
+    # Test fails with ConnectionError trying to connect to api.softlayer.com
+    "tests/transports/soap_tests.py.unstable"
+  ];
+
+  pythonImportsCheck = [
+    "SoftLayer"
+  ];
 
   meta = with lib; {
-    broken = (stdenv.isLinux && stdenv.isAarch64) || stdenv.isDarwin;
     description = "Python libraries that assist in calling the SoftLayer API";
     homepage = "https://github.com/softlayer/softlayer-python";
+    changelog = "https://github.com/softlayer/softlayer-python/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ onny ];
   };
 }

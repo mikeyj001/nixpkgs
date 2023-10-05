@@ -22,12 +22,23 @@ buildPythonPackage rec {
     hash = "sha256-CmDypmlc/kb6ONCUggjT1Iqd29xNSLRaGh5Hz36dvOw=";
   };
 
-  propagatedBuildInputs = [
-    asn1crypto
-    openssl
+  patches = [
+    ./support-openssl-3.0.10.patch
   ];
 
-  checkInputs = [
+  postPatch = ''
+    for file in oscrypto/_openssl/_lib{crypto,ssl}_c{ffi,types}.py; do
+      substituteInPlace $file \
+        --replace "get_library('crypto', 'libcrypto.dylib', '42')" "'${openssl.out}/lib/libcrypto${stdenv.hostPlatform.extensions.sharedLibrary}'" \
+        --replace "get_library('ssl', 'libssl', '44')" "'${openssl.out}/lib/libssl${stdenv.hostPlatform.extensions.sharedLibrary}'"
+    done
+  '';
+
+  propagatedBuildInputs = [
+    asn1crypto
+  ];
+
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

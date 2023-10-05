@@ -1,5 +1,5 @@
 { lib, stdenv, fetchpatch, fetchFromGitHub, cmake, zlib, gmp, jdk8,
-  # The JDK we use on Darwin currenly makes extensive use of rpaths which are
+  # The JDK we use on Darwin currently makes extensive use of rpaths which are
   # annoying and break the python library, so let's not bother for now
   includeJava ? !stdenv.hostPlatform.isDarwin, includeGplCode ? true }:
 
@@ -47,6 +47,9 @@ let
       "-DBUILD_STATIC=OFF"
       "-DJAVA=${boolToCmake includeJava}"
       "-DGPL=${boolToCmake includeGplCode}"
+
+      # file RPATH_CHANGE could not write new RPATH
+      "-DCMAKE_SKIP_BUILD_RPATH=ON"
     ];
 
     postInstall = optionalString includeJava ''
@@ -86,7 +89,7 @@ let
         --replace 'library_dir = "../../../../"' 'library_dir = "${core}/lib/"'
     '';
 
-    checkInputs = [ pytestCheckHook ];
+    nativeCheckInputs = [ pytestCheckHook ];
 
     disabledTests = [
       "test_assertAtMostOne"

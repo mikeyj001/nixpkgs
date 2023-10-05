@@ -1,13 +1,13 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, utils, ... }:
 
 with lib;
 
 let
   cfg = config.services.xserver.desktopManager.xfce;
+  excludePackages = config.environment.xfce.excludePackages;
+
 in
-
 {
-
   meta = {
     maintainers = teams.xfce.members;
   };
@@ -36,6 +36,12 @@ in
       [ "services" "xserver" "desktopManager" "xfce" "extraSessionCommands" ]
       [ "services" "xserver" "displayManager" "sessionCommands" ])
     (mkRemovedOptionModule [ "services" "xserver" "desktopManager" "xfce" "screenLock" ] "")
+
+    # added 2022-06-26
+    # thunar has its own module
+    (mkRenamedOptionModule
+      [ "services" "xserver" "desktopManager" "xfce" "thunarPlugins" ]
+      [ "programs" "thunar" "plugins" ])
   ];
 
   options = {
@@ -43,40 +49,38 @@ in
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = "Enable the Xfce desktop environment.";
-      };
-
-      thunarPlugins = mkOption {
-        default = [];
-        type = types.listOf types.package;
-        example = literalExpression "[ pkgs.xfce.thunar-archive-plugin ]";
-        description = ''
-          A list of plugin that should be installed with Thunar.
-        '';
+        description = lib.mdDoc "Enable the Xfce desktop environment.";
       };
 
       noDesktop = mkOption {
         type = types.bool;
         default = false;
-        description = "Don't install XFCE desktop components (xfdesktop and panel).";
+        description = lib.mdDoc "Don't install XFCE desktop components (xfdesktop and panel).";
       };
 
       enableXfwm = mkOption {
         type = types.bool;
         default = true;
-        description = "Enable the XFWM (default) window manager.";
+        description = lib.mdDoc "Enable the XFWM (default) window manager.";
       };
 
       enableScreensaver = mkOption {
         type = types.bool;
         default = true;
-        description = "Enable the XFCE screensaver.";
+        description = lib.mdDoc "Enable the XFCE screensaver.";
       };
+    };
+
+    environment.xfce.excludePackages = mkOption {
+      default = [];
+      example = literalExpression "[ pkgs.xfce.xfce4-volumed-pulse ]";
+      type = types.listOf types.package;
+      description = lib.mdDoc "Which packages XFCE should exclude from the default environment";
     };
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = with pkgs.xfce // pkgs; [
+    environment.systemPackages = utils.removePackagesByName (with pkgs.xfce // pkgs; [
       glib # for gsettings
       gtk3.out # gtk-update-icon-cache
 
@@ -98,7 +102,6 @@ in
       exo
       garcon
       libxfce4ui
-      xfconf
 
       mousepad
       parole
@@ -110,8 +113,6 @@ in
       xfce4-settings
       xfce4-taskmanager
       xfce4-terminal
-
-      (thunar.override { thunarPlugins = cfg.thunarPlugins; })
     ] # TODO: NetworkManager doesn't belong here
       ++ optional config.networking.networkmanager.enable networkmanagerapplet
       ++ optional config.powerManagement.enable xfce4-power-manager
@@ -128,7 +129,10 @@ in
       ] ++ optionals (!cfg.noDesktop) [
         xfce4-panel
         xfdesktop
-      ] ++ optional cfg.enableScreensaver xfce4-screensaver;
+      ] ++ optional cfg.enableScreensaver xfce4-screensaver) excludePackages;
+
+    programs.xfconf.enable = true;
+    programs.thunar.enable = true;
 
     environment.pathsToLink = [
       "/share/xfce4"
@@ -169,10 +173,9 @@ in
     programs.zsh.vteIntegration = mkDefault true;
 
     # Systemd services
-    systemd.packages = with pkgs.xfce; [
-      (thunar.override { thunarPlugins = cfg.thunarPlugins; })
+    systemd.packages = utils.removePackagesByName (with pkgs.xfce; [
       xfce4-notifyd
-    ];
+    ]) excludePackages;
 
     security.pam.services.xfce4-screensaver.unixAuth = cfg.enableScreensaver;
   };

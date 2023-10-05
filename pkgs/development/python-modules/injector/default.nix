@@ -1,17 +1,33 @@
-{ lib, buildPythonPackage, fetchPypi, typing-extensions }:
+{ lib
+, buildPythonPackage
+, pythonOlder
+, fetchFromGitHub
+, typing-extensions
+, pytestCheckHook
+, pytest-cov
+}:
 
 buildPythonPackage rec {
   pname = "injector";
-  version = "0.19.0";
+  version = "0.21.0";
+  format = "setuptools";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "3eaaf51cd3ba7be1354d92a5210c8bba43dd324300eafd214e1f2568834a912f";
+  src = fetchFromGitHub {
+    owner = "python-injector";
+    repo = pname;
+    rev = "refs/tags/${version}";
+    hash = "sha256-5O4vJSXfYNTrUzmv5XuT9pSUndNSvTZTxfVwiAd+0ck=";
   };
 
-  propagatedBuildInputs = [ typing-extensions ];
+  propagatedBuildInputs = lib.optionals (pythonOlder "3.9") [
+    typing-extensions
+  ];
 
-  doCheck = false; # No tests are available
+  nativeCheckInputs = [
+    pytestCheckHook
+    pytest-cov
+  ];
+
   pythonImportsCheck = [ "injector" ];
 
   meta = with lib; {

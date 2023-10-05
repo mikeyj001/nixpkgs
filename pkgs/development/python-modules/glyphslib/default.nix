@@ -1,6 +1,6 @@
 { lib
 , buildPythonPackage
-, fetchPypi
+, fetchFromGitHub
 , fonttools
 , openstep-plist
 , ufoLib2
@@ -16,21 +16,20 @@
 
 buildPythonPackage rec {
   pname = "glyphslib";
-  version = "6.0.4";
+  version = "6.4.1";
 
   format = "pyproject";
 
-  src = fetchPypi {
-    pname = "glyphsLib";
-    inherit version;
-    sha256 = "sha256-PT66n1WEO5FNcwov8GaXT1YNrAi22X4HN7iVNkuehKI=";
+  src = fetchFromGitHub {
+    owner = "googlefonts";
+    repo = "glyphsLib";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-pDFPn1KDiZ5yw1UzPgi0+Syv3h606bsOOzLbdOiag8s=";
   };
 
+  SETUPTOOLS_SCM_PRETEND_VERSION = version;
+
   nativeBuildInputs = [ setuptools-scm ];
-
-  checkInputs = [ pytestCheckHook ];
-
-  pythonImportsCheck = [ "glyphsLib" ];
 
   propagatedBuildInputs = [
     fonttools
@@ -43,6 +42,10 @@ buildPythonPackage rec {
     ufo2ft
     skia-pathops
   ];
+
+  nativeCheckInputs = [ pytestCheckHook ];
+
+  pythonImportsCheck = [ "glyphsLib" ];
 
   disabledTestPaths = [
     "tests/builder/designspace_gen_test.py" # this test tries to use non-existent font "CoolFoundry Examplary Serif"

@@ -2,20 +2,19 @@
 
 let
   cfg = config.services.joycond;
-  kernelPackages = config.boot.kernelPackages;
 in
 
 with lib;
 
 {
   options.services.joycond = {
-    enable = mkEnableOption "support for Nintendo Pro Controllers and Joycons";
+    enable = mkEnableOption (lib.mdDoc "support for Nintendo Pro Controllers and Joycons");
 
     package = mkOption {
       type = types.package;
       default = pkgs.joycond;
-      defaultText = "pkgs.joycond";
-      description = ''
+      defaultText = lib.literalExpression "pkgs.joycond";
+      description = lib.mdDoc ''
         The joycond package to use.
       '';
     };
@@ -23,8 +22,6 @@ with lib;
 
   config = mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
-
-    boot.extraModulePackages = optional (versionOlder kernelPackages.kernel.version "5.16") kernelPackages.hid-nintendo;
 
     services.udev.packages = [ cfg.package ];
 

@@ -9,10 +9,12 @@
 , pycryptodomex
 , websockets
 , mutagen
+, secretstorage
 , atomicparsleySupport ? true
 , ffmpegSupport ? true
 , rtmpSupport ? true
 , withAlias ? false # Provides bin/youtube-dl for backcompat
+, update-python-libraries
 }:
 
 buildPythonPackage rec {
@@ -20,15 +22,21 @@ buildPythonPackage rec {
   # The websites yt-dlp deals with are a very moving target. That means that
   # downloads break constantly. Because of that, updates should always be backported
   # to the latest stable release.
-  version = "2022.05.18";
+  version = "2023.9.24";
 
   src = fetchPypi {
-    inherit pname;
-    version = builtins.replaceStrings [ ".0" ] [ "." ] version;
-    sha256 = "sha256-OntZ0vtLOc6LqOC5xaN/4g5WJPRqI0a0rmarEyDjUTQ=";
+    inherit pname version;
+    sha256 = "sha256-z8+1/8EgE7auS4x6KDp+RimI8bSSg94pHei/vgU7gHM=";
   };
 
-  propagatedBuildInputs = [ brotli certifi mutagen pycryptodomex websockets ];
+  propagatedBuildInputs = [
+    brotli
+    certifi
+    mutagen
+    pycryptodomex
+    secretstorage  # "optional", as in not in requirements.txt, needed for `--cookies-from-browser`
+    websockets
+  ];
 
   # Ensure these utilities are available in $PATH:
   # - ffmpeg: post-processing & transcoding support
@@ -54,10 +62,11 @@ buildPythonPackage rec {
     ln -s "$out/bin/yt-dlp" "$out/bin/youtube-dl"
   '';
 
+  passthru.updateScript = [ update-python-libraries (toString ./.) ];
+
   meta = with lib; {
     homepage = "https://github.com/yt-dlp/yt-dlp/";
     description = "Command-line tool to download videos from YouTube.com and other sites (youtube-dl fork)";
-    changelog = "https://github.com/yt-dlp/yt-dlp/raw/${version}/Changelog.md";
     longDescription = ''
       yt-dlp is a youtube-dl fork based on the now inactive youtube-dlc.
 
@@ -68,5 +77,6 @@ buildPythonPackage rec {
     '';
     license = licenses.unlicense;
     maintainers = with maintainers; [ mkg20001 SuperSandro2000 marsam ];
+    mainProgram = "yt-dlp";
   };
 }

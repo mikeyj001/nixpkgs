@@ -1,29 +1,22 @@
 { lib
 , python3
-, fetchpatch
+, fetchPypi
 }:
 
 with python3.pkgs;
 
 buildPythonPackage rec {
   pname = "HyperKitty";
-  # Note: Mailman core must be on the latest version before upgrading HyperKitty.
-  # See: https://gitlab.com/mailman/postorius/-/issues/516#note_544571309
-  version = "1.3.5";
+  version = "1.3.7";
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-gmkiK8pIHfubbbxNdm/D6L2o722FptxYgINYdIUOn4Y=";
+    sha256 = "sha256-TXSso+wwVGdBymIzns5yOS4pj1EdConmm87b/NyBAss=";
   };
 
   patches = [
-    # FIXME: backport Python 3.10 support fix, remove for next release
-    (fetchpatch {
-      url = "https://gitlab.com/mailman/hyperkitty/-/commit/551a44a76e46931fc5c1bcb341235d8f579820be.patch";
-      sha256 = "sha256-5XCrvyrDEqH3JryPMoOXSlVVDLQ+PdYBqwGYxkExdvk=";
-      includes = [ "hyperkitty/*" ];
-    })
+    ./0001-Disable-broken-test_help_output-testcase.patch
   ];
 
   postPatch = ''
@@ -40,11 +33,11 @@ buildPythonPackage rec {
     django-haystack
     django-mailman3
     django-q
-    django_compressor
+    django-compressor
     django-extensions
     djangorestframework
     flufl_lock
-    mistune_2_0
+    mistune
     networkx
     psycopg2
     python-dateutil
@@ -55,12 +48,12 @@ buildPythonPackage rec {
   # listed as dependencies in setup.py.  To use these, they should be
   # dependencies of the Django Python environment, but not of
   # HyperKitty so they're not included for people who don't need them.
-  checkInputs = [
+  nativeCheckInputs = [
     beautifulsoup4
     elasticsearch
     mock
     whoosh
-  ];
+  ] ++ beautifulsoup4.optional-dependencies.lxml;
 
   checkPhase = ''
     cd $NIX_BUILD_TOP/$sourceRoot

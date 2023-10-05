@@ -5,9 +5,7 @@
 , pkg-config
 , meson
 , ninja
-, gettext
 , vala
-, python3
 , desktop-file-utils
 , libcanberra
 , gtk3
@@ -15,13 +13,11 @@
 , libgee
 , libhandy
 , granite
-, libnotify
 , pango
 , elementary-dock
 , bamf
 , sqlite
 , zeitgeist
-, glib-networking
 , libcloudproviders
 , libgit2-glib
 , wrapGAppsHook
@@ -30,7 +26,7 @@
 
 stdenv.mkDerivation rec {
   pname = "elementary-files";
-  version = "6.1.2";
+  version = "6.5.2";
 
   outputs = [ "out" "dev" ];
 
@@ -38,17 +34,14 @@ stdenv.mkDerivation rec {
     owner = "elementary";
     repo = "files";
     rev = version;
-    sha256 = "sha256-g9g4wJXjjudk4Qt96XGUiV/X86Ae2lqhM+psh9h+XFE=";
+    sha256 = "sha256-YwXyqZ0exwQ3Qx+VWWyTTmhqCVr6be8tqzS1k3Luo8o=";
   };
 
   nativeBuildInputs = [
     desktop-file-utils
-    gettext
-    glib-networking
     meson
     ninja
     pkg-config
-    python3
     vala
     wrapGAppsHook
   ];
@@ -64,22 +57,14 @@ stdenv.mkDerivation rec {
     libgee
     libgit2-glib
     libhandy
-    libnotify
     pango
     sqlite
     systemd
     zeitgeist
   ];
 
-  postPatch = ''
-    chmod +x meson/post_install.py
-    patchShebangs meson/post_install.py
-  '';
-
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = "pantheon.${pname}";
-    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {

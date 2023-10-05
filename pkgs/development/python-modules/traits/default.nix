@@ -8,14 +8,14 @@
 
 buildPythonPackage rec {
   pname = "traits";
-  version = "6.3.2";
+  version = "6.4.2";
   format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "4520ef4a675181f38be4a5bab1b1d5472691597fe2cfe4faf91023e89407e2c6";
+    hash = "sha256-W+fMX7epnLp+kBR4Y3PjrS9177RF7s7QlGVLuvOw+oI=";
   };
 
   # Circular dependency

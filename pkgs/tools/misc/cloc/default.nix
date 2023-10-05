@@ -1,17 +1,15 @@
 { lib, stdenv, fetchFromGitHub, makeWrapper, perlPackages }:
 
-stdenv.mkDerivation rec {
+let version = "1.98";
+in stdenv.mkDerivation {
   pname = "cloc";
-  version = "1.92";
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "AlDanial";
     repo = "cloc";
     rev = "v${version}";
-    sha256 = if stdenv.isDarwin then
-      "1hy1hskiw02b7xaxn2qz0v7znj14l49w1anx20z6rkcps7212l5l"
-    else
-      "sha256-tFARxNGXzWw+EN2qwBOhJEj7zwYfC9tVP0sAHqeGwcM=";
+    sha256 = "sha256-OTzIzLgE9sdbHZUSARSbVrxD95dW8gPiM8tvMvqm1Bg=";
   };
 
   setSourceRoot = ''
@@ -29,6 +27,28 @@ stdenv.mkDerivation rec {
   makeFlags = [ "prefix=" "DESTDIR=$(out)" "INSTALL=install" ];
 
   postFixup = "wrapProgram $out/bin/cloc --prefix PERL5LIB : $PERL5LIB";
+
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    echo -n 'checking --version...'
+    $out/bin/cloc --version | grep '${version}' > /dev/null
+    echo ' ok'
+
+    cat > test.nix <<EOF
+    {a, b}: {
+      test = a
+        + b;
+    }
+    EOF
+
+    echo -n 'checking lines in test.nix...'
+    $out/bin/cloc --quiet --csv test.nix | grep '1,Nix,0,0,4' > /dev/null
+    echo ' ok'
+
+    runHook postInstallCheck
+  '';
 
   meta = {
     description = "A program that counts lines of source code";

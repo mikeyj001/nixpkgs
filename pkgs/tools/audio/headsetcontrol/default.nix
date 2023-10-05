@@ -7,13 +7,13 @@
 
 stdenv.mkDerivation rec {
   pname = "headsetcontrol";
-  version = "2.6";
+  version = "2.7.0";
 
   src = fetchFromGitHub {
     owner = "Sapd";
     repo = "HeadsetControl";
     rev = version;
-    sha256 = "0a7zimzi71416pmn6z0l1dn1c2x8p702hkd0k6da9rsznff85a88";
+    sha256 = "sha256-tAndkfLEgj81JWzXtDBNspRxzKAL6XaRw0aDI1XbC1E=";
   };
 
   nativeBuildInputs = [
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   ];
 
   /*
-  Test depends on having the apropiate headsets connected.
+  Tests depend on having the appropriate headsets connected.
   */
   doCheck = false;
 

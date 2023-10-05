@@ -1,14 +1,19 @@
 { stdenv
 , lib
+, callPackage
 , fetchurl
-, fetchpatch
 , makeWrapper
 , cmake
+, coreutils
 , git
+, davix
 , ftgl
 , gl2ps
 , glew
+, gnugrep
+, gnused
 , gsl
+, gtest
 , lapack
 , libX11
 , libXpm
@@ -16,15 +21,21 @@
 , libXext
 , libGLU
 , libGL
+, libxcrypt
 , libxml2
-, llvm_9
+, llvm_13
+, lsof
 , lz4
 , xz
+, man
 , openblas
+, openssl
 , pcre
 , nlohmann_json
 , pkg-config
+, procps
 , python
+, which
 , xxHash
 , zlib
 , zstd
@@ -33,7 +44,11 @@
 , libjpeg
 , libtiff
 , libpng
+, patchRcPathCsh
+, patchRcPathFish
+, patchRcPathPosix
 , tbb
+, xrootd
 , Cocoa
 , CoreSymbolication
 , OpenGL
@@ -42,15 +57,23 @@
 
 stdenv.mkDerivation rec {
   pname = "root";
-  version = "6.24.06";
+  version = "6.28.06";
+
+  passthru = {
+    tests = import ./tests { inherit callPackage; };
+  };
 
   src = fetchurl {
     url = "https://root.cern.ch/download/root_v${version}.source.tar.gz";
-    sha256 = "sha256-kH9p9LrKHk8w7rSXlZjKdZm2qoA8oEboDiW2u6oO9SI=";
+    hash = "sha256-rztnO5rKOTpcmuG/huqyZyqvGEG2WMXG56MKuTxYZTM=";
   };
 
   nativeBuildInputs = [ makeWrapper cmake pkg-config git ];
+  propagatedBuildInputs = [
+    nlohmann_json
+  ];
   buildInputs = [
+    davix
     ftgl
     gl2ps
     glew
@@ -58,21 +81,27 @@ stdenv.mkDerivation rec {
     zlib
     zstd
     lapack
+    libxcrypt
     libxml2
-    llvm_9
+    llvm_13
     lz4
     xz
     gsl
+    gtest
     openblas
+    openssl
     xxHash
     libAfterImage
     giflib
     libjpeg
     libtiff
     libpng
-    nlohmann_json
+    patchRcPathCsh
+    patchRcPathFish
+    patchRcPathPosix
     python.pkgs.numpy
     tbb
+    xrootd
   ]
   ++ lib.optionals (!stdenv.isDarwin) [ libX11 libXpm libXft libXext libGLU libGL ]
   ++ lib.optionals (stdenv.isDarwin) [ Cocoa CoreSymbolication OpenGL ]
@@ -80,27 +109,15 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./sw_vers.patch
-
-    # Fix builtin_llvm=OFF support
-    (fetchpatch {
-      url = "https://github.com/root-project/root/commit/0cddef5d3562a89fe254e0036bb7d5ca8a5d34d2.diff";
-      excludes = [ "interpreter/cling/tools/plugins/clad/CMakeLists.txt" ];
-      sha256 = "sha256-VxWUbxRHB3O6tERFQdbGI7ypDAZD3sjSi+PYfu1OAbM=";
-    })
   ];
-
-  # Fix build against vanilla LLVM 9
-  postPatch = ''
-    sed \
-      -e '/#include "llvm.*RTDyldObjectLinkingLayer.h"/i#define private protected' \
-      -e '/#include "llvm.*RTDyldObjectLinkingLayer.h"/a#undef private' \
-      -i interpreter/cling/lib/Interpreter/IncrementalJIT.h
-  '';
 
   preConfigure = ''
     rm -rf builtins/*
     substituteInPlace cmake/modules/SearchInstalledSoftware.cmake \
       --replace 'set(lcgpackages ' '#set(lcgpackages '
+
+    substituteInPlace interpreter/llvm/src/tools/clang/tools/driver/CMakeLists.txt \
+      --replace 'add_clang_symlink(''${link} clang)' ""
 
     # Don't require textutil on macOS
     : > cmake/modules/RootCPack.cmake
@@ -116,6 +133,8 @@ stdenv.mkDerivation rec {
     # Eliminate impure reference to /System/Library/PrivateFrameworks
     substituteInPlace core/CMakeLists.txt \
       --replace "-F/System/Library/PrivateFrameworks" ""
+  '' + lib.optionalString (stdenv.isDarwin && lib.versionAtLeast stdenv.hostPlatform.darwinMinVersion "11") ''
+    MACOSX_DEPLOYMENT_TARGET=10.16
   '';
 
   cmakeFlags = [
@@ -124,6 +143,8 @@ stdenv.mkDerivation rec {
     "-DCMAKE_INSTALL_LIBDIR=lib"
     "-DCMAKE_INSTALL_INCLUDEDIR=include"
     "-Dbuiltin_llvm=OFF"
+    "-Dbuiltin_freetype=OFF"
+    "-Dbuiltin_gtest=OFF"
     "-Dbuiltin_nlohmannjson=OFF"
     "-Dbuiltin_openui5=OFF"
     "-Dalien=OFF"
@@ -131,12 +152,13 @@ stdenv.mkDerivation rec {
     "-Dcastor=OFF"
     "-Dchirp=OFF"
     "-Dclad=OFF"
-    "-Ddavix=OFF"
+    "-Ddavix=ON"
     "-Ddcache=OFF"
     "-Dfail-on-missing=ON"
     "-Dfftw3=OFF"
     "-Dfitsio=OFF"
     "-Dfortran=OFF"
+    "-Dgnuinstall=ON"
     "-Dimt=ON"
     "-Dgfal=OFF"
     "-Dgviz=OFF"
@@ -155,12 +177,12 @@ stdenv.mkDerivation rec {
     "-Drfio=OFF"
     "-Droot7=OFF"
     "-Dsqlite=OFF"
-    "-Dssl=OFF"
+    "-Dssl=ON"
     "-Dtmva=ON"
     "-Dvdt=OFF"
     "-Dwebgui=OFF"
     "-Dxml=ON"
-    "-Dxrootd=OFF"
+    "-Dxrootd=ON"
   ]
   ++ lib.optional (stdenv.cc.libc != null) "-DC_INCLUDE_DIRS=${lib.getDev stdenv.cc.libc}/include"
   ++ lib.optionals stdenv.isDarwin [
@@ -172,13 +194,62 @@ stdenv.mkDerivation rec {
     "-Druntime_cxxmodules=OFF"
   ];
 
+  # Workaround the xrootd runpath bug #169677 by prefixing [DY]LD_LIBRARY_PATH with ${lib.makeLibraryPath xrootd}.
+  # TODO: Remove the [DY]LDLIBRARY_PATH prefix for xrootd when #200830 get merged.
   postInstall = ''
     for prog in rootbrowse rootcp rooteventselector rootls rootmkdir rootmv rootprint rootrm rootslimtree; do
       wrapProgram "$out/bin/$prog" \
         --set PYTHONPATH "$out/lib" \
-        --set ${lib.optionalString stdenv.isDarwin "DY"}LD_LIBRARY_PATH "$out/lib"
+        --set ${lib.optionalString stdenv.isDarwin "DY"}LD_LIBRARY_PATH "$out/lib:${lib.makeLibraryPath [ xrootd ]}"
     done
+
+    # Make ldd and sed available to the ROOT executable by prefixing PATH.
+    wrapProgram "$out/bin/root" \
+      --prefix PATH : "${lib.makeBinPath [
+        gnused # sed
+        stdenv.cc # c++ ld etc.
+        stdenv.cc.libc # ldd
+      ]}" \
+      --prefix ${lib.optionalString stdenv.hostPlatform.isDarwin "DY"}LD_LIBRARY_PATH : "${lib.makeLibraryPath [ xrootd ]}"
+
+    # Patch thisroot.{sh,csh,fish}
+
+    # The main target of `thisroot.sh` is "bash-like shells",
+    # but it also need to support Bash-less POSIX shell like dash,
+    # as they are mentioned in `thisroot.sh`.
+
+    patchRcPathPosix "$out/bin/thisroot.sh" "${lib.makeBinPath [
+      coreutils # dirname tail
+      gnugrep # grep
+      gnused # sed
+      lsof # lsof
+      man # manpath
+      procps # ps
+      which # which
+    ]}"
+    patchRcPathCsh "$out/bin/thisroot.csh" "${lib.makeBinPath [
+      coreutils
+      gnugrep
+      gnused
+      lsof # lsof
+      man
+      which
+    ]}"
+    patchRcPathFish "$out/bin/thisroot.fish" "${lib.makeBinPath [
+      coreutils
+      man
+      which
+    ]}"
   '';
+
+  # To use the debug information on the fly (without installation)
+  # add the outPath of root.debug into NIX_DEBUG_INFO_DIRS (in PATH-like format)
+  # and make sure that gdb from Nixpkgs can be found in PATH.
+  #
+  # Darwin currently fails to support it (#203380)
+  # we set it to true hoping to benefit from the future fix.
+  # Before that, please make sure if root.debug exists before using it.
+  separateDebugInfo = true;
 
   setupHook = ./setup-hook.sh;
 

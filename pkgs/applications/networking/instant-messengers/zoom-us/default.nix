@@ -1,6 +1,7 @@
 { stdenv
 , lib
 , fetchurl
+, pipewire
 , makeWrapper
 , xar
 , cpio
@@ -29,6 +30,7 @@
 , libxkbcommon
 , udev
 , zlib
+, libkrb5
   # Runtime
 , coreutils
 , pciutils
@@ -43,24 +45,26 @@ let
   throwSystem = throw "Unsupported system: ${system}";
 
   # Zoom versions are released at different times for each platform
-  version = {
-    aarch64-darwin = "5.10.4.6592";
-    x86_64-darwin = "5.10.4.6592";
-    x86_64-linux = "5.10.6.3192";
-   }.${system} or throwSystem;
+  # and often with different versions.  We write them on three lines
+  # like this (rather than using {}) so that the updater script can
+  # find where to edit them.
+  versions.aarch64-darwin = "5.16.1.23158";
+  versions.x86_64-darwin = "5.16.1.23158";
+  versions.x86_64-linux = "5.16.1.8561";
 
   srcs = {
     aarch64-darwin = fetchurl {
-       url = "https://zoom.us/client/${version}/Zoom.pkg?archType=arm64";
-       sha256 = "0jg5f9hvb67hhfnifpx5fzz65fcijldy1znlia6pqflxwci3m5rq";
+      url = "https://zoom.us/client/${versions.aarch64-darwin}/zoomusInstallerFull.pkg?archType=arm64";
+      name = "zoomusInstallerFull.pkg";
+      hash = "sha256-D3eYHbnNSLLmOh7eIT2+J7PubhBZONqHThB6ibJLqGY=";
     };
     x86_64-darwin = fetchurl {
-      url = "https://zoom.us/client/${version}/Zoom.pkg";
-      sha256 = "1p83691bid8kz5mw09x6l9zvjglfszi5vbhfmbbpiqhiqcxlfz83";
+      url = "https://zoom.us/client/${versions.x86_64-darwin}/zoomusInstallerFull.pkg";
+      hash = "sha256-kvnaHwwWUiJmNsef6H5S/JHHtQgfFJd9rWwzTvi05g0=";
     };
     x86_64-linux = fetchurl {
-      url = "https://zoom.us/client/${version}/zoom_x86_64.pkg.tar.xz";
-      sha256 = "8QIkF5+875VFoGK6T0CROsqML6bJDG934c1gkuz8Klk=";
+      url = "https://zoom.us/client/${versions.x86_64-linux}/zoom_x86_64.pkg.tar.xz";
+      hash = "sha256-zT0qGl8ODIcBISiRQ184aVr9hE8ZHnYatolqcsS6dpo=";
     };
   };
 
@@ -76,6 +80,7 @@ let
     expat
     libdrm
     libGL
+    pipewire
     fontconfig
     freetype
     gtk3
@@ -98,16 +103,19 @@ let
     xorg.libxshmfence
     xorg.xcbutilimage
     xorg.xcbutilkeysyms
+    xorg.xcbutilrenderutil
+    xorg.xcbutilwm
     xorg.libXfixes
     xorg.libXtst
     udev
     zlib
+    libkrb5
   ] ++ lib.optional (pulseaudioSupport) libpulseaudio);
 
 in
 stdenv.mkDerivation rec {
   pname = "zoom";
-  inherit version;
+  version = versions.${system} or throwSystem;
 
   src = srcs.${system} or throwSystem;
 
@@ -148,7 +156,7 @@ stdenv.mkDerivation rec {
     substituteInPlace $out/share/applications/Zoom.desktop \
         --replace "Exec=/usr/bin/zoom" "Exec=$out/bin/zoom"
 
-    for i in zopen zoom ZoomLauncher; do
+    for i in aomhost zopen zoom ZoomLauncher; do
       patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/opt/zoom/$i
     done
 
@@ -183,8 +191,10 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://zoom.us/";
     description = "zoom.us video conferencing application";
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.unfree;
     platforms = builtins.attrNames srcs;
-    maintainers = with maintainers; [ danbst tadfisher doronbehar ];
+    maintainers = with maintainers; [ danbst tadfisher ];
+    mainProgram = "zoom";
   };
 }

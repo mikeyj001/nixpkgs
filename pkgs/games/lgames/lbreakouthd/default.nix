@@ -1,19 +1,20 @@
 { lib
 , stdenv
 , fetchurl
+, directoryListingUpdater
 , SDL2
 , SDL2_image
 , SDL2_mixer
 , SDL2_ttf
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "lbreakouthd";
-  version = "1.0.9";
+  version = "1.1.3";
 
   src = fetchurl {
-    url = "mirror://sourceforge/lgames/${pname}-${version}.tar.gz";
-    hash = "sha256-MHwK4jeDfZSS4jh///jW0/q4ntM4IuB0fQ8Bsaq0d0s=";
+    url = "mirror://sourceforge/lgames/lbreakouthd-${finalAttrs.version}.tar.gz";
+    hash = "sha256-BpF583f2if4FeJ2Fi/8GZYuh5T37GXdNq/Ww4LM65wY=";
   };
 
   buildInputs = [
@@ -25,12 +26,18 @@ stdenv.mkDerivation rec {
 
   hardeningDisable = [ "format" ];
 
-  meta = with lib; {
-    broken = stdenv.isDarwin;
+  passthru.updateScript = directoryListingUpdater {
+    inherit (finalAttrs) pname version;
+    url = "https://lgames.sourceforge.io/LBreakoutHD/";
+    extraRegex = "(?!.*-win(32|64)).*";
+  };
+
+  meta = {
     homepage = "https://lgames.sourceforge.io/LBreakoutHD/";
     description = "A widescreen Breakout clone";
-    license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ AndersonTorres ];
+    license = lib.licenses.gpl2Plus;
+    maintainers = with lib.maintainers; [ AndersonTorres ];
     inherit (SDL2.meta) platforms;
+    broken = stdenv.isDarwin;
   };
-}
+})

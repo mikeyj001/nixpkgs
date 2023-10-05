@@ -9,7 +9,7 @@
 
 buildPythonPackage rec {
   pname = "pyclipper";
-  version = "1.3.0.post2";
+  version = "1.3.0.post4";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -17,8 +17,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "fonttools";
     repo = pname;
-    rev = version;
-    hash = "sha256-AFdfzM1zdhmfh3Uu5fFVOMWStbuHxKS3FovZPTeuNFA=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-FMqOZ0WOorTtbdweeu9UdoUNWOPrcwc+0SK+55XxyQQ=";
   };
 
   SETUPTOOLS_SCM_PRETEND_VERSION = version;
@@ -28,7 +28,7 @@ buildPythonPackage rec {
     cython
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

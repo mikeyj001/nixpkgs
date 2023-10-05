@@ -21,7 +21,7 @@ set which contains `emacs.pkgs.withPackages`. For example, to override
 `emacs.pkgs.emacs.pkgs.withPackages`,
 ```
 let customEmacsPackages =
-      emacs.pkgs.overrideScope' (self: super: {
+      emacs.pkgs.overrideScope (self: super: {
         # use a custom version of emacs
         emacs = ...;
         # use the unstable MELPA version of magit
@@ -32,32 +32,25 @@ in customEmacsPackages.withPackages (epkgs: [ epkgs.evil epkgs.magit ])
 
 */
 
-{ lib, lndir, makeWrapper, runCommand, gcc }: self:
-
-with lib;
-
+{ lib, lndir, makeBinaryWrapper, runCommand, gcc }:
+self:
 let
-
   inherit (self) emacs;
-
-  nativeComp = emacs.nativeComp or false;
-
+  withNativeCompilation = emacs.withNativeCompilation or emacs.nativeComp or false;
+  withTreeSitter = emacs.withTreeSitter or emacs.treeSitter or false;
 in
-
 packagesFun: # packages explicitly requested by the user
-
 let
   explicitRequires =
     if lib.isFunction packagesFun
-      then packagesFun self
+    then packagesFun self
     else packagesFun;
 in
-
 runCommand
-  (appendToName "with-packages" emacs).name
+  (lib.appendToName "with-packages" emacs).name
   {
-    nativeBuildInputs = [ emacs lndir makeWrapper ];
     inherit emacs explicitRequires;
+    nativeBuildInputs = [ emacs lndir makeBinaryWrapper ];
 
     preferLocalBuild = true;
     allowSubstitutes = false;
@@ -65,10 +58,12 @@ runCommand
     # Store all paths we want to add to emacs here, so that we only need to add
     # one path to the load lists
     deps = runCommand "emacs-packages-deps"
-      {
+      ({
         inherit explicitRequires lndir emacs;
-        nativeBuildInputs = lib.optional nativeComp gcc;
-      }
+        nativeBuildInputs = lib.optional withNativeCompilation gcc;
+      } // lib.optionalAttrs withNativeCompilation {
+        inherit (emacs) LIBRARY_PATH;
+      })
       ''
         findInputsOld() {
           local pkg="$1"; shift
@@ -106,8 +101,11 @@ runCommand
         }
         mkdir -p $out/bin
         mkdir -p $out/share/emacs/site-lisp
-        ${optionalString nativeComp ''
+        ${lib.optionalString withNativeCompilation ''
           mkdir -p $out/share/emacs/native-lisp
+        ''}
+        ${lib.optionalString withTreeSitter ''
+          mkdir -p $out/lib
         ''}
 
         local requires
@@ -130,21 +128,18 @@ runCommand
         linkEmacsPackage() {
           linkPath "$1" "bin" "bin"
           linkPath "$1" "share/emacs/site-lisp" "share/emacs/site-lisp"
-          ${optionalString nativeComp ''
+          ${lib.optionalString withNativeCompilation ''
             linkPath "$1" "share/emacs/native-lisp" "share/emacs/native-lisp"
           ''}
+          ${lib.optionalString withTreeSitter ''
+            linkPath "$1" "lib" "lib"
+          ''}
         }
-
-        siteAutoloads="$out/share/emacs/site-lisp/nix-generated-autoload.el"
-        touch $siteAutoloads
 
         # Iterate over the array of inputs (avoiding nix's own interpolation)
         for pkg in "''${requires[@]}"; do
           linkEmacsPackage $pkg
-          find $pkg -name "*-autoloads.el" \
-              -exec echo \(load \"{}\" \'noerror \'nomessage\) \; >> $siteAutoloads
         done
-        echo "(provide 'nix-generated-autoload)" >> $siteAutoloads
 
         siteStart="$out/share/emacs/site-lisp/site-start.el"
         siteStartByteCompiled="$siteStart"c
@@ -164,11 +159,12 @@ runCommand
         rm -f $siteStart $siteStartByteCompiled $subdirs $subdirsByteCompiled
         cat >"$siteStart" <<EOF
         (let ((inhibit-message t))
-          (load-file "$emacs/share/emacs/site-lisp/site-start.el"))
-        (add-to-list 'load-path "$out/share/emacs/site-lisp")
+          (load "$emacs/share/emacs/site-lisp/site-start"))
+        ;; "$out/share/emacs/site-lisp" is added to load-path in wrapper.sh
+        ;; "$out/share/emacs/native-lisp" is added to native-comp-eln-load-path in wrapper.sh
         (add-to-list 'exec-path "$out/bin")
-        ${optionalString nativeComp ''
-          (add-to-list 'native-comp-eln-load-path "$out/share/emacs/native-lisp/")
+        ${lib.optionalString withTreeSitter ''
+          (add-to-list 'treesit-extra-load-path "$out/lib/")
         ''}
         EOF
 
@@ -180,12 +176,12 @@ runCommand
           > "$subdirs"
 
         # Byte-compiling improves start-up time only slightly, but costs nothing.
-        $emacs/bin/emacs --batch -f batch-byte-compile "$siteStart" "$subdirs" "$siteAutoloads"
+        $emacs/bin/emacs --batch -f batch-byte-compile "$siteStart" "$subdirs"
 
-        ${optionalString nativeComp ''
+        ${lib.optionalString withNativeCompilation ''
           $emacs/bin/emacs --batch \
             --eval "(add-to-list 'native-comp-eln-load-path \"$out/share/emacs/native-lisp/\")" \
-            -f batch-native-compile "$siteStart" "$subdirs" "$siteAutoloads"
+            -f batch-native-compile "$siteStart" "$subdirs"
         ''}
       '';
 
@@ -197,20 +193,19 @@ runCommand
     # Wrap emacs and friends so they find our site-start.el before the original.
     for prog in $emacs/bin/*; do # */
       local progname=$(basename "$prog")
-      local autoloadExpression=""
       rm -f "$out/bin/$progname"
-      if [[ $progname == emacs ]]; then
-        # progs other than "emacs" do not understand the `-l` switches
-        autoloadExpression="-l cl-loaddefs -l nix-generated-autoload"
-      fi
 
       substitute ${./wrapper.sh} $out/bin/$progname \
         --subst-var-by bash ${emacs.stdenv.shell} \
         --subst-var-by wrapperSiteLisp "$deps/share/emacs/site-lisp" \
-        --subst-var-by wrapperSiteLispNative "$deps/share/emacs/native-lisp:" \
-        --subst-var autoloadExpression \
+        --subst-var-by wrapperSiteLispNative "$deps/share/emacs/native-lisp" \
         --subst-var prog
       chmod +x $out/bin/$progname
+      # Create a “NOP” binary wrapper for the pure sake of it becoming a
+      # non-shebang, actual binary. See the makeBinaryWrapper docs for rationale
+      # (summary: it allows you to use emacs as a shebang itself on Darwin,
+      # e.g. #!$ {emacs}/bin/emacs --script)
+      wrapProgramBinary $out/bin/$progname
     done
 
     # Wrap MacOS app
@@ -227,15 +222,15 @@ runCommand
       substitute ${./wrapper.sh} $out/Applications/Emacs.app/Contents/MacOS/Emacs \
         --subst-var-by bash ${emacs.stdenv.shell} \
         --subst-var-by wrapperSiteLisp "$deps/share/emacs/site-lisp" \
-        --subst-var-by wrapperSiteLispNative "$deps/share/emacs/native-lisp:" \
-        --subst-var-by autoloadExpression "-l cl-loaddefs -l nix-generated-autoload" \
+        --subst-var-by wrapperSiteLispNative "$deps/share/emacs/native-lisp" \
         --subst-var-by prog "$emacs/Applications/Emacs.app/Contents/MacOS/Emacs"
       chmod +x $out/Applications/Emacs.app/Contents/MacOS/Emacs
+      wrapProgramBinary $out/Applications/Emacs.app/Contents/MacOS/Emacs
     fi
 
     mkdir -p $out/share
     # Link icons and desktop files into place
-    for dir in applications icons info man emacs; do
+    for dir in applications icons info man; do
       ln -s $emacs/share/$dir $out/share/$dir
     done
   ''

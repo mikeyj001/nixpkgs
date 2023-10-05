@@ -1,97 +1,56 @@
-{ lib, stdenv, fetchurl, fetchFromGitHub, buildGoPackage, buildEnv
+{ lib
+, buildGoModule
+, fetchFromGitHub
+, fetchpatch
+, fetchurl
+, nixosTests
+}:
 
-# The suffix for the Mattermost version.
-, versionSuffix ? "nixpkgs"
+buildGoModule rec {
+  pname = "mattermost";
+  version = "8.1.2";
 
-# The constant build date.
-, buildDate ? "1970-01-01"
+  src = fetchFromGitHub {
+    owner = "mattermost";
+    repo = "mattermost";
+    rev = "v${version}";
+    hash = "sha256-hOt3xqrCs7akWyCv/6keiZN0ReF2adwiQNVibKFG3mk=";
+  } + "/server";
 
-# Set to true to set the build hash to the Nix store path.
-, storePathAsBuildHash ? false }:
-
-let
-  version = "6.3.6";
-
-  goPackagePath = "github.com/mattermost/mattermost-server";
-
-  mattermost-server-build = buildGoPackage rec {
-    pname = "mattermost-server";
-    inherit version goPackagePath;
-
-    src = fetchFromGitHub {
-      owner = "mattermost";
-      repo = "mattermost-server";
-      rev = "v${version}";
-      sha256 = "905zxMucDTxxrLoh5ZoAExW4eFmi+xa98aI3EpJZ2Og=";
-    };
-
-    ldflags = [
-      "-s" "-w"
-      "-X ${goPackagePath}/model.BuildNumber=${version}${lib.optionalString (versionSuffix != null) "-${versionSuffix}"}"
-      "-X ${goPackagePath}/model.BuildDate=${buildDate}"
-      "-X ${goPackagePath}/model.BuildEnterpriseReady=false"
-    ];
+  webapp = fetchurl {
+    url = "https://releases.mattermost.com/${version}/mattermost-${version}-linux-amd64.tar.gz";
+    hash = "sha256-cIfUIGp51dyfmY3LnV+1F9CX+y5XyTCez6R8TLLz9fo=";
   };
 
-  mattermost-server = if storePathAsBuildHash then mattermost-server-build.overrideAttrs (orig: {
-    buildPhase = ''
-      origGo="$(type -p go)"
+  vendorHash = "sha256-3OZUWg4e2h7g15FXxiFKk2EXceHP4phBTpyy/uY2Ni4=";
 
-      # Override the Go binary to set the build hash in -ldflags to $out.
-      # Technically this is more accurate than a Git hash!
-      # nixpkgs does not appear to support environment variables in ldflags
-      # for go packages, so we have to rewrite -ldflags before calling go.
-      go() {
-        local args=()
-        local ldflags="-X ${goPackagePath}/model.BuildHash=$out"
-        local found=0
-        for arg in "$@"; do
-          if [[ "$arg" == -ldflags=* ]] && [ $found -eq 0 ]; then
-            arg="-ldflags=''${ldflags} ''${arg#-ldflags=}"
-            found=1
-          fi
-          args+=("$arg")
-        done
-        "$origGo" "''${args[@]}"
-      }
+  subPackages = [ "cmd/mattermost" ];
 
-      ${orig.buildPhase}
-    '';
-  }) else mattermost-server-build;
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/mattermost/mattermost/server/public/model.Version=${version}"
+    "-X github.com/mattermost/mattermost/server/public/model.BuildNumber=${version}-nixpkgs"
+    "-X github.com/mattermost/mattermost/server/public/model.BuildDate=1970-01-01"
+    "-X github.com/mattermost/mattermost/server/public/model.BuildHash=v${version}"
+    "-X github.com/mattermost/mattermost/server/public/model.BuildHashEnterprise=v${version}"
+    "-X github.com/mattermost/mattermost/server/public/model.BuildEnterpriseReady=false"
+  ];
 
-  mattermost-webapp = stdenv.mkDerivation {
-    pname = "mattermost-webapp";
-    inherit version;
+  postInstall = ''
+    tar --strip 1 --directory $out -xf $webapp \
+      mattermost/{client,i18n,fonts,templates,config}
 
-    src = fetchurl {
-      url = "https://releases.mattermost.com/${version}/mattermost-${version}-linux-amd64.tar.gz";
-      sha256 = "JDsCDZEtbeBTYuzOSwrxFNRKXy+9KXirjaCz6ODP5uw=";
-    };
+    # For some reason a bunch of these files are executable
+    find $out/{client,i18n,fonts,templates,config} -type f -exec chmod -x {} \;
+  '';
 
-    installPhase = ''
-      mkdir -p $out
-      tar --strip 1 --directory $out -xf $src \
-        mattermost/client \
-        mattermost/i18n \
-        mattermost/fonts \
-        mattermost/templates \
-        mattermost/config
+  passthru.tests.mattermost = nixosTests.mattermost;
 
-      # For some reason a bunch of these files are +x...
-      find $out -type f -exec chmod -x {} \;
-    '';
+  meta = with lib; {
+    description = "Mattermost is an open source platform for secure collaboration across the entire software development lifecycle";
+    homepage = "https://www.mattermost.org";
+    license = with licenses; [ agpl3 asl20 ];
+    maintainers = with maintainers; [ ryantm numinit kranzes ];
   };
-
-in
-  buildEnv {
-    name = "mattermost-${version}";
-    paths = [ mattermost-server mattermost-webapp ];
-
-    meta = with lib; {
-      description = "Open-source, self-hosted Slack-alternative";
-      homepage = "https://www.mattermost.org";
-      license = with licenses; [ agpl3 asl20 ];
-      maintainers = with maintainers; [ fpletz ryantm numinit ];
-      platforms = platforms.unix;
-    };
-  }
+}

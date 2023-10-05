@@ -1,88 +1,145 @@
 { lib
 , stdenv
-, bokeh
 , buildPythonPackage
-, cloudpickle
-, distributed
 , fetchFromGitHub
-, fetchpatch
+
+# build-system
+, setuptools
+, wheel
+
+# dependencies
+, click
+, cloudpickle
 , fsspec
-, jinja2
-, numpy
+, importlib-metadata
 , packaging
-, pandas
 , partd
+, pyyaml
+, toolz
+
+# optional-dependencies
+, numpy
+, pyarrow
+, lz4
+, pandas
+, distributed
+, bokeh
+, jinja2
+
+# tests
+, arrow-cpp
+, hypothesis
+, pytest-asyncio
 , pytest-rerunfailures
 , pytest-xdist
 , pytestCheckHook
 , pythonOlder
-, pyyaml
-, toolz
 }:
 
 buildPythonPackage rec {
   pname = "dask";
-  version = "2022.02.1";
-  format = "setuptools";
+  version = "2023.8.0";
+  format = "pyproject";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "dask";
-    repo = pname;
-    rev = version;
-    hash = "sha256-A8ktvfpow/QKAEEt9SUnkTqYFJCrV1mgnuDIP3gdyrE=";
+    repo = "dask";
+    rev = "refs/tags/${version}";
+    hash = "sha256-ZKjfxTJCu3EUOKz16+VP8+cPqQliFNc7AU1FPC1gOXw=";
   };
 
+  nativeBuildInputs = [
+    setuptools
+    wheel
+  ];
+
   propagatedBuildInputs = [
+    click
     cloudpickle
     fsspec
     packaging
     partd
     pyyaml
+    importlib-metadata
     toolz
-    pandas
-    jinja2
-    bokeh
-    numpy
   ];
 
-  doCheck = true;
+  passthru.optional-dependencies = lib.fix (self: {
+    array = [
+      numpy
+    ];
+    complete = [
+      pyarrow
+      lz4
+    ]
+    ++ self.array
+    ++ self.dataframe
+    ++ self.distributed
+    ++ self.diagnostics;
+    dataframe = [
+      numpy
+      pandas
+    ];
+    distributed = [
+      distributed
+    ];
+    diagnostics = [
+      bokeh
+      jinja2
+    ];
+  });
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-rerunfailures
     pytest-xdist
+    # from panda[test]
+    hypothesis
+    pytest-asyncio
+  ] ++ lib.optionals (!arrow-cpp.meta.broken) [ # support is sparse on aarch64
+    pyarrow
   ];
 
   dontUseSetuptoolsCheck = true;
 
   postPatch = ''
-    # versioneer hack to set version of github package
+    # versioneer hack to set version of GitHub package
     echo "def get_versions(): return {'dirty': False, 'error': None, 'full-revisionid': None, 'version': '${version}'}" > dask/_version.py
 
     substituteInPlace setup.py \
+      --replace "import versioneer" "" \
       --replace "version=versioneer.get_version()," "version='${version}'," \
       --replace "cmdclass=versioneer.get_cmdclass()," ""
+
+    substituteInPlace pyproject.toml \
+      --replace ', "versioneer[toml]==0.28"' "" \
+      --replace " --durations=10" "" \
+      --replace " --cov-config=pyproject.toml" "" \
+      --replace "\"-v" "\" "
   '';
 
   pytestFlagsArray = [
-    # rerun failed tests up to three times
+    # Rerun failed tests up to three times
     "--reruns 3"
-    # don't run tests that require network access
+    # Don't run tests that require network access
     "-m 'not network'"
   ];
 
   disabledTests = lib.optionals stdenv.isDarwin [
-    # this test requires features of python3Packages.psutil that are
+    # Test requires features of python3Packages.psutil that are
     # blocked in sandboxed-builds
     "test_auto_blocksize_csv"
+    # AttributeError: 'str' object has no attribute 'decode'
+    "test_read_dir_nometa"
   ] ++ [
-    # A deprecation warning from newer sqlalchemy versions makes these tests
-    # to fail https://github.com/dask/dask/issues/7406
-    "test_sql"
-    # Test interrupt fails intermittently https://github.com/dask/dask/issues/2192
-    "test_interrupt"
+    # https://github.com/dask/dask/issues/10347#issuecomment-1589683941
+    "test_concat_categorical"
+    # AttributeError: 'ArrowStringArray' object has no attribute 'tobytes'. Did you mean: 'nbytes'?
+    "test_dot"
+    "test_dot_nan"
+    "test_merge_column_with_nulls"
   ];
 
   __darwinAllowLocalNetworking = true;
@@ -97,10 +154,6 @@ buildPythonPackage rec {
     "dask.dataframe.tseries"
     "dask.diagnostics"
   ];
-
-  passthru.optional-dependencies = {
-    complete = [ distributed ];
-  };
 
   meta = with lib; {
     description = "Minimal task scheduling abstraction";

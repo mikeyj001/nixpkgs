@@ -1,25 +1,24 @@
-{ lib, buildGoModule, fetchFromGitHub, copyDesktopItems }:
+{ lib, buildGoModule, fetchFromGitHub }:
 
 buildGoModule rec {
   pname = "NoiseTorch";
-  version = "0.11.5";
+  version = "0.12.2";
 
   src = fetchFromGitHub {
-    owner = "lawl";
+    owner = "noisetorch";
     repo = "NoiseTorch";
-    rev = version;
-    sha256 = "sha256-j/6XB3vA5LvTuCxmeB0HONqEDzYg210AWW/h3nCGOD8=";
+    rev = "v${version}";
+    fetchSubmodules = true;
+    sha256 = "sha256-gOPSMPH99Upi/30OnAdwSb7SaMV0i/uHB051cclfz6A=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
   doCheck = false;
 
-  ldflags = [ "-X main.version=${version}"  "-X main.distribution=nix" ];
+  ldflags = [ "-s" "-w" "-X main.version=${version}" "-X main.distribution=nixpkgs" ];
 
   subPackages = [ "." ];
-
-  nativeBuildInputs = [ copyDesktopItems ];
 
   preBuild = ''
     make -C c/ladspa/
@@ -29,14 +28,12 @@ buildGoModule rec {
 
   postInstall = ''
     install -D ./assets/icon/noisetorch.png $out/share/icons/hicolor/256x256/apps/noisetorch.png
-    copyDesktopItems assets/noisetorch.desktop $out/share/applications/
+    install -Dm444 ./assets/noisetorch.desktop $out/share/applications/noisetorch.desktop
   '';
 
   meta = with lib; {
-    insecure = true;
-    knownVulnerabilities = [ "https://github.com/lawl/NoiseTorch/releases/tag/0.11.6" ];
     description = "Virtual microphone device with noise supression for PulseAudio";
-    homepage = "https://github.com/lawl/NoiseTorch";
+    homepage = "https://github.com/noisetorch/NoiseTorch";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
     maintainers = with maintainers; [ panaeon lom ];

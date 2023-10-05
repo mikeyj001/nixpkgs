@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p "$out"/{share/java,bin}
-    cp ./build/*.jar "$out/share/java/"
+    cp ./build/*.jar ./lib/resolver.jar "$out/share/java/"
 
     for tool in jing trang; do
     cat > "$out/bin/$tool" <<EOF
@@ -46,6 +46,10 @@ stdenv.mkDerivation rec {
     # for downloads and call it the "project site".
     homepage = "https://www.thaiopensource.com/relaxng/trang.html";
     platforms = platforms.unix;
+    sourceProvenance = with sourceTypes; [
+      fromSource
+      binaryBytecode  # source bundles dependencies as jars
+    ];
     maintainers = [ maintainers.bjornfor ];
   };
 }

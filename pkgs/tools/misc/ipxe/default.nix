@@ -1,8 +1,9 @@
-{ stdenv, lib, fetchFromGitHub, unstableGitUpdater
+{ stdenv, lib, fetchFromGitHub, unstableGitUpdater, buildPackages
 , gnu-efi, mtools, openssl, perl, xorriso, xz
 , syslinux ? null
 , embedScript ? null
 , additionalTargets ? {}
+, additionalOptions ? []
 }:
 
 let
@@ -29,15 +30,18 @@ in
 
 stdenv.mkDerivation rec {
   pname = "ipxe";
-  version = "unstable-2022-04-06";
+  version = "unstable-2023-07-19";
 
   nativeBuildInputs = [ gnu-efi mtools openssl perl xorriso xz ] ++ lib.optional stdenv.hostPlatform.isx86 syslinux;
+  depsBuildBuild = [ buildPackages.stdenv.cc ];
+
+  strictDeps = true;
 
   src = fetchFromGitHub {
     owner = "ipxe";
     repo = "ipxe";
-    rev = "70995397e5bdfd3431e12971aa40630c7014785f";
-    sha256 = "SrTNEYk13JXAcJuogm9fZ7CrzJIDRc0aziGdjRNv96I=";
+    rev = "c1834f323f4f6b9b46cd5895b1457a117381363f";
+    hash = "sha256-fJeDgm+OaItshWFliq08Y0BPDD2FCkezeEp7trqWNjA=";
   };
 
   postPatch = lib.optionalString stdenv.hostPlatform.isAarch64 ''
@@ -47,10 +51,11 @@ stdenv.mkDerivation rec {
   # not possible due to assembler code
   hardeningDisable = [ "pic" "stackprotector" ];
 
-  NIX_CFLAGS_COMPILE = "-Wno-error";
+  env.NIX_CFLAGS_COMPILE = "-Wno-error";
 
   makeFlags =
     [ "ECHO_E_BIN_ECHO=echo" "ECHO_E_BIN_ECHO_E=echo" # No /bin/echo here.
+      "CROSS=${stdenv.cc.targetPrefix}"
     ] ++ lib.optional (embedScript != null) "EMBED=${embedScript}";
 
 
@@ -59,7 +64,7 @@ stdenv.mkDerivation rec {
     "IMAGE_TRUST_CMD"
     "DOWNLOAD_PROTO_HTTP"
     "DOWNLOAD_PROTO_HTTPS"
-  ];
+  ] ++ additionalOptions;
 
   configurePhase = ''
     runHook preConfigure

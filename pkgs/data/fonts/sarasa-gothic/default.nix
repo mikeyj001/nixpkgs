@@ -1,21 +1,27 @@
-{ lib, fetchurl, libarchive }:
+{ lib, stdenvNoCC, fetchurl, p7zip }:
 
-let
-  version = "0.36.2";
-in fetchurl {
-  name = "sarasa-gothic-${version}";
+stdenvNoCC.mkDerivation rec {
+  pname = "sarasa-gothic";
+  version = "0.42.1";
 
-  # Use the 'ttc' files here for a smaller closure size.
-  # (Using 'ttf' files gives a closure size about 15x larger, as of November 2021.)
-  url = "https://github.com/be5invis/Sarasa-Gothic/releases/download/v${version}/sarasa-gothic-ttc-${version}.7z";
-  sha256 = "sha256-hUQi8mbtQC+peslaz+AVINjELVXseuVi44qbDBtJ+fc=";
+  src = fetchurl {
+    # Use the 'ttc' files here for a smaller closure size.
+    # (Using 'ttf' files gives a closure size about 15x larger, as of November 2021.)
+    url = "https://github.com/be5invis/Sarasa-Gothic/releases/download/v${version}/sarasa-gothic-ttc-${version}.7z";
+    hash = "sha256-e6ig+boWzYiOzENkIsj/z9FFt2pZc+T0dYoFoeONMFM=";
+  };
 
-  recursiveHash = true;
-  downloadToTemp = true;
+  sourceRoot = ".";
 
-  postFetch = ''
+  nativeBuildInputs = [ p7zip ];
+
+  installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/share/fonts/truetype
-    ${libarchive}/bin/bsdtar -xf $downloadedFile -C $out/share/fonts/truetype
+    cp *.ttc $out/share/fonts/truetype
+
+    runHook postInstall
   '';
 
   meta = with lib; {

@@ -11,13 +11,14 @@
 , markdown
 , testers
 , tomlkit
+, typing-extensions
 , staticjinja
 , callPackage
 }:
 
 buildPythonPackage rec {
   pname = "staticjinja";
-  version = "4.1.2";
+  version = "5.0.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.6";
@@ -27,7 +28,7 @@ buildPythonPackage rec {
     owner = "staticjinja";
     repo = pname;
     rev = version;
-    sha256 = "0qqyadhqsn66b7qrpfj08qc899pjwfa2byqqzh73xq1n22i4cy30";
+    hash = "sha256-LfJTQhZtnTOm39EWF1m2MP5rxz/5reE0G1Uk9L7yx0w=";
   };
 
   nativeBuildInputs = [
@@ -40,11 +41,12 @@ buildPythonPackage rec {
     easywatch
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-check
     markdown
     tomlkit
+    typing-extensions
   ];
 
   # The tests need to find and call the installed staticjinja executable

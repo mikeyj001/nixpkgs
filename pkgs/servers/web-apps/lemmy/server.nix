@@ -7,10 +7,12 @@
 , libiconv
 , Security
 , protobuf
+, rustfmt
+, nixosTests
 }:
 let
   pinData = lib.importJSON ./pin.json;
-  version = pinData.version;
+  version = pinData.serverVersion;
 in
 rustPlatform.buildRustPackage rec {
   inherit version;
@@ -20,10 +22,15 @@ rustPlatform.buildRustPackage rec {
     owner = "LemmyNet";
     repo = "lemmy";
     rev = version;
-    sha256 = pinData.serverSha256;
+    hash = pinData.serverHash;
+    fetchSubmodules = true;
   };
 
-  cargoSha256 = pinData.serverCargoSha256;
+  preConfigure = ''
+    echo 'pub const VERSION: &str = "${version}";' > crates/utils/src/version.rs
+  '';
+
+  cargoHash = pinData.serverCargoHash;
 
   buildInputs = [ postgresql ]
     ++ lib.optionals stdenv.isDarwin [ libiconv Security ];
@@ -37,15 +44,16 @@ rustPlatform.buildRustPackage rec {
 
   PROTOC = "${protobuf}/bin/protoc";
   PROTOC_INCLUDE = "${protobuf}/include";
-  nativeBuildInputs = [ protobuf ];
+  nativeBuildInputs = [ protobuf rustfmt ];
 
-  passthru.updateScript = ./update.sh;
+  passthru.updateScript = ./update.py;
+  passthru.tests.lemmy-server = nixosTests.lemmy;
 
   meta = with lib; {
     description = "🐀 Building a federated alternative to reddit in rust";
     homepage = "https://join-lemmy.org/";
     license = licenses.agpl3Only;
-    maintainers = with maintainers; [ happysalada ];
+    maintainers = with maintainers; [ happysalada billewanick adisbladis ];
     mainProgram = "lemmy_server";
   };
 }

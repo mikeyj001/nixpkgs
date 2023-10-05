@@ -8,14 +8,14 @@
 
 buildPythonPackage rec {
   pname = "aiotractive";
-  version = "0.5.4";
+  version = "0.5.6";
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "zhulik";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-pcGUl8mq1O1QY5EPkNhWRLCKDn2FWAF9XymXkUXWEUk=";
+    hash = "sha256-jJw1L1++Z/r+E12tA6zoyyy4MmTpaaVVzKwfI6xcDBQ=";
   };
 
   propagatedBuildInputs = [
@@ -29,6 +29,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "aiotractive" ];
 
   meta = with lib; {
+    changelog = "https://github.com/zhulik/aiotractive/releases/tag/v${version}";
     description = "Python client for the Tractive REST API";
     homepage = "https://github.com/zhulik/aiotractive";
     license = licenses.mit;

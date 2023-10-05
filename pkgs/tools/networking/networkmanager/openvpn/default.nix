@@ -3,7 +3,7 @@
 , fetchurl
 , substituteAll
 , openvpn
-, intltool
+, gettext
 , libxml2
 , pkg-config
 , file
@@ -21,11 +21,11 @@
 
 stdenv.mkDerivation rec {
   pname = "NetworkManager-openvpn";
-  version = "1.8.18";
+  version = "1.10.2";
 
   src = fetchurl {
     url = "mirror://gnome/sources/NetworkManager-openvpn/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
-    sha256 = "U9+wrPZEeK3HKAdPFi9i5gv/YqYFvYl+uIsmfnBXkno=";
+    sha256 = "YvDyqHgiIbkj8hKsKo67wQAu/WqQ7pRdrUrftW0HbSE=";
   };
 
   patches = [
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   ];
 
   nativeBuildInputs = [
-    intltool
+    gettext
     pkg-config
     file
     libxml2

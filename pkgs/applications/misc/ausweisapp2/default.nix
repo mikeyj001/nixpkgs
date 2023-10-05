@@ -3,16 +3,22 @@
 
 mkDerivation rec {
   pname = "AusweisApp2";
-  version = "1.22.5";
+  version = "1.26.7";
 
   src = fetchFromGitHub {
     owner = "Governikus";
     repo = "AusweisApp2";
     rev = version;
-    sha256 = "sha256-EuHg8JrI6ZoyTXqD3v4cfk4/NovAj4fF2NY1V2ZF64c=";
+    hash = "sha256-i9hfmMp0pEqtIeKc1mcyINXetzD/33aM0utL8nomVcg=";
   };
 
   nativeBuildInputs = [ cmake pkg-config ];
+
+  # The build scripts copy the entire translations directory from Qt
+  # which ends up being read-only because it's in the store.
+  preBuild = ''
+    chmod +w resources/translations
+  '';
 
   buildInputs = [ qtsvg qttools qtwebsockets qtquickcontrols2 qtgraphicaleffects pcsclite ];
 

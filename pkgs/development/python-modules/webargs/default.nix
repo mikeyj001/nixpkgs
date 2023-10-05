@@ -4,12 +4,12 @@
 
 buildPythonPackage rec {
   pname = "webargs";
-  version = "8.1.0";
+  version = "8.3.0";
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "f1f0b7f054a22263cf750529fc0926709ca47da9a2c417d423ad88d9fa6a5d33";
+    hash = "sha256-yrIHlBsGhsTQhsgjYy3c1DQxUWRDQaMvz1C46qceMcc=";
   };
 
   pythonImportsCheck = [
@@ -18,7 +18,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ marshmallow ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-aiohttp
     webtest

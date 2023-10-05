@@ -8,11 +8,11 @@
 , liblinphone
 , mediastreamer
 , mediastreamer-openh264
-, minizip2
+, minizip-ng
 , mkDerivation
 , qtgraphicaleffects
 , qtquickcontrols2
-, qttranslations
+, qttools
 }:
 
 # How to update Linphone? (The Qt desktop app)
@@ -33,7 +33,7 @@
 
 mkDerivation rec {
   pname = "linphone-desktop";
-  version = "4.4.1";
+  version = "5.0.16";
 
   src = fetchFromGitLab {
     domain = "gitlab.linphone.org";
@@ -41,7 +41,7 @@ mkDerivation rec {
     group = "BC";
     repo = pname;
     rev = version;
-    sha256 = "sha256-BBOTyKMZikkxMJSmzAuChVHpVeCvbAimn1K3REGbqEg=";
+    hash = "sha256-zS0JyK+HGiHY7tPdl3RK6fJJOUS+fKM1u3npNxDAAYE=";
   };
 
   patches = [
@@ -54,7 +54,7 @@ mkDerivation rec {
   postPatch = ''
     echo "project(linphoneqt VERSION ${version})" >linphone-app/linphoneqt_version.cmake
     substituteInPlace linphone-app/src/app/AppController.cpp \
-      --replace "LINPHONE_QT_GIT_VERSION" "\"${version}\""
+      --replace "APPLICATION_SEMVER" "\"${version}\""
   '';
 
   # TODO: After linphone-desktop and liblinphone split into separate packages,
@@ -70,19 +70,22 @@ mkDerivation rec {
     mediastreamer
     mediastreamer-openh264
 
-    minizip2
+    minizip-ng
     qtgraphicaleffects
     qtquickcontrols2
-    qttranslations
   ];
 
   nativeBuildInputs = [
     cmake
+    qttools
   ];
 
   cmakeFlags = [
-    "-DMINIZIP_INCLUDE_DIRS=${minizip2}/include"
+    "-DMINIZIP_INCLUDE_DIRS=${minizip-ng}/include"
     "-DMINIZIP_LIBRARIES=minizip"
+
+    # RPATH of binary /nix/store/.../bin/... contains a forbidden reference to /build/
+    "-DCMAKE_SKIP_BUILD_RPATH=ON"
   ];
 
   # The default install phase fails because the paths are somehow messed up in

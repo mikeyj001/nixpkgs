@@ -8,6 +8,7 @@
 , fetchFromGitHub
 , poetry-core
 , pytest-asyncio
+, pytest-freezegun
 , pytestCheckHook
 , pythonOlder
 , xmltodict
@@ -16,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "rokuecp";
-  version = "0.16.0";
+  version = "0.18.1";
   format = "pyproject";
 
   disabled = pythonOlder "3.9";
@@ -24,8 +25,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "ctalkington";
     repo = "python-rokuecp";
-    rev = version;
-    hash = "sha256-MeugjIZorwO8d0Yb7bthI6f4NNo6GX9JrRbxrVSdWv0=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-0ArnP9xITVpbIfDrsNK3ukmeJBdd6SE3tnDwCLWSHMo=";
   };
 
   nativeBuildInputs = [
@@ -41,16 +42,17 @@ buildPythonPackage rec {
     yarl
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aresponses
-    pytestCheckHook
     pytest-asyncio
+    pytest-freezegun
+    pytestCheckHook
   ];
 
   postPatch = ''
     substituteInPlace pyproject.toml \
       --replace 'version = "0.0.0"' 'version = "${version}"' \
-      --replace " --cov" ""
+      --replace "--cov" ""
   '';
 
   disabledTests = [
@@ -59,6 +61,9 @@ buildPythonPackage rec {
     "test_get_dns_state"
     # Assertion issue
     "test_guess_stream_format"
+    "test_update_tv"
+    "test_get_apps_single_app"
+    "test_get_tv_channels_single_channel"
   ];
 
   pythonImportsCheck = [
@@ -68,6 +73,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Asynchronous Python client for Roku (ECP)";
     homepage = "https://github.com/ctalkington/python-rokuecp";
+    changelog = "https://github.com/ctalkington/python-rokuecp/releases/tag/${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

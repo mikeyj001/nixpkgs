@@ -1,21 +1,21 @@
-{ lib, stdenv, fetchFromGitHub, libcap, acl }:
+{ lib, stdenv, fetchFromGitHub, libcap, acl, oniguruma }:
 
 stdenv.mkDerivation rec {
   pname = "bfs";
-  version = "2.3.1";
+  version = "3.0.1";
 
   src = fetchFromGitHub {
     repo = "bfs";
     owner = "tavianator";
     rev = version;
-    sha256 = "sha256-V82UdCG0J04sZP3FTVQqANrez/LCwOLQY6zzFOoIeNo=";
+    sha256 = "sha256-/CiQUK6nmu3MtkG5PMQPn05qIO/M0Oy/LdBI/8oFdqA=";
   };
 
-  buildInputs = lib.optionals stdenv.isLinux [ libcap acl ];
+  buildInputs = [ oniguruma ] ++ lib.optionals stdenv.isLinux [ libcap acl ];
 
   # Disable LTO on darwin. See https://github.com/NixOS/nixpkgs/issues/19098
   preConfigure = lib.optionalString stdenv.isDarwin ''
-    substituteInPlace Makefile --replace "-flto -DNDEBUG" "-DNDEBUG"
+    substituteInPlace Makefile --replace "-flto" ""
   '';
 
   makeFlags = [ "PREFIX=$(out)" ];

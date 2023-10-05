@@ -6,22 +6,22 @@
 , cython
 , setuptools-scm
 , pytestCheckHook
+, ApplicationServices
 }:
 
 buildPythonPackage rec {
   pname = "uharfbuzz";
-  version = "0.24.1";
+  version = "0.37.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.5";
 
-  # Fetching from GitHub as Pypi contains different versions
   src = fetchFromGitHub {
     owner = "harfbuzz";
     repo = "uharfbuzz";
     rev = "v${version}";
-    sha256 = "sha256-DyFXbwB28JH2lvmWDezRh49tjCvleviUNSE5LHG3kUg=";
     fetchSubmodules = true;
+    hash = "sha256-CZp+/5fG5IBawnIZLeO9lXke8rodqRcSf+ofyF584mc=";
   };
 
   SETUPTOOLS_SCM_PRETEND_VERSION = version;
@@ -31,7 +31,9 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  checkInputs = [
+  buildInputs = lib.optionals stdenv.isDarwin [ ApplicationServices ];
+
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -41,7 +43,6 @@ buildPythonPackage rec {
     description = "Streamlined Cython bindings for the harfbuzz shaping engine";
     homepage = "https://github.com/harfbuzz/uharfbuzz";
     license = licenses.asl20;
-    maintainers = with maintainers; [ wolfangaukang ];
-    broken = stdenv.isDarwin;
+    maintainers = with maintainers; [ ];
   };
 }

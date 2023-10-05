@@ -1,21 +1,32 @@
-{ lib, buildGoModule, fetchFromGitHub, testers, kube-linter }:
+{ lib, buildGoModule, fetchFromGitHub, installShellFiles, testers, kube-linter }:
 
 buildGoModule rec {
   pname = "kube-linter";
-  version = "0.3.0";
+  version = "0.6.4";
 
   src = fetchFromGitHub {
     owner = "stackrox";
     repo = pname;
-    rev = version;
-    sha256 = "ZqnD9zsh+r1RL34o1nAkvO1saKe721ZJ2+DgBjmsH58=";
+    rev = "v${version}";
+    sha256 = "sha256-L0JjbjV5KwI4qas8iLp5OLkleQlD29jsYLpe3ER1l2Y=";
   };
 
-  vendorSha256 = "sha256-tm1+2jsktNrw8S7peJz7w8k3+JwAYUgKfKWuQ8zIfvk=";
+  vendorHash = "sha256-1erG3TFv3DR6SLDIrmRefAPjXhgXEVYFiAsUPiI7kX4=";
 
   ldflags = [
     "-s" "-w" "-X golang.stackrox.io/kube-linter/internal/version.version=${version}"
   ];
+
+  nativeBuildInputs = [ installShellFiles ];
+
+  checkFlags = [ "-skip=TestCreateContextsWithIgnorePaths" ];
+
+  postInstall = ''
+    installShellCompletion --cmd kube-linter \
+      --bash <($out/bin/kube-linter completion bash) \
+      --fish <($out/bin/kube-linter completion fish) \
+      --zsh <($out/bin/kube-linter completion zsh)
+  '';
 
   passthru.tests.version = testers.testVersion {
     package = kube-linter;
@@ -25,7 +36,9 @@ buildGoModule rec {
   meta = with lib; {
     description = "A static analysis tool that checks Kubernetes YAML files and Helm charts";
     homepage = "https://kubelinter.io";
+    changelog   = "https://github.com/stackrox/kube-linter/releases/tag/v${version}";
     license = licenses.asl20;
-    maintainers = with maintainers; [ mtesseract stehessel ];
+    maintainers = with maintainers; [ mtesseract stehessel Intuinewin ];
+    platforms = platforms.all;
   };
 }

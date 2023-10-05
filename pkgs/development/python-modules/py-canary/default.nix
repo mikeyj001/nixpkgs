@@ -6,12 +6,13 @@
 , pythonOlder
 , requests
 , requests-mock
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "py-canary";
-  version = "0.5.2";
-  format = "setuptools";
+  version = "0.5.3";
+  format = "pyproject";
 
   disabled = pythonOlder "3.6";
 
@@ -19,14 +20,18 @@ buildPythonPackage rec {
     owner = "snjoetw";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-PE31J82Uc6mErnh7nQ1pkIjnMbuCnlYEX2R0azknMHQ=";
+    hash = "sha256-873XAf0jOX5pjrNRELEcTWCauk80FUYxTu7G7jc3MHE=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
     requests-mock
@@ -34,6 +39,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [
     "canary"
+  ];
+
+  disabledTests = [
+    # Test requires network access
+    "test_location_with_motion_entry"
   ];
 
   meta = with lib; {

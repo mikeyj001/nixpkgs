@@ -1,9 +1,10 @@
 { lib
 , blinker
 , buildPythonPackage
+, django
 , fetchFromGitHub
 , flake8
-, flask_sqlalchemy
+, flask-sqlalchemy
 , isPy27
 , mock
 , peewee
@@ -31,9 +32,9 @@ buildPythonPackage rec {
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     flake8
-    flask_sqlalchemy
+    flask-sqlalchemy
     mock
     peewee
     pytest-django
@@ -79,5 +80,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/jmcarp/nplusone";
     maintainers = with maintainers; [ cript0nauta ];
     license = licenses.mit;
+    broken = lib.versionAtLeast django.version "4";
   };
 }

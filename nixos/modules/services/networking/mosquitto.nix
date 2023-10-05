@@ -36,40 +36,49 @@ let
       password = mkOption {
         type = uniq (nullOr str);
         default = null;
-        description = ''
+        description = lib.mdDoc ''
           Specifies the (clear text) password for the MQTT User.
         '';
       };
 
       passwordFile = mkOption {
-        type = uniq (nullOr types.path);
+        type = uniq (nullOr path);
         example = "/path/to/file";
         default = null;
-        description = ''
+        description = lib.mdDoc ''
           Specifies the path to a file containing the
           clear text password for the MQTT user.
+          The file is securely passed to mosquitto by
+          leveraging systemd credentials. No special
+          permissions need to be set on this file.
         '';
       };
 
       hashedPassword = mkOption {
         type = uniq (nullOr str);
         default = null;
-        description = ''
+        description = mdDoc ''
           Specifies the hashed password for the MQTT User.
-          To generate hashed password install <literal>mosquitto</literal>
-          package and use <literal>mosquitto_passwd</literal>.
+          To generate hashed password install the `mosquitto`
+          package and use `mosquitto_passwd`, then extract
+          the second field (after the `:`) from the generated
+          file.
         '';
       };
 
       hashedPasswordFile = mkOption {
-        type = uniq (nullOr types.path);
+        type = uniq (nullOr path);
         example = "/path/to/file";
         default = null;
-        description = ''
+        description = mdDoc ''
           Specifies the path to a file containing the
           hashed password for the MQTT user.
-          To generate hashed password install <literal>mosquitto</literal>
-          package and use <literal>mosquitto_passwd</literal>.
+          To generate hashed password install the `mosquitto`
+          package and use `mosquitto_passwd`, then remove the
+          `username:` prefix from the generated file.
+          The file is securely passed to mosquitto by
+          leveraging systemd credentials. No special
+          permissions need to be set on this file.
         '';
       };
 
@@ -77,7 +86,7 @@ let
         type = listOf str;
         example = [ "read A/B" "readwrite A/#" ];
         default = [];
-        description = ''
+        description = lib.mdDoc ''
           Control client access to topics on the broker.
         '';
       };
@@ -99,15 +108,43 @@ let
         message = "Cannot set more than one password option for user ${n} in ${prefix}";
       }) users;
 
-  makePasswordFile = users: path:
+  listenerScope = index: "listener-${toString index}";
+  userScope = prefix: index: "${prefix}-user-${toString index}";
+  credentialID = prefix: credential: "${prefix}-${credential}";
+
+  toScopedUsers = listenerScope: users: pipe users [
+    attrNames
+    (imap0 (index: user: nameValuePair user
+      (users.${user} // { scope = userScope listenerScope index; })
+    ))
+    listToAttrs
+  ];
+
+  userCredentials = user: credentials: pipe credentials [
+    (filter (credential: user.${credential} != null))
+    (map (credential: "${credentialID user.scope credential}:${user.${credential}}"))
+  ];
+  usersCredentials = listenerScope: users: credentials: pipe users [
+    (toScopedUsers listenerScope)
+    (mapAttrsToList (_: user: userCredentials user credentials))
+    concatLists
+  ];
+  systemdCredentials = listeners: listenerCredentials: pipe listeners [
+    (imap0 (index: listener: listenerCredentials (listenerScope index) listener))
+    concatLists
+  ];
+
+  makePasswordFile = listenerScope: users: path:
     let
-      makeLines = store: file:
+      makeLines = store: file: let
+        scopedUsers = toScopedUsers listenerScope users;
+      in
         mapAttrsToList
-          (n: u: "addLine ${escapeShellArg n} ${escapeShellArg u.${store}}")
-          (filterAttrs (_: u: u.${store} != null) users)
+          (name: user: ''addLine ${escapeShellArg name} "''$(systemd-creds cat ${credentialID user.scope store})"'')
+          (filterAttrs (_: user: user.${store} != null) scopedUsers)
         ++ mapAttrsToList
-          (n: u: "addFile ${escapeShellArg n} ${escapeShellArg "${u.${file}}"}")
-          (filterAttrs (_: u: u.${file} != null) users);
+          (name: user: ''addFile ${escapeShellArg name} "''${CREDENTIALS_DIRECTORY}/${credentialID user.scope file}"'')
+          (filterAttrs (_: user: user.${file} != null) scopedUsers);
       plainLines = makeLines "password" "passwordFile";
       hashedLines = makeLines "hashedPassword" "hashedPasswordFile";
     in
@@ -155,24 +192,24 @@ let
     options = {
       plugin = mkOption {
         type = path;
-        description = ''
-          Plugin path to load, should be a <literal>.so</literal> file.
+        description = mdDoc ''
+          Plugin path to load, should be a `.so` file.
         '';
       };
 
       denySpecialChars = mkOption {
         type = bool;
-        description = ''
-          Automatically disallow all clients using <literal>#</literal>
-          or <literal>+</literal> in their name/id.
+        description = mdDoc ''
+          Automatically disallow all clients using `#`
+          or `+` in their name/id.
         '';
         default = true;
       };
 
       options = mkOption {
         type = attrsOf optionType;
-        description = ''
-          Options for the auth plugin. Each key turns into a <literal>auth_opt_*</literal>
+        description = mdDoc ''
+          Options for the auth plugin. Each key turns into a `auth_opt_*`
            line in the config.
         '';
         default = {};
@@ -231,7 +268,7 @@ let
     options = {
       port = mkOption {
         type = port;
-        description = ''
+        description = lib.mdDoc ''
           Port to listen on. Must be set to 0 to listen on a unix domain socket.
         '';
         default = 1883;
@@ -239,8 +276,8 @@ let
 
       address = mkOption {
         type = nullOr str;
-        description = ''
-          Address to listen on. Listen on <literal>0.0.0.0</literal>/<literal>::</literal>
+        description = mdDoc ''
+          Address to listen on. Listen on `0.0.0.0`/`::`
           when unset.
         '';
         default = null;
@@ -248,10 +285,10 @@ let
 
       authPlugins = mkOption {
         type = listOf authPluginOptions;
-        description = ''
+        description = mdDoc ''
           Authentication plugin to attach to this listener.
-          Refer to the <link xlink:href="https://mosquitto.org/man/mosquitto-conf-5.html">
-          mosquitto.conf documentation</link> for details on authentication plugins.
+          Refer to the [mosquitto.conf documentation](https://mosquitto.org/man/mosquitto-conf-5.html)
+          for details on authentication plugins.
         '';
         default = [];
       };
@@ -259,7 +296,7 @@ let
       users = mkOption {
         type = attrsOf userOptions;
         example = { john = { password = "123456"; acl = [ "readwrite john/#" ]; }; };
-        description = ''
+        description = lib.mdDoc ''
           A set of users and their passwords and ACLs.
         '';
         default = {};
@@ -267,7 +304,7 @@ let
 
       omitPasswordAuth = mkOption {
         type = bool;
-        description = ''
+        description = lib.mdDoc ''
           Omits password checking, allowing anyone to log in with any user name unless
           other mandatory authentication methods (eg TLS client certificates) are configured.
         '';
@@ -276,7 +313,7 @@ let
 
       acl = mkOption {
         type = listOf str;
-        description = ''
+        description = lib.mdDoc ''
           Additional ACL items to prepend to the generated ACL file.
         '';
         example = [ "pattern read #" "topic readwrite anon/report/#" ];
@@ -287,7 +324,7 @@ let
         type = submodule {
           freeformType = attrsOf optionType;
         };
-        description = ''
+        description = lib.mdDoc ''
           Additional settings for this listener.
         '';
         default = {};
@@ -354,14 +391,14 @@ let
           options = {
             address = mkOption {
               type = str;
-              description = ''
+              description = lib.mdDoc ''
                 Address of the remote MQTT broker.
               '';
             };
 
             port = mkOption {
               type = port;
-              description = ''
+              description = lib.mdDoc ''
                 Port of the remote MQTT broker.
               '';
               default = 1883;
@@ -369,17 +406,17 @@ let
           };
         });
         default = [];
-        description = ''
+        description = lib.mdDoc ''
           Remote endpoints for the bridge.
         '';
       };
 
       topics = mkOption {
         type = listOf str;
-        description = ''
+        description = lib.mdDoc ''
           Topic patterns to be shared between the two brokers.
-          Refer to the <link xlink:href="https://mosquitto.org/man/mosquitto-conf-5.html">
-          mosquitto.conf documentation</link> for details on the format.
+          Refer to the [
+          mosquitto.conf documentation](https://mosquitto.org/man/mosquitto-conf-5.html) for details on the format.
         '';
         default = [];
         example = [ "# both 2 local/topic/ remote/topic/" ];
@@ -389,7 +426,7 @@ let
         type = submodule {
           freeformType = attrsOf optionType;
         };
-        description = ''
+        description = lib.mdDoc ''
           Additional settings for this bridge.
         '';
         default = {};
@@ -443,13 +480,13 @@ let
   };
 
   globalOptions = with types; {
-    enable = mkEnableOption "the MQTT Mosquitto broker";
+    enable = mkEnableOption (lib.mdDoc "the MQTT Mosquitto broker");
 
     package = mkOption {
       type = package;
       default = pkgs.mosquitto;
       defaultText = literalExpression "pkgs.mosquitto";
-      description = ''
+      description = lib.mdDoc ''
         Mosquitto package to use.
       '';
     };
@@ -457,7 +494,7 @@ let
     bridges = mkOption {
       type = attrsOf bridgeOptions;
       default = {};
-      description = ''
+      description = lib.mdDoc ''
         Bridges to build to other MQTT brokers.
       '';
     };
@@ -465,25 +502,25 @@ let
     listeners = mkOption {
       type = listOf listenerOptions;
       default = {};
-      description = ''
+      description = lib.mdDoc ''
         Listeners to configure on this broker.
       '';
     };
 
     includeDirs = mkOption {
       type = listOf path;
-      description = ''
+      description = mdDoc ''
         Directories to be scanned for further config files to include.
         Directories will processed in the order given,
-        <literal>*.conf</literal> files in the directory will be
-        read in case-sensistive alphabetical order.
+        `*.conf` files in the directory will be
+        read in case-sensitive alphabetical order.
       '';
       default = [];
     };
 
     logDest = mkOption {
       type = listOf (either path (enum [ "stdout" "stderr" "syslog" "topic" "dlt" ]));
-      description = ''
+      description = lib.mdDoc ''
         Destinations to send log messages to.
       '';
       default = [ "stderr" ];
@@ -492,7 +529,7 @@ let
     logType = mkOption {
       type = listOf (enum [ "debug" "error" "warning" "notice" "information"
                             "subscribe" "unsubscribe" "websockets" "none" "all" ]);
-      description = ''
+      description = lib.mdDoc ''
         Types of messages to log.
       '';
       default = [];
@@ -500,7 +537,7 @@ let
 
     persistence = mkOption {
       type = bool;
-      description = ''
+      description = lib.mdDoc ''
         Enable persistent storage of subscriptions and messages.
       '';
       default = true;
@@ -509,7 +546,7 @@ let
     dataDir = mkOption {
       default = "/var/lib/mosquitto";
       type = types.path;
-      description = ''
+      description = lib.mdDoc ''
         The data directory.
       '';
     };
@@ -518,7 +555,7 @@ let
       type = submodule {
         freeformType = attrsOf optionType;
       };
-      description = ''
+      description = lib.mdDoc ''
         Global configuration options for the mosquitto broker.
       '';
       default = {};
@@ -577,6 +614,19 @@ in
         Restart = "on-failure";
         ExecStart = "${cfg.package}/bin/mosquitto -c ${configFile}";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
+
+        # Credentials
+        SetCredential = let
+          listenerCredentials = listenerScope: listener:
+            usersCredentials listenerScope listener.users [ "password" "hashedPassword" ];
+        in
+          systemdCredentials cfg.listeners listenerCredentials;
+
+        LoadCredential = let
+          listenerCredentials = listenerScope: listener:
+            usersCredentials listenerScope listener.users [ "passwordFile" "hashedPasswordFile" ];
+        in
+          systemdCredentials cfg.listeners listenerCredentials;
 
         # Hardening
         CapabilityBoundingSet = "";
@@ -650,7 +700,7 @@ in
         concatStringsSep
           "\n"
           (imap0
-            (idx: listener: makePasswordFile listener.users "${cfg.dataDir}/passwd-${toString idx}")
+            (idx: listener: makePasswordFile (listenerScope idx) listener.users "${cfg.dataDir}/passwd-${toString idx}")
             cfg.listeners);
     };
 
@@ -668,8 +718,6 @@ in
 
   meta = {
     maintainers = with lib.maintainers; [ pennae ];
-    # Don't edit the docbook xml directly, edit the md and generate it:
-    # `pandoc mosquitto.md -t docbook --top-level-division=chapter --extract-media=media -f markdown+smart > mosquitto.xml`
-    doc = ./mosquitto.xml;
+    doc = ./mosquitto.md;
   };
 }

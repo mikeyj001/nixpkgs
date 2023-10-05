@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , python3Packages
+, fetchPypi
 , nix-update-script
 , s-tui
 , testers
@@ -8,11 +9,11 @@
 
 python3Packages.buildPythonPackage rec {
   pname = "s-tui";
-  version = "1.1.3";
+  version = "1.1.4";
 
-  src = python3Packages.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-t3h8d0yc7i3UvO8CVfBd3/3h3RfGN6yE6hutymOZUdA=";
+    sha256 = "sha256-soVrmzlVy0zrqvOclR7SfPphp4xAEHv+xdr0NN19ye0=";
   };
 
   propagatedBuildInputs = with python3Packages; [
@@ -21,7 +22,7 @@ python3Packages.buildPythonPackage rec {
   ];
 
   passthru = {
-    updateScript = nix-update-script { attrPath = pname; };
+    updateScript = nix-update-script { };
     tests = testers.testVersion { package = s-tui; };
   };
 

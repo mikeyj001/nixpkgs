@@ -1,55 +1,71 @@
 { lib
 , buildPythonPackage
-, pythonOlder
-, fetchFromGitHub
-, pytestCheckHook
-, attrs
 , cached-property
 , click
-, six
+, fetchFromGitHub
 , packaging
-, pytest-cov
+, pydantic
 , pytest-timeout
+, pytestCheckHook
+, pythonOlder
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "pythonfinder";
-  version = "1.2.10";
+  version = "2.0.5";
   format = "pyproject";
+
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "sarugaku";
     repo = pname;
-    rev = version;
-    sha256 = "sha256-4a648wOh+ASeocevFVh/4Fkq0CEhkFbt+2mWVmb9Bhw=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-L/+6w5lLqHO5c9CThoUPOHXRPVxBlOWFDAmfoYxRw5g=";
   };
 
+  postPatch = ''
+    substituteInPlace setup.cfg \
+      --replace " --cov" ""
+  '';
+
+  nativeBuildInputs = [
+    setuptools
+  ];
+
   propagatedBuildInputs = [
-    attrs
     cached-property
-    click
-    six
     packaging
+    pydantic
   ];
 
-  checkInputs = [
-    pytestCheckHook
-    pytest-cov
+  passthru.optional-dependencies = {
+    cli = [
+      click
+    ];
+  };
+
+  nativeCheckInputs = [
     pytest-timeout
-  ];
+    pytestCheckHook
+  ] ++ lib.flatten (builtins.attrValues passthru.optional-dependencies);
 
-  pytestFlagsArray = [ "--no-cov" ];
+  pythonImportsCheck = [
+    "pythonfinder"
+  ];
 
   # these tests invoke git in a subprocess and
-  # for some reason git can't be found even if included in checkInputs
-  disabledTests = [
-    "test_shims_are_kept"
-    "test_shims_are_removed"
-  ];
+  # for some reason git can't be found even if included in nativeCheckInputs
+  # disabledTests = [
+  #   "test_shims_are_kept"
+  #   "test_shims_are_removed"
+  # ];
 
   meta = with lib; {
+    description = "Cross platform search tool for finding Python";
     homepage = "https://github.com/sarugaku/pythonfinder";
-    description = "Cross Platform Search Tool for Finding Pythons";
+    changelog = "https://github.com/sarugaku/pythonfinder/blob/v${version}/CHANGELOG.rst";
     license = licenses.mit;
     maintainers = with maintainers; [ cpcloud ];
   };

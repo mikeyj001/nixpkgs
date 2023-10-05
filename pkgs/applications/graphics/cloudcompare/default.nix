@@ -23,13 +23,13 @@
 
 mkDerivation rec {
   pname = "cloudcompare";
-  version = "2.12.1";
+  version = "2.12.4";
 
   src = fetchFromGitHub {
     owner = "CloudCompare";
     repo = "CloudCompare";
     rev = "v${version}";
-    sha256 = "sha256-gX07Km+DNnsz5eDAC2RueMHjmIfQvgGnNOujZ/yM/vE=";
+    sha256 = "sha256-rQ9/vS/fyRWGBL4UGPNSeeNsDtnRHEp9NCViBtu/QEs=";
     fetchSubmodules = true;
   };
 
@@ -88,7 +88,7 @@ mkDerivation rec {
     "-DPLUGIN_STANDARD_QM3C2=ON"
     "-DPLUGIN_STANDARD_QMPLANE=ON"
     "-DPLUGIN_STANDARD_QPOISSON_RECON=ON"
-    "-DPLUGIN_STANDARD_QRANSAC_SD=ON"
+    "-DPLUGIN_STANDARD_QRANSAC_SD=OFF" # not compatible with GPL, broken on non-x86
     "-DPLUGIN_STANDARD_QSRA=ON"
     "-DPLUGIN_STANDARD_QCLOUDLAYERS=ON"
   ];

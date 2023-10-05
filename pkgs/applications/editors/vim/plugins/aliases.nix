@@ -47,6 +47,7 @@ mapAliases (with prev; {
   solarized           = vim-colors-solarized;
   colors-solarized    = vim-colors-solarized;
   caw                 = caw-vim;
+  chad                = chadtree;
   colorsamplerpack    = Colour-Sampler-Pack;
   Colour_Sampler_Pack = Colour-Sampler-Pack;
   command_T           = command-t; # backwards compat, added 2014-10-18
@@ -126,10 +127,12 @@ mapAliases (with prev; {
   tlib                = tlib_vim;
   tmux-navigator      = vim-tmux-navigator;
   tmuxNavigator       = vim-tmux-navigator; # backwards compat, added 2014-10-18
+  todo-nvim           = throw "todo-nvim has been removed: abandoned by upstream"; # Added 2023-08-23
   tslime              = tslime-vim;
   unite               = unite-vim;
   UltiSnips           = ultisnips;
   vim-addon-vim2nix   = vim2nix;
+  vim-sourcetrail     = throw "vim-sourcetrail has been removed: abandoned by upstream"; # Added 2022-08-14
   vimproc             = vimproc-vim;
   vimshell            = vimshell-vim;
   vinegar             = vim-vinegar;

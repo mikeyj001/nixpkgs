@@ -1,5 +1,7 @@
-{ lib
+{ stdenv
+, lib
 , buildPythonPackage
+, pythonAtLeast
 , pythonOlder
 , fetchFromGitHub
 
@@ -12,6 +14,7 @@
 
 , django-filter
 , mock
+, py
 , pytest-django
 , pytest-random-order
 , pytestCheckHook
@@ -19,20 +22,17 @@
 
 buildPythonPackage rec {
   pname = "graphene-django";
-  version = "unstable-2022-03-03";
+  version = "3.1.5";
   format = "setuptools";
+
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "graphql-python";
     repo = pname;
-    rev = "f6ec0689c18929344c79ae363d2e3d5628fa4a2d";
-    hash = "sha256-KTZ5jcoeHYXnlaF47t8jIi6+7NyMyA4hDPv+il3bt+U=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-1vl1Yj9MVBej5aFND8A63JMIog8aIW9SdwiOLIUwXxI=";
   };
-
-  patches = [
-    ./graphene-3_2_0.patch
-  ];
 
   postPatch = ''
     substituteInPlace setup.py \
@@ -52,17 +52,30 @@ buildPythonPackage rec {
     export DJANGO_SETTINGS_MODULE=examples.django_test_settings
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     django-filter
     mock
+    py
     pytest-django
     pytest-random-order
     pytestCheckHook
   ];
 
+  disabledTests = lib.optionals (pythonAtLeast "3.11") [
+    # Python 3.11 support, https://github.com/graphql-python/graphene-django/pull/1365
+    "test_django_objecttype_convert_choices_enum_naming_collisions"
+    "test_django_objecttype_choices_custom_enum_name"
+    "test_django_objecttype_convert_choices_enum_list"
+    "test_schema_representation"
+  ] ++ lib.optionals stdenv.isDarwin [
+    # this test touches files in the "/" directory and fails in darwin sandbox
+    "test_should_filepath_convert_string"
+  ];
+
   meta = with lib; {
     description = "Integrate GraphQL into your Django project";
     homepage = "https://github.com/graphql-python/graphene-django";
+    changelog = "https://github.com/graphql-python/graphene-django/releases/tag/v${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ hexa ];
   };

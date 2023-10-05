@@ -1,32 +1,42 @@
-{ lib, python3Packages }:
+{ lib, python3Packages, fetchPypi, installShellFiles }:
 
-let
-  pypkgs = python3Packages;
-
-in
-pypkgs.buildPythonApplication rec {
+python3Packages.buildPythonApplication rec {
   pname = "tmuxp";
-  version = "1.11.0";
+  version = "1.29.0";
+  format = "pyproject";
 
-  src = pypkgs.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-N5kZ+e17ZgLOCvV/lcT/hdG1VNqLxh98QOQyM0BmZCA=";
+    hash = "sha256-MiXG4MVzomyc4LjovPsvhmPngtJv85s6Ypo/Cm2Whho=";
   };
 
-  # No tests in archive
-  doCheck = false;
+  nativeBuildInputs = [
+    python3Packages.poetry-core
+    python3Packages.shtab
+    installShellFiles
+  ];
 
-  propagatedBuildInputs = with pypkgs; [
+  propagatedBuildInputs = with python3Packages; [
     click
     colorama
     kaptan
     libtmux
   ];
 
+  # No tests in archive
+  doCheck = false;
+
+  postInstall = ''
+    installShellCompletion --cmd tmuxp \
+      --bash <(shtab --shell=bash -u tmuxp.cli.create_parser) \
+      --zsh <(shtab --shell=zsh -u tmuxp.cli.create_parser)
+  '';
+
   meta = with lib; {
-    description = "Manage tmux workspaces from JSON and YAML";
+    description = "tmux session manager";
     homepage = "https://tmuxp.git-pull.com/";
-    license = licenses.bsd3;
+    changelog = "https://github.com/tmux-python/tmuxp/raw/v${version}/CHANGES";
+    license = licenses.mit;
     maintainers = with maintainers; [ peterhoeg ];
   };
 }

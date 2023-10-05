@@ -10,21 +10,21 @@
 
 buildPythonPackage rec {
   pname = "pip-api";
-  version = "0.0.29";
+  version = "0.0.30";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-9wFYTrHD4BAhyEb4nWKauTc7ZiTwYmdXd0rVT8TClXE=";
+    hash = "sha256-oF3yx6qbcVc3S89Cc1RCAaDHuuYKnGW8+E85We84lvM=";
   };
 
   propagatedBuildInputs = [
     pip
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pretend
     pytestCheckHook
     virtualenv

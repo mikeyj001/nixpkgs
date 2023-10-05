@@ -1,4 +1,4 @@
-{ mkDerivation, lib, fetchurl, fetchpatch, cmake, doxygen, extra-cmake-modules, wrapGAppsHook
+{ mkDerivation, config, lib, fetchurl, cmake, doxygen, extra-cmake-modules, wrapGAppsHook
 
 # For `digitaglinktree`
 , perl, sqlite
@@ -7,6 +7,7 @@
 , qtxmlpatterns
 , qtsvg
 , qtwebengine
+, qtnetworkauth
 
 , akonadi-contacts
 , kcalendarcore
@@ -24,7 +25,7 @@
 , boost
 , eigen
 , exiv2
-, ffmpeg
+, ffmpeg_4
 , flex
 , graphviz
 , imagemagick
@@ -52,33 +53,36 @@
 
 , breeze-icons
 , oxygen
+
+, cudaSupport ? config.cudaSupport
+, cudaPackages ? {}
 }:
 
 mkDerivation rec {
   pname   = "digikam";
-  version = "7.6.0";
+  version = "8.1.0";
 
   src = fetchurl {
     url = "mirror://kde/stable/${pname}/${version}/digiKam-${version}.tar.xz";
-    sha256 = "sha256-2OHucyHT/DE5FvUVdW4wKaxBh9xFO2kzhI1N5TFLZkE=";
+    hash = "sha256-BQPANORF/0JPGKZxXAp6eb5KXgyCs+vEYaIc7DdFpbM=";
   };
 
-  patches = [
-    (fetchpatch {
-      name = "akonadi-22.04.patch";
-      url = "https://github.com/archlinux/svntogit-packages/raw/1b3c76a4482055524120f598325d90545ff9c020/trunk/akonadi-22.04.patch";
-      sha256 = "sha256-ittgkl2t/nAD0ci2fNYoAd4E2M6Gg0vqqjxqZugBuko=";
-    })
-  ];
-
-  nativeBuildInputs = [ cmake doxygen extra-cmake-modules kdoctools wrapGAppsHook ];
+  nativeBuildInputs = [
+    cmake
+    doxygen
+    extra-cmake-modules
+    kdoctools
+    wrapGAppsHook
+  ] ++ lib.optionals cudaSupport (with cudaPackages; [
+    cuda_nvcc
+  ]);
 
   buildInputs = [
     bison
     boost
     eigen
     exiv2
-    ffmpeg
+    ffmpeg_4
     flex
     graphviz
     imagemagick
@@ -101,6 +105,7 @@ mkDerivation rec {
     qtxmlpatterns
     qtsvg
     qtwebengine
+    qtnetworkauth
 
     akonadi-contacts
     kcalendarcore
@@ -117,7 +122,9 @@ mkDerivation rec {
     marble
     oxygen
     threadweaver
-  ];
+  ] ++ lib.optionals cudaSupport (with cudaPackages; [
+    cuda_cudart
+  ]);
 
   cmakeFlags = [
     "-DENABLE_MYSQLSUPPORT=1"
@@ -144,5 +151,6 @@ mkDerivation rec {
     license = licenses.gpl2;
     homepage = "https://www.digikam.org";
     platforms = platforms.linux;
+    mainProgram = "digikam";
   };
 }

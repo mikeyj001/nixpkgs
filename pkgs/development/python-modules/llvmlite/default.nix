@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchPypi
+, fetchFromGitHub
 , buildPythonPackage
 , python
 , llvm
@@ -12,13 +12,19 @@
 
 buildPythonPackage rec {
   pname = "llvmlite";
-  version = "0.38.0";
+  # The main dependency of llvmlite is numba, which we currently package an
+  # untagged version of it (for numpy>1.25 support). That numba version
+  # requires at least this version of llvmlite (also not yet officially
+  # released, but at least tagged).
+  version = "0.41.0dev0";
 
   disabled = isPyPy || !isPy3k;
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "a99d166ccf3b116f3b9ed23b9b70ba2415640a9c978f3aaa13fad49c58f4965c";
+  src = fetchFromGitHub {
+    owner = "numba";
+    repo = "llvmlite";
+    rev = "v${version}";
+    hash = "sha256-fsH+rqouweNENU+YlWr7m0bC0YdreQLNp1n2rwrOiFw=";
   };
 
   nativeBuildInputs = [ llvm ];

@@ -13,25 +13,26 @@
 , wrapt
 , passlib
 , pydot
-, python-Levenshtein
+, levenshtein
 , html2text
 , weasyprint
 , gevent
 , pillow
-, withPostgresql ? true, psycopg2
-, python
+, withPostgresql ? true
+, psycopg2
+, unittestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "trytond";
-  version = "6.4.0";
+  version = "6.8.4";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "3c04d75c2a779b88b8c7ab6dd252cf4fc51f9546bf42760d10dbd1a17f61b288";
+    hash = "sha256-jZTc9Cc5XC1KScpniVtbBPdfwo3LodVNOo/zQSDBWY4=";
   };
 
   propagatedBuildInputs = [
@@ -48,26 +49,25 @@ buildPythonPackage rec {
 
     # extra dependencies
     pydot
-    python-Levenshtein
+    levenshtein
     html2text
     weasyprint
     gevent
     pillow
   ] ++ relatorio.optional-dependencies.fodt
-    ++ passlib.optional-dependencies.bcrypt
-    ++ passlib.optional-dependencies.argon2
-    ++ lib.optional withPostgresql psycopg2;
+  ++ passlib.optional-dependencies.bcrypt
+  ++ passlib.optional-dependencies.argon2
+  ++ lib.optional withPostgresql psycopg2;
 
-  checkPhase = ''
-    runHook preCheck
+  nativeCheckInputs = [ unittestCheckHook ];
 
+  preCheck = ''
     export HOME=$(mktemp -d)
     export TRYTOND_DATABASE_URI="sqlite://"
     export DB_NAME=":memory:";
-    ${python.interpreter} -m unittest discover -s trytond.tests
-
-    runHook postCheck
   '';
+
+  unittestFlagsArray = [ "-s" "trytond.tests" ];
 
   meta = with lib; {
     description = "The server of the Tryton application platform";

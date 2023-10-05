@@ -1,11 +1,10 @@
 { stdenv
 , lib
-, fetchpatch
 , fetchurl
 , pkg-config
 , expat
-, enableSystemd ? stdenv.isLinux && !stdenv.hostPlatform.isStatic
-, systemd
+, enableSystemd ? lib.meta.availableOn stdenv.hostPlatform systemdMinimal
+, systemdMinimal
 , audit
 , libapparmor
 , dbus
@@ -20,21 +19,14 @@
 
 stdenv.mkDerivation rec {
   pname = "dbus";
-  version = "1.14.0";
+  version = "1.14.8";
 
   src = fetchurl {
     url = "https://dbus.freedesktop.org/releases/dbus/dbus-${version}.tar.xz";
-    sha256 = "sha256-zNfM43WW4KGVWP1mSNEnKrQ/AR2AyGNa6o/QutWK69Q=";
+    sha256 = "sha256-pr1brFzxnww8WUva4lZaCVaWmApoOg7zfLYhLgk73jU=";
   };
 
-  patches = [
-    # Fix dbus-daemon crashing when running tests due to long XDG_DATA_DIRS.
-    # https://gitlab.freedesktop.org/dbus/dbus/-/merge_requests/302
-    (fetchpatch {
-      url = "https://gitlab.freedesktop.org/dbus/dbus/-/commit/b551b3e9737958216a1a9d359150a4110a9d0549.patch";
-      sha256 = "kOVjlklZzKvBZXmmrE1UiO4XWRoBLViGwdn6/eDH+DY=";
-    })
-  ] ++ (lib.optional stdenv.isSunOS ./implement-getgrouplist.patch);
+  patches = lib.optional stdenv.isSunOS ./implement-getgrouplist.patch;
 
   postPatch = ''
     substituteInPlace bus/Makefile.am \
@@ -71,9 +63,11 @@ stdenv.mkDerivation rec {
       libX11
       libICE
       libSM
-    ]) ++ lib.optional enableSystemd systemd
+    ]) ++ lib.optional enableSystemd systemdMinimal
     ++ lib.optionals stdenv.isLinux [ audit libapparmor ];
   # ToDo: optional selinux?
+
+  __darwinAllowLocalNetworking = true;
 
   configureFlags = [
     "--enable-user-session"
@@ -90,13 +84,18 @@ stdenv.mkDerivation rec {
     "--with-systemduserunitdir=${placeholder "out"}/etc/systemd/user"
   ] ++ lib.optional (!x11Support) "--without-x"
   ++ lib.optionals stdenv.isLinux [ "--enable-apparmor" "--enable-libaudit" ]
-  ++ lib.optionals enableSystemd [ "SYSTEMCTL=${systemd}/bin/systemctl" ];
+  ++ lib.optionals enableSystemd [ "SYSTEMCTL=${systemdMinimal}/bin/systemctl" ];
 
   NIX_CFLAGS_LINK = lib.optionalString (!stdenv.isDarwin) "-Wl,--as-needed";
 
   enableParallelBuilding = true;
 
   doCheck = true;
+
+  makeFlags = [
+    # Fix paths in XML catalog broken by mismatching build/install datadir.
+    "dtddir=${placeholder "out"}/share/xml/dbus-1"
+  ];
 
   installFlags = [
     "sysconfdir=${placeholder "out"}/etc"
@@ -111,12 +110,12 @@ stdenv.mkDerivation rec {
 
   passthru = {
     dbus-launch = "${dbus.lib}/bin/dbus-launch";
-    daemon = dbus.out;
   };
 
   meta = with lib; {
     description = "Simple interprocess messaging system";
     homepage = "http://www.freedesktop.org/wiki/Software/dbus/";
+    changelog = "https://gitlab.freedesktop.org/dbus/dbus/-/blob/dbus-${version}/NEWS";
     license = licenses.gpl2Plus; # most is also under AFL-2.1
     maintainers = teams.freedesktop.members ++ (with maintainers; [ ]);
     platforms = platforms.unix;

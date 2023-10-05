@@ -1,19 +1,19 @@
-{ stdenv
-, lib
+{ lib
+, stdenv
 , fetchFromGitHub
 , cc65
 , python3
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "x16-rom";
-  version = "40";
+  version = "44";
 
   src = fetchFromGitHub {
-    owner = "commanderx16";
-    repo = pname;
-    rev = "r${version}";
-    hash = "sha256-5oqttuTJiJOUENncOJipAar22OsI1uG3G69m+eYoSh0=";
+    owner = "X16Community";
+    repo = "x16-rom";
+    rev = "r${finalAttrs.version}";
+    hash = "sha256-x/U+8e869mkWZKmCiW2fZKGB9un2cFXNclemwxbAjLQ=";
   };
 
   nativeBuildInputs = [
@@ -22,31 +22,36 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-    patchShebangs scripts/
+    patchShebangs findsymbols scripts/
+    substituteInPlace Makefile \
+    --replace '/bin/echo' 'echo'
   '';
 
   dontConfigure = true;
 
+  makeFlags = [ "PRERELEASE_VERSION=${finalAttrs.version}" ];
+
   installPhase = ''
     runHook preInstall
 
-    install -Dm 444 -t $out/share/${pname} build/x16/rom.bin
-    install -Dm 444 -t $out/share/doc/${pname} README.md
+    install -Dm 444 -t $out/share/x16-rom/ build/x16/rom.bin
+    install -Dm 444 -t $out/share/doc/x16-rom/ README.md
 
     runHook postInstall
   '';
 
-  meta = with lib; {
-    homepage = "https://www.commanderx16.com/forum/index.php?/home/";
-    description = "ROM file for CommanderX16 8-bit computer";
-    license = licenses.bsd2;
-    maintainers = with maintainers; [ AndersonTorres ];
-    inherit (cc65.meta) platforms;
+  passthru = {
+    # upstream project recommends emulator and rom to be synchronized; passing
+    # through the version is useful to ensure this
+    inherit (finalAttrs) version;
   };
 
-  passthru = {
-    # upstream project recommends emulator and rom synchronized;
-    # passing through the version is useful to ensure this
-    inherit version;
+  meta = {
+    homepage = "https://github.com/X16Community/x16-rom";
+    description = "ROM file for CommanderX16 8-bit computer";
+    license = lib.licenses.bsd2;
+    maintainers = with lib.maintainers; [ AndersonTorres ];
+    inherit (cc65.meta) platforms;
+    broken = stdenv.isDarwin && stdenv.isAarch64;
   };
-}
+})

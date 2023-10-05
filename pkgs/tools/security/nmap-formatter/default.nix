@@ -5,26 +5,21 @@
 
 buildGoModule rec {
   pname = "nmap-formatter";
-  version = "0.3.0";
+  version = "2.1.1";
 
   src = fetchFromGitHub {
     owner = "vdjagilev";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-tG91Cutk+RCBPv4Rf8CVnZa5Wh8qgsxEL0C6WIoEdsw=";
+    hash = "sha256-i2g+l5XJkBjXMbJwpSirEKCDxO2Ric4CwF3jzue/4+o=";
   };
 
-  vendorSha256 = "sha256-WXX1b8fPcwIE40w+Kzd7ZuSRXPiYtolRXC/Z8Kc9H2s=";
-
-  postPatch = ''
-    # Fix hard-coded release
-    substituteInPlace cmd/root.go \
-      --replace "0.2.0" "${version}"
-  '';
+  vendorHash = "sha256-YAsWXbIyeC4uhzRFXX/bZs3cOvEa3k4/ZCoDisUN1Yw=";
 
   meta = with lib; {
     description = "Tool that allows you to convert nmap output";
     homepage = "https://github.com/vdjagilev/nmap-formatter";
+    changelog = "https://github.com/vdjagilev/nmap-formatter/releases/tag/v${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

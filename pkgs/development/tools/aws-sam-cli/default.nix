@@ -1,34 +1,37 @@
 { lib
 , python3
+, fetchPypi
 , enableTelemetry ? false
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "aws-sam-cli";
-  version = "1.37.0";
+  version = "1.90.0";
 
-  src = python3.pkgs.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
-    hash = "sha256-XE3g2mKwAiaJvi0ShVScnCKrmz7ujaQgOeFXuYwtP4g=";
+    hash = "sha256-JXUfc37O6cTTOCTTtWE05m+GR4iDyBsmRPyXoTRxFmo=";
   };
 
   propagatedBuildInputs = with python3.pkgs; [
     aws-lambda-builders
     aws-sam-translator
+    boto3
+    cfn-lint
     chevron
-    click
     cookiecutter
     dateparser
-    python-dateutil
     docker
     flask
-    jmespath
-    requests
+    pyopenssl
+    pyyaml
+    rich
+    ruamel-yaml
     serverlessrepo
     tomlkit
-    watchdog
     typing-extensions
-    regex
+    tzlocal
+    watchdog
   ];
 
   postFixup = if enableTelemetry then "echo aws-sam-cli TELEMETRY IS ENABLED" else ''
@@ -36,30 +39,28 @@ python3.pkgs.buildPythonApplication rec {
     wrapProgram $out/bin/sam --set  SAM_CLI_TELEMETRY 0
   '';
 
-  # fix over-restrictive version bounds
   postPatch = ''
     substituteInPlace requirements/base.txt \
-      --replace "aws_lambda_builders==" "aws-lambda-builders #" \
-      --replace "click~=7.1" "click~=8.0" \
-      --replace "dateparser~=1.0" "dateparser>=0.7" \
-      --replace "docker~=4.2.0" "docker>=4.2.0" \
-      --replace "Flask~=1.1.2" "Flask~=2.0" \
-      --replace "jmespath~=0.10.0" "jmespath" \
-      --replace "PyYAML~=5.3" "PyYAML #" \
-      --replace "regex==" "regex #" \
-      --replace "requests==" "requests #" \
-      --replace "typing_extensions==" "typing-extensions #" \
-      --replace "tzlocal==3.0" "tzlocal #" \
-      --replace "tomlkit==0.7.2" "tomlkit #" \
-      --replace "watchdog==" "watchdog #"
+      --replace 'PyYAML>=' 'PyYAML>=5.4.1 #' \
+      --replace "aws_lambda_builders==" "aws_lambda_builders>=" \
+      --replace 'aws-sam-translator==1.70.0' 'aws-sam-translator>=1.60.1' \
+      --replace 'boto3>=' 'boto3>=1.26.79 #' \
+      --replace 'cfn-lint~=0.77.9' 'cfn-lint~=0.73.2' \
+      --replace "cookiecutter~=" "cookiecutter>=" \
+      --replace 'docker~=6.1.0' 'docker~=6.0.1' \
+      --replace 'ruamel_yaml~=0.17.32' 'ruamel_yaml~=0.17.21' \
+      --replace 'tomlkit==0.11.8' 'tomlkit>=0.11.8' \
+      --replace 'typing_extensions~=4.4.0' 'typing_extensions~=4.4' \
+      --replace 'tzlocal==3.0' 'tzlocal>=3.0' \
+      --replace 'watchdog==' 'watchdog>=2.1.2 #'
   '';
 
-  # Tests are not included in the PyPI package
   doCheck = false;
 
   meta = with lib; {
-    homepage = "https://github.com/awslabs/aws-sam-cli";
     description = "CLI tool for local development and testing of Serverless applications";
+    homepage = "https://github.com/awslabs/aws-sam-cli";
+    changelog = "https://github.com/aws/aws-sam-cli/releases/tag/v${version}";
     license = licenses.asl20;
     maintainers = with maintainers; [ lo1tuma ];
   };

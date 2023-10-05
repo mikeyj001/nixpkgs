@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, nix-update-script
 , meson
 , ninja
 , pkg-config
@@ -9,6 +10,7 @@
 , accountsservice
 , dbus
 , desktop-file-utils
+, fwupd
 , geoclue2
 , glib
 , gobject-introspection
@@ -21,13 +23,13 @@
 
 stdenv.mkDerivation rec {
   pname = "elementary-settings-daemon";
-  version = "1.2.0";
+  version = "1.3.1";
 
   src = fetchFromGitHub {
     owner = "elementary";
     repo = "settings-daemon";
     rev = version;
-    sha256 = "sha256-5QdCj2Z31t7dxZi7ZZ5g6qLgsMyw7rM5dRw0G8uoC6o=";
+    sha256 = "sha256-mEmc9uLwUTObsP70P0G2vcRdQF6do/wMTQjvfLUU//o=";
   };
 
   nativeBuildInputs = [
@@ -44,6 +46,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     accountsservice
     dbus
+    fwupd
     geoclue2
     glib
     gtk3
@@ -56,6 +59,10 @@ stdenv.mkDerivation rec {
     chmod +x meson/post_install.py
     patchShebangs meson/post_install.py
   '';
+
+  passthru = {
+    updateScript = nix-update-script { };
+  };
 
   meta = with lib; {
     description = "Settings daemon for Pantheon";

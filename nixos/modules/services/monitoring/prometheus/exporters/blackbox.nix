@@ -21,7 +21,7 @@ let
       throw
       "${logPrefix}: configuration file must not reside within /tmp - it won't be visible to the systemd service."
     else
-      true;
+      file;
   checkConfig = file:
     pkgs.runCommand "checked-blackbox-exporter.conf" {
       preferLocalBuild = true;
@@ -35,14 +35,14 @@ in {
   extraOpts = {
     configFile = mkOption {
       type = types.path;
-      description = ''
+      description = lib.mdDoc ''
         Path to configuration file.
       '';
     };
     enableConfigCheck = mkOption {
       type = types.bool;
       default = true;
-      description = ''
+      description = lib.mdDoc ''
         Whether to run a correctness check for the configuration file. This depends
         on the configuration file residing in the nix-store. Paths passed as string will
         be copied to the store.

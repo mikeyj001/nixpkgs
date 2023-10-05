@@ -2,22 +2,25 @@
 , stdenv
 , buildGoModule
 , fetchFromGitHub
+, installShellFiles
 }:
 
 buildGoModule rec {
   pname = "arkade";
-  version = "0.8.25";
+  version = "0.10.10";
 
   src = fetchFromGitHub {
     owner = "alexellis";
     repo = "arkade";
     rev = version;
-    sha256 = "sha256-m4vgQ4K73qmUMwPtviUQuRC2jNIDlE516WEZkFr3Upw=";
+    hash = "sha256-Lu/itKaF7mSG/jwg2sA4wNkbzBWdDY4pfwHB0elI1Bc=";
   };
 
   CGO_ENABLED = 0;
 
-  vendorSha256 = "sha256-E+fjDW7UIAYDiDI8Eb8atAtccEIRcV5hqYdSxRYM9fc=";
+  nativeBuildInputs = [ installShellFiles ];
+
+  vendorHash = null;
 
   # Exclude pkg/get: tests downloading of binaries which fail when sandbox=true
   subPackages = [
@@ -34,14 +37,21 @@ buildGoModule rec {
 
   ldflags = [
     "-s" "-w"
-    "-X github.com/alexellis/arkade/cmd.GitCommit=ref/tags/${version}"
-    "-X github.com/alexellis/arkade/cmd.Version=${version}"
+    "-X github.com/alexellis/arkade/pkg.GitCommit=ref/tags/${version}"
+    "-X github.com/alexellis/arkade/pkg.Version=${version}"
   ];
+
+  postInstall = ''
+    installShellCompletion --cmd arkade \
+      --bash <($out/bin/arkade completion bash) \
+      --zsh <($out/bin/arkade completion zsh) \
+      --fish <($out/bin/arkade completion fish)
+  '';
 
   meta = with lib; {
     homepage = "https://github.com/alexellis/arkade";
     description = "Open Source Kubernetes Marketplace";
     license = licenses.mit;
-    maintainers = with maintainers; [ welteki techknowlogick ];
+    maintainers = with maintainers; [ welteki techknowlogick qjoly ];
   };
 }

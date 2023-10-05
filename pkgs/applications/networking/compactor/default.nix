@@ -6,14 +6,14 @@
 
 stdenv.mkDerivation rec {
   pname = "compactor";
-  version = "1.2.0";
+  version = "1.2.3";
 
   src = fetchFromGitHub {
     owner = "dns-stats";
     repo = pname;
     rev = version;
     fetchSubmodules = true;
-    hash = "sha256-AUNPUk70VwJ0nZgMPLMU258nqkL4QP6km0USrZi2ea0=";
+    hash = "sha256-5Z14suhO5ghhmZsSj4DsSoKm+ct2gQFO6qxhjmx4Xm4=";
   };
 
   nativeBuildInputs = [
@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   doCheck = !stdenv.isDarwin; # check-dnstap.sh failing on Darwin
-  checkInputs = [
+  nativeCheckInputs = [
     cbor-diag
     cddl
     diffutils

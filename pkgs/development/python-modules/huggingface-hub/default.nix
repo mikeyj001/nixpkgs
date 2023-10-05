@@ -3,46 +3,50 @@
 , buildPythonPackage
 , pythonOlder
 , filelock
-, importlib-metadata
+, fsspec
 , packaging
 , pyyaml
 , requests
-, ruamel-yaml
 , tqdm
 , typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "huggingface-hub";
-  version = "0.6.0";
+  version = "0.16.4";
+  format = "setuptools";
+
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "huggingface";
     repo = "huggingface_hub";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-jR4aqMAAQJ5a7pOe3RpCtLgdm5JVVSPsBQtube6FeqM=";
+    hash = "sha256-fWvEvYiaLiVGmDdfibIHJAsu7nUX+eaE0QGolS3LHO8=";
   };
-
-  nativeBuildInputs = [ packaging ];
 
   propagatedBuildInputs = [
     filelock
+    fsspec
+    packaging
     pyyaml
     requests
-    ruamel-yaml
     tqdm
     typing-extensions
-  ] ++ lib.optionals (pythonOlder "3.8") [ importlib-metadata ];
+  ];
 
   # Tests require network access.
   doCheck = false;
-  pythonImportsCheck = [ "huggingface_hub" ];
 
-   meta = with lib; {
-    homepage = "https://github.com/huggingface/huggingface_hub";
+  pythonImportsCheck = [
+    "huggingface_hub"
+  ];
+
+  meta = with lib; {
     description = "Download and publish models and other files on the huggingface.co hub";
+    homepage = "https://github.com/huggingface/huggingface_hub";
     changelog = "https://github.com/huggingface/huggingface_hub/releases/tag/v${version}";
     license = licenses.asl20;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ kira-bruneau ];
   };
 }

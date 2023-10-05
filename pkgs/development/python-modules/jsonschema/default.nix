@@ -2,62 +2,96 @@
 , attrs
 , buildPythonPackage
 , fetchPypi
-, importlib-metadata
+, hatch-fancy-pypi-readme
+, hatch-vcs
+, hatchling
 , importlib-resources
-, pyrsistent
+, jsonschema-specifications
+, pkgutil-resolve-name
+, pip
+, pytestCheckHook
 , pythonOlder
-, setuptools-scm
-, twisted
-, typing-extensions
+, referencing
+, rpds-py
+
+# optionals
+, fqdn
+, idna
+, isoduration
+, jsonpointer
+, rfc3339-validator
+, rfc3986-validator
+, rfc3987
+, uri-template
+, webcolors
 }:
 
 buildPythonPackage rec {
   pname = "jsonschema";
-  version = "4.5.1";
+  version = "4.18.4";
   format = "pyproject";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-fG2IJhk0DDNHob9zFeFH5tPa5DkDOuY4PWrLkIwQHfw=";
+    hash = "sha256-+zZCc1OZ+pWMDSqtcFeQFVRZbGM0n09rKDxJPPaSol0=";
   };
 
   postPatch = ''
     patchShebangs json/bin/jsonschema_suite
   '';
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
   nativeBuildInputs = [
-    setuptools-scm
+    hatch-fancy-pypi-readme
+    hatch-vcs
+    hatchling
   ];
 
   propagatedBuildInputs = [
     attrs
-    pyrsistent
-  ] ++ lib.optionals (pythonOlder "3.8") [
-    importlib-metadata
-    typing-extensions
+    jsonschema-specifications
+    referencing
+    rpds-py
   ] ++ lib.optionals (pythonOlder "3.9") [
     importlib-resources
+    pkgutil-resolve-name
   ];
 
-  checkInputs = [
-    twisted
-  ];
+  passthru.optional-dependencies = {
+    format = [
+      fqdn
+      idna
+      isoduration
+      jsonpointer
+      rfc3339-validator
+      rfc3987
+      uri-template
+      webcolors
+    ];
+    format-nongpl = [
+      fqdn
+      idna
+      isoduration
+      jsonpointer
+      rfc3339-validator
+      rfc3986-validator
+      uri-template
+      webcolors
+    ];
+  };
 
-  checkPhase = ''
-    export JSON_SCHEMA_TEST_SUITE=json
-    trial jsonschema
-  '';
+  nativeCheckInputs = [
+    pip
+    pytestCheckHook
+  ];
 
   pythonImportsCheck = [
     "jsonschema"
   ];
 
   meta = with lib; {
-    description = "An implementation of JSON Schema validation for Python";
+    description = "An implementation of JSON Schema validation";
     homepage = "https://github.com/python-jsonschema/jsonschema";
     license = licenses.mit;
     maintainers = with maintainers; [ domenkozar ];

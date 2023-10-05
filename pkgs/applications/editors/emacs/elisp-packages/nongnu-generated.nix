@@ -1,5 +1,20 @@
 { callPackage }:
   {
+    adoc-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "adoc-mode";
+        ename = "adoc-mode";
+        version = "0.7.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/adoc-mode-0.7.0.tar";
+          sha256 = "055wljs3y8z9m9rvnqv8w0mvcpz5qd3v9sjhr5v0fv72p1vvf9rc";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/adoc-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     afternoon-theme = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "afternoon-theme";
@@ -49,10 +64,10 @@
       elpaBuild {
         pname = "annotate";
         ename = "annotate";
-        version = "1.5.4";
+        version = "2.0.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/annotate-1.5.4.tar";
-          sha256 = "1d11q4ddc2rw7n8jrxdddc5h42hf16sbc1l4v6zmmsriahxhgfdd";
+          url = "https://elpa.nongnu.org/nongnu/annotate-2.0.2.tar";
+          sha256 = "03iigyh9s378jif2vaaii8d31nag6mzairmgl9ffhmryz08jkig1";
         };
         packageRequires = [];
         meta = {
@@ -109,10 +124,10 @@
       elpaBuild {
         pname = "apropospriate-theme";
         ename = "apropospriate-theme";
-        version = "0.1.1";
+        version = "0.2.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/apropospriate-theme-0.1.1.tar";
-          sha256 = "11m80gijxvg4jf9davjja3bvykv161ggsrg7q0bihr0gq0flxgd7";
+          url = "https://elpa.nongnu.org/nongnu/apropospriate-theme-0.2.0.tar";
+          sha256 = "1s4cvh24zj3wpdqc3lklvi1dkba3jf87nxrzq0s3l1rzhg21pfpj";
         };
         packageRequires = [];
         meta = {
@@ -135,23 +150,50 @@
           license = lib.licenses.free;
         };
       }) {};
-    autothemer = callPackage ({ cl-lib ? null
-                              , dash
-                              , elpaBuild
-                              , emacs
-                              , fetchurl
-                              , lib }:
+    auto-dim-other-buffers = callPackage ({ elpaBuild
+                                          , fetchurl
+                                          , lib }:
+      elpaBuild {
+        pname = "auto-dim-other-buffers";
+        ename = "auto-dim-other-buffers";
+        version = "2.1.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/auto-dim-other-buffers-2.1.1.tar";
+          sha256 = "0a7xdp25bny5ykf7808jwmziad8myf8yp01p07f20bsrl4m0bzz6";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/auto-dim-other-buffers.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    autothemer = callPackage ({ dash, elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "autothemer";
         ename = "autothemer";
-        version = "0.2.3";
+        version = "0.2.18";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/autothemer-0.2.3.tar";
-          sha256 = "10r4lf3nl7mk6yzfcyld5k0njslw8ly2sd0iz1zkzywnv31lsxnd";
+          url = "https://elpa.nongnu.org/nongnu/autothemer-0.2.18.tar";
+          sha256 = "1gn7n8xd07sks49xirwah1y039s2hn02p0y1j4lmqh7m47l0fvl2";
         };
-        packageRequires = [ cl-lib dash emacs ];
+        packageRequires = [ dash emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/autothemer.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    bash-completion = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "bash-completion";
+        ename = "bash-completion";
+        version = "3.1.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/bash-completion-3.1.1.tar";
+          sha256 = "19vs0rflqm1z4r17pv1qx6v60g03x4n2b7503rjr2d0ljrwkbpcp";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/bash-completion.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -200,14 +242,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    blow = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "blow";
+        ename = "blow";
+        version = "1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/blow-1.0.tar";
+          sha256 = "0z2y3vq8m4x9ihn84x7p2vgkxprrrvhavcgwll897gsc9khp1xda";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/blow.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     boxquote = callPackage ({ cl-lib ? null, elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "boxquote";
         ename = "boxquote";
-        version = "2.2";
+        version = "2.3";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/boxquote-2.2.tar";
-          sha256 = "0vcqm78b5fsizkn2xalnzmdci5m02yxxypcr9q2sai04j7lhmwd9";
+          url = "https://elpa.nongnu.org/nongnu/boxquote-2.3.tar";
+          sha256 = "1d072qls4ywl71wi29khlq4w6yw9idp55vf811nvbmiihn6lwmiv";
         };
         packageRequires = [ cl-lib ];
         meta = {
@@ -219,14 +276,29 @@
       elpaBuild {
         pname = "buttercup";
         ename = "buttercup";
-        version = "1.25";
+        version = "1.31";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/buttercup-1.25.tar";
-          sha256 = "1iadgn56sfakv927g9bk7fq7yjg0f3r10ygrmjpy46vgvfz0fqs6";
+          url = "https://elpa.nongnu.org/nongnu/buttercup-1.31.tar";
+          sha256 = "1aw9k3dfscqpq2jkk1yqh6i3682yjs85fnm7rzc5i9qawrl9db6h";
         };
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/buttercup.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    camera = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "camera";
+        ename = "camera";
+        version = "0.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/camera-0.3.tar";
+          sha256 = "0faqdsgi3kwkk0yqp1676d8x4mi11yj856fj7spf3j02y83r1lmj";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/camera.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -245,6 +317,21 @@
           license = lib.licenses.free;
         };
       }) {};
+    cdlatex = callPackage ({ elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "cdlatex";
+        ename = "cdlatex";
+        version = "4.18.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/cdlatex-4.18.2.tar";
+          sha256 = "1sqmb7qcvdphkrak9bxw3xs0fdlv5vn36ckcqiannpm870s7ajnk";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/cdlatex.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     cider = callPackage ({ clojure-mode
                          , elpaBuild
                          , emacs
@@ -258,10 +345,10 @@
       elpaBuild {
         pname = "cider";
         ename = "cider";
-        version = "1.4.0";
+        version = "1.7.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/cider-1.4.0.tar";
-          sha256 = "11a3ysvrywp79pp1yivpsgi8azgzbg7ayiai94p1dyd3viy29qn0";
+          url = "https://elpa.nongnu.org/nongnu/cider-1.7.0.tar";
+          sha256 = "0x0acszamylmmly6h8s56lskd5l7lm8hdnf8rbvjd89v0j2anb0l";
         };
         packageRequires = [
           clojure-mode
@@ -281,14 +368,29 @@
       elpaBuild {
         pname = "clojure-mode";
         ename = "clojure-mode";
-        version = "5.14.0";
+        version = "5.17.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/clojure-mode-5.14.0.tar";
-          sha256 = "1lirhp6m5r050dm73nrslgzdgy6rdbxn02wal8n52q37m2armra2";
+          url = "https://elpa.nongnu.org/nongnu/clojure-mode-5.17.0.tar";
+          sha256 = "189kyj57q4v8m9r9cd9q2x9db42vl5vb1qvww401lxlappc58fmw";
         };
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/clojure-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    clojure-ts-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "clojure-ts-mode";
+        ename = "clojure-ts-mode";
+        version = "0.1.5";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/clojure-ts-mode-0.1.5.tar";
+          sha256 = "1py4kxw2w9ggkl8ljchbcry14v9anxn9zinbdfls9x120y1cljsa";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/clojure-ts-mode.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -325,6 +427,26 @@
           license = lib.licenses.free;
         };
       }) {};
+    corfu-terminal = callPackage ({ corfu
+                                  , elpaBuild
+                                  , emacs
+                                  , fetchurl
+                                  , lib
+                                  , popon }:
+      elpaBuild {
+        pname = "corfu-terminal";
+        ename = "corfu-terminal";
+        version = "0.7";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/corfu-terminal-0.7.tar";
+          sha256 = "1vva3wwmczdph8dlhvwy1vlan8nmzlz6370zia6hz3adwc496a4s";
+        };
+        packageRequires = [ corfu emacs popon ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/corfu-terminal.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     crux = callPackage ({ elpaBuild, fetchurl, lib, seq }:
       elpaBuild {
         pname = "crux";
@@ -352,6 +474,25 @@
         packageRequires = [];
         meta = {
           homepage = "https://elpa.gnu.org/packages/cyberpunk-theme.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    cycle-at-point = callPackage ({ elpaBuild
+                                  , emacs
+                                  , fetchurl
+                                  , lib
+                                  , recomplete }:
+      elpaBuild {
+        pname = "cycle-at-point";
+        ename = "cycle-at-point";
+        version = "0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/cycle-at-point-0.1.tar";
+          sha256 = "0097w7nw8d1q7ad4b4qjk0svwxqg80jr2p27540vkir7289w59j3";
+        };
+        packageRequires = [ emacs recomplete ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/cycle-at-point.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -385,14 +526,89 @@
           license = lib.licenses.free;
         };
       }) {};
+    denote-refs = callPackage ({ denote, elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "denote-refs";
+        ename = "denote-refs";
+        version = "0.1.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/denote-refs-0.1.2.tar";
+          sha256 = "1s2q9j2xg2g293ip7w2bq2kjk6pasaf6cmvzcbh0k00yx8aa2alp";
+        };
+        packageRequires = [ denote emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/denote-refs.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    devhelp = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "devhelp";
+        ename = "devhelp";
+        version = "1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/devhelp-1.0.tar";
+          sha256 = "16zx748n24diqqk3jhgyz74s71kqzl7h7l6j9nkz40cpcn18ddiz";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/devhelp.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    devil = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "devil";
+        ename = "devil";
+        version = "0.6.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/devil-0.6.0.tar";
+          sha256 = "01n552pvr598igmd2q6w9kgjrwgzrgrb4w59mxpsylcv6wy2v2h5";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/devil.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    diff-ansi = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "diff-ansi";
+        ename = "diff-ansi";
+        version = "0.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/diff-ansi-0.2.tar";
+          sha256 = "1fcy89m6wkhc5hy4lqcd60ckrf9qwimilydjx083nackppdz1xlw";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/diff-ansi.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    doc-show-inline = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "doc-show-inline";
+        ename = "doc-show-inline";
+        version = "0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/doc-show-inline-0.1.tar";
+          sha256 = "11khy906vmhz445ryrdb63v0hjq0x59dn152j96vv9jlg5gqdi3b";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/doc-show-inline.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     dockerfile-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "dockerfile-mode";
         ename = "dockerfile-mode";
-        version = "1.5";
+        version = "1.7";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/dockerfile-mode-1.5.tar";
-          sha256 = "0dz91i4ak3v0x1v75ibhjjz211k9g6qimz4lxn3x424j7dlpa9f3";
+          url = "https://elpa.nongnu.org/nongnu/dockerfile-mode-1.7.tar";
+          sha256 = "1kb768kv48ypw7fm5xcvkw4pq9mfkvv0bg1inlhfifkb4i9kmz3l";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -404,10 +620,10 @@
       elpaBuild {
         pname = "dracula-theme";
         ename = "dracula-theme";
-        version = "1.7.0";
+        version = "1.8.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/dracula-theme-1.7.0.tar";
-          sha256 = "0vbi9560phdp38x5mfl1f9rp8cw7p7s2mvbww84ka0gfz0zrczpm";
+          url = "https://elpa.nongnu.org/nongnu/dracula-theme-1.8.1.tar";
+          sha256 = "0j7m9z4y6jh0wlbi8xrg5syjaybhxs4karwshh1919ajzjs0f8ql";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -430,21 +646,46 @@
           license = lib.licenses.free;
         };
       }) {};
-    editorconfig = callPackage ({ cl-lib ? null
-                                , elpaBuild
-                                , emacs
-                                , fetchurl
-                                , lib
-                                , nadvice }:
+    eat = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "eat";
+        ename = "eat";
+        version = "0.8";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/eat-0.8.tar";
+          sha256 = "1nvwd8iryjdcbm3v2xjgnf4ifcbs4d8hxn7xydxw6i7c5l8vya9f";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/eat.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    edit-indirect = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "edit-indirect";
+        ename = "edit-indirect";
+        version = "0.1.10";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/edit-indirect-0.1.10.tar";
+          sha256 = "0mk6s5hc8n9s5c434im6r06mfgmdf5s44zlr9j3hfkjaic1lf45b";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/edit-indirect.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    editorconfig = callPackage ({ elpaBuild, emacs, fetchurl, lib, nadvice }:
       elpaBuild {
         pname = "editorconfig";
         ename = "editorconfig";
-        version = "0.8.2";
+        version = "0.10.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/editorconfig-0.8.2.tar";
-          sha256 = "1ff8hwyzb249lf78j023sbibgfmimmk6mxkjmcnqqnk1jafprk02";
+          url = "https://elpa.nongnu.org/nongnu/editorconfig-0.10.1.tar";
+          sha256 = "0x6qij98rwq2yra7c0qa01rjb10pg23nwnnsb2fb76d5yhk1dcqw";
         };
-        packageRequires = [ cl-lib emacs nadvice ];
+        packageRequires = [ emacs nadvice ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/editorconfig.html";
           license = lib.licenses.free;
@@ -454,10 +695,10 @@
       elpaBuild {
         pname = "elixir-mode";
         ename = "elixir-mode";
-        version = "2.4.0";
+        version = "2.5.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/elixir-mode-2.4.0.tar";
-          sha256 = "0h3ypyxmcpfh8kcwd08rsild4jy8s4mr3zr8va03bbh81pd3nm1m";
+          url = "https://elpa.nongnu.org/nongnu/elixir-mode-2.5.0.tar";
+          sha256 = "0j4rkwmzb3grs7c56m1f6h3mcxvf4cskxf2qw9jw4fc88j5135ym";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -469,14 +710,29 @@
       elpaBuild {
         pname = "elpher";
         ename = "elpher";
-        version = "3.4.1";
+        version = "3.5.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/elpher-3.4.1.tar";
-          sha256 = "1vayhcamdp8nn6hrgffd0yx9k9q3mckbcsfwclhyyfc0x1hcwf92";
+          url = "https://elpa.nongnu.org/nongnu/elpher-3.5.0.tar";
+          sha256 = "10b4s3anbm4afs5i7rkv9qm5f5y9lzyj9dzajb1x654df4l0m4w4";
         };
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/elpher.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    engine-mode = callPackage ({ cl-lib ? null, elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "engine-mode";
+        ename = "engine-mode";
+        version = "2.2.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/engine-mode-2.2.3.tar";
+          sha256 = "07r5g2xrss175m622npna7c51ra4im7l69mkqp6689m2954g23wk";
+        };
+        packageRequires = [ cl-lib ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/engine-mode.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -559,6 +815,21 @@
           license = lib.licenses.free;
         };
       }) {};
+    evil-iedit-state = callPackage ({ elpaBuild, evil, fetchurl, iedit, lib }:
+      elpaBuild {
+        pname = "evil-iedit-state";
+        ename = "evil-iedit-state";
+        version = "1.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/evil-iedit-state-1.3.tar";
+          sha256 = "1dsdlhi58xsdsgkdhpnlkx1gkwc4m5sks99ph8lbj179vd1gszn6";
+        };
+        packageRequires = [ evil iedit ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/evil-iedit-state.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     evil-indent-plus = callPackage ({ cl-lib ? null
                                     , elpaBuild
                                     , evil
@@ -598,16 +869,16 @@
           license = lib.licenses.free;
         };
       }) {};
-    evil-matchit = callPackage ({ elpaBuild, emacs, evil, fetchurl, lib }:
+    evil-matchit = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "evil-matchit";
         ename = "evil-matchit";
-        version = "2.4.4";
+        version = "3.0.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/evil-matchit-2.4.4.tar";
-          sha256 = "1p8xsi0068wabsfn3jwhyinkk2684xp9hlapcbj6y58wkpzqj0f6";
+          url = "https://elpa.nongnu.org/nongnu/evil-matchit-3.0.2.tar";
+          sha256 = "02sim8hkclkp7lzj3hybjky75lyvf452wc7hmbkx1rjb3cx9j5m5";
         };
-        packageRequires = [ emacs evil ];
+        packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/evil-matchit.html";
           license = lib.licenses.free;
@@ -617,10 +888,10 @@
       elpaBuild {
         pname = "evil-nerd-commenter";
         ename = "evil-nerd-commenter";
-        version = "3.5.7";
+        version = "3.6.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/evil-nerd-commenter-3.5.7.tar";
-          sha256 = "1lar8hy9n29gv4cijalyy2ba23y0kyh9ycnsi5dzjs68pk3y4hca";
+          url = "https://elpa.nongnu.org/nongnu/evil-nerd-commenter-3.6.1.tar";
+          sha256 = "0ixyn669fk7gcnl3nhjma67zvnavikn75yzsa4sx850s5i4i1b2a";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -632,10 +903,10 @@
       elpaBuild {
         pname = "evil-numbers";
         ename = "evil-numbers";
-        version = "0.6";
+        version = "0.7";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/evil-numbers-0.6.tar";
-          sha256 = "0zl16ljb64cawcj11f4ndz941sllj8nhgjcb4w0r1afxbvpn5rss";
+          url = "https://elpa.nongnu.org/nongnu/evil-numbers-0.7.tar";
+          sha256 = "1kd60kc8762i9vyig179dnbmrjyw30bm06g26abndw2kjxaqjhr8";
         };
         packageRequires = [ emacs evil ];
         meta = {
@@ -658,6 +929,74 @@
           license = lib.licenses.free;
         };
       }) {};
+    exec-path-from-shell = callPackage ({ cl-lib ? null
+                                        , elpaBuild
+                                        , emacs
+                                        , fetchurl
+                                        , lib }:
+      elpaBuild {
+        pname = "exec-path-from-shell";
+        ename = "exec-path-from-shell";
+        version = "2.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/exec-path-from-shell-2.1.tar";
+          sha256 = "0vqjd44fiaqc2ppmb2yk7m75dndndrlrml4lfmar5213vlmds1cl";
+        };
+        packageRequires = [ cl-lib emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/exec-path-from-shell.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    flx = callPackage ({ cl-lib ? null, elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "flx";
+        ename = "flx";
+        version = "0.6.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/flx-0.6.2.tar";
+          sha256 = "0xmxin1k758nskrxhmvi4m5vbcfi2ncfp5n9q18mlc1j45vwawpx";
+        };
+        packageRequires = [ cl-lib ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/flx.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    flx-ido = callPackage ({ cl-lib ? null, elpaBuild, fetchurl, flx, lib }:
+      elpaBuild {
+        pname = "flx-ido";
+        ename = "flx-ido";
+        version = "0.6.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/flx-ido-0.6.2.tar";
+          sha256 = "1jdk87v605m4brvf0pxfd6bz0j2r217cw9pmrpl38nrszbngh67l";
+        };
+        packageRequires = [ cl-lib flx ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/flx-ido.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    flymake-guile = callPackage ({ elpaBuild
+                                 , emacs
+                                 , fetchurl
+                                 , flymake ? null
+                                 , lib }:
+      elpaBuild {
+        pname = "flymake-guile";
+        ename = "flymake-guile";
+        version = "0.5";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/flymake-guile-0.5.tar";
+          sha256 = "1na5jxjwl2jy857ipvgy01m1wlsy0s7ingaxdzsldppjfvgwb7yd";
+        };
+        packageRequires = [ emacs flymake ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/flymake-guile.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     flymake-kondor = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "flymake-kondor";
@@ -670,6 +1009,42 @@
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/flymake-kondor.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    flymake-popon = callPackage ({ elpaBuild
+                                 , emacs
+                                 , fetchurl
+                                 , flymake ? null
+                                 , lib
+                                 , popon
+                                 , posframe }:
+      elpaBuild {
+        pname = "flymake-popon";
+        ename = "flymake-popon";
+        version = "0.5.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/flymake-popon-0.5.1.tar";
+          sha256 = "0vk20affwb7qcg7nm6n2ssrrgljisqn45a8jagrf947l2kgaccvd";
+        };
+        packageRequires = [ emacs flymake popon posframe ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/flymake-popon.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    focus = callPackage ({ cl-lib ? null, elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "focus";
+        ename = "focus";
+        version = "1.0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/focus-1.0.1.tar";
+          sha256 = "1kiyvbdbjhjfkl5cq6q78lfgbir7iayswwm2qnj4df95nbm8shsz";
+        };
+        packageRequires = [ cl-lib emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/focus.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -703,21 +1078,31 @@
           license = lib.licenses.free;
         };
       }) {};
-    geiser = callPackage ({ elpaBuild
-                          , emacs
-                          , fetchurl
-                          , lib
-                          , project
-                          , transient }:
+    gc-buffers = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "gc-buffers";
+        ename = "gc-buffers";
+        version = "1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/gc-buffers-1.0.tar";
+          sha256 = "15zpg4j25bk7y2wgqsd57c4c6h3xvigf39hjnzh3g1hlrqk2lv0g";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/gc-buffers.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    geiser = callPackage ({ elpaBuild, emacs, fetchurl, lib, project }:
       elpaBuild {
         pname = "geiser";
         ename = "geiser";
-        version = "0.24";
+        version = "0.29.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/geiser-0.24.tar";
-          sha256 = "14qnni8ridrg3afh1wy9nvchbk0drn0h7ww5xgc6s03ivvmy7a71";
+          url = "https://elpa.nongnu.org/nongnu/geiser-0.29.1.tar";
+          sha256 = "0k9jvnaci23swyf3zy67f9msz205d9vdm90rgidnl81w7hg8gjm4";
         };
-        packageRequires = [ emacs project transient ];
+        packageRequires = [ emacs project ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/geiser.html";
           license = lib.licenses.free;
@@ -727,10 +1112,10 @@
       elpaBuild {
         pname = "geiser-chez";
         ename = "geiser-chez";
-        version = "0.17";
+        version = "0.18";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/geiser-chez-0.17.tar";
-          sha256 = "139x7b3q5n04ig0m263jljm4bsjiiyvi3f84pcq3bgnj3dk5dlxh";
+          url = "https://elpa.nongnu.org/nongnu/geiser-chez-0.18.tar";
+          sha256 = "01pkcf0lpzmazah3ddd16yf2la4zd5x4mmi5lwpbsyvyfqhxhsca";
         };
         packageRequires = [ emacs geiser ];
         meta = {
@@ -798,16 +1183,21 @@
           license = lib.licenses.free;
         };
       }) {};
-    geiser-guile = callPackage ({ elpaBuild, emacs, fetchurl, geiser, lib }:
+    geiser-guile = callPackage ({ elpaBuild
+                                , emacs
+                                , fetchurl
+                                , geiser
+                                , lib
+                                , transient }:
       elpaBuild {
         pname = "geiser-guile";
         ename = "geiser-guile";
-        version = "0.23.2";
+        version = "0.28.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/geiser-guile-0.23.2.tar";
-          sha256 = "1z2khagg425y5cfja694zxrj3lyw3awsmqd86b2hpqhrylrb8jaa";
+          url = "https://elpa.nongnu.org/nongnu/geiser-guile-0.28.1.tar";
+          sha256 = "0imh2vdc757vimwxi7pjdv09f83js76nbk7dg861qg0bcqf21g3i";
         };
-        packageRequires = [ emacs geiser ];
+        packageRequires = [ emacs geiser transient ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/geiser-guile.html";
           license = lib.licenses.free;
@@ -862,10 +1252,10 @@
       elpaBuild {
         pname = "geiser-stklos";
         ename = "geiser-stklos";
-        version = "1.4";
+        version = "1.8";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/geiser-stklos-1.4.tar";
-          sha256 = "18z34x4xmn58080r2ar6wd07kap7f367my2q5ph6cdf0gs6nz4sv";
+          url = "https://elpa.nongnu.org/nongnu/geiser-stklos-1.8.tar";
+          sha256 = "1bz7ggq5pl08pr68nmn82sdpb2vqi7zvsjnai8zvr93dai7p3isa";
         };
         packageRequires = [ emacs geiser ];
         meta = {
@@ -894,16 +1284,16 @@
           license = lib.licenses.free;
         };
       }) {};
-    git-modes = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+    git-modes = callPackage ({ compat, elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "git-modes";
         ename = "git-modes";
-        version = "1.4.0";
+        version = "1.4.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/git-modes-1.4.0.tar";
-          sha256 = "1pag50l0rl361p1617rdvhhdajsmq9b1lyi94g16hibygdn7vaff";
+          url = "https://elpa.nongnu.org/nongnu/git-modes-1.4.1.tar";
+          sha256 = "0zxab7rjy5rh8y0ln9h04pvcim8a4qdpj1zs0c0dwbxcsa7v7hz1";
         };
-        packageRequires = [ emacs ];
+        packageRequires = [ compat emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/git-modes.html";
           license = lib.licenses.free;
@@ -924,14 +1314,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    gnu-indent = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "gnu-indent";
+        ename = "gnu-indent";
+        version = "1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/gnu-indent-1.0.tar";
+          sha256 = "0h2kj19k3b9sw1bp0fk37kmc4xwvd3ajlgfa8s13jnvggx77nn8a";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/gnu-indent.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     gnuplot = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "gnuplot";
         ename = "gnuplot";
-        version = "0.8.0";
+        version = "0.8.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/gnuplot-0.8.0.tar";
-          sha256 = "1f27y18ivcdwlkgr3ql4qcbgzdp6vk1bkw2wlryrclpydbb1nya3";
+          url = "https://elpa.nongnu.org/nongnu/gnuplot-0.8.1.tar";
+          sha256 = "015b8ly4wmz03bcysbwy4d63r42sicwqa0j2j4aiis1kpy4lj3xw";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -951,6 +1356,21 @@
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/go-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    golden-ratio = callPackage ({ elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "golden-ratio";
+        ename = "golden-ratio";
+        version = "1.0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/golden-ratio-1.0.1.tar";
+          sha256 = "03vjn4b9s4xhcc009mcxc2w6ymnhss3hci7drkkdd2nlv58lcvs0";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/golden-ratio.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -999,14 +1419,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    gruber-darker-theme = callPackage ({ elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "gruber-darker-theme";
+        ename = "gruber-darker-theme";
+        version = "0.7";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/gruber-darker-theme-0.7.tar";
+          sha256 = "0k2njsg7bwy4i7ll5d9dpqawylgkfvp74bany8g487xvspjscrji";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/gruber-darker-theme.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     gruvbox-theme = callPackage ({ autothemer, elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "gruvbox-theme";
         ename = "gruvbox-theme";
-        version = "1.26.0";
+        version = "1.30.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/gruvbox-theme-1.26.0.tar";
-          sha256 = "19q5i0jz01hdn09wwg929yva6278fhyvk68id5p9dyi8h2n73djn";
+          url = "https://elpa.nongnu.org/nongnu/gruvbox-theme-1.30.1.tar";
+          sha256 = "19r3ffkyq779jjz0jvyxdf2zhm1yd1lax9sh0qsj1r5xrcmb15l7";
         };
         packageRequires = [ autothemer ];
         meta = {
@@ -1033,10 +1468,10 @@
       elpaBuild {
         pname = "haml-mode";
         ename = "haml-mode";
-        version = "3.1.10";
+        version = "3.2.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/haml-mode-3.1.10.tar";
-          sha256 = "1qkhm52xr8vh9zp728ass5kxjw7fj65j84m06db084qpavnwvysa";
+          url = "https://elpa.nongnu.org/nongnu/haml-mode-3.2.1.tar";
+          sha256 = "10pnpx4x5wjk4yq4kgynkhfv4xg8nzwmfwf1bappivrdii47hbiq";
         };
         packageRequires = [ cl-lib emacs ];
         meta = {
@@ -1044,16 +1479,16 @@
           license = lib.licenses.free;
         };
       }) {};
-    haskell-mode = callPackage ({ elpaBuild, fetchurl, lib }:
+    haskell-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "haskell-mode";
         ename = "haskell-mode";
-        version = "4.7.1";
+        version = "17.4";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/haskell-mode-4.7.1.tar";
-          sha256 = "07x7440xi8dkv1zpzwi7p96jy3zd6pdv1mhs066l8bp325516wyb";
+          url = "https://elpa.nongnu.org/nongnu/haskell-mode-17.4.tar";
+          sha256 = "0xf8smasbb53ddg4vxckpg5w48dnm16v2k5vimfqr73cig49z87f";
         };
-        packageRequires = [];
+        packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/haskell-mode.html";
           license = lib.licenses.free;
@@ -1074,16 +1509,16 @@
           license = lib.licenses.free;
         };
       }) {};
-    helm = callPackage ({ elpaBuild, fetchurl, helm-core, lib, popup }:
+    helm = callPackage ({ elpaBuild, fetchurl, helm-core, lib, popup, wfnames }:
       elpaBuild {
         pname = "helm";
         ename = "helm";
-        version = "3.8.5";
+        version = "3.9.5";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/helm-3.8.5.tar";
-          sha256 = "1h71qcik375zhkk4rgcxj6ffnzpns2lvzwq82yfhmmhzrrxhds0z";
+          url = "https://elpa.nongnu.org/nongnu/helm-3.9.5.tar";
+          sha256 = "1vsg1xflz5880h477s8hqrxinv4wdx12gdvs08zy7xbmypzwhrz1";
         };
-        packageRequires = [ helm-core popup ];
+        packageRequires = [ helm-core popup wfnames ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/helm.html";
           license = lib.licenses.free;
@@ -1093,10 +1528,10 @@
       elpaBuild {
         pname = "helm-core";
         ename = "helm-core";
-        version = "3.8.5";
+        version = "3.9.5";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/helm-core-3.8.5.tar";
-          sha256 = "0117y2gazm8h5fxj23166a53w4r68r1mscgardk0y6xd6lz73yz9";
+          url = "https://elpa.nongnu.org/nongnu/helm-core-3.9.5.tar";
+          sha256 = "1ixbbh0zcxnkl5ry5sswgh8nw8a2hrgkw9hqzznz9wiw1avs4g9c";
         };
         packageRequires = [ async emacs ];
         meta = {
@@ -1122,6 +1557,36 @@
           license = lib.licenses.free;
         };
       }) {};
+    hl-block-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "hl-block-mode";
+        ename = "hl-block-mode";
+        version = "0.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/hl-block-mode-0.2.tar";
+          sha256 = "1qrq238arblk8v8nf98kcdckfhwzi27w5zbl31yvf36xz69l9y8n";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/hl-block-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    hl-column = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "hl-column";
+        ename = "hl-column";
+        version = "1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/hl-column-1.0.tar";
+          sha256 = "00y4g912s341p30xnb0qgj0gmzsqm696v06kjgy9yva5qgw51f03";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/hl-column.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     htmlize = callPackage ({ elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "htmlize";
@@ -1134,6 +1599,43 @@
         packageRequires = [];
         meta = {
           homepage = "https://elpa.gnu.org/packages/htmlize.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    hyperdrive = callPackage ({ compat
+                              , elpaBuild
+                              , emacs
+                              , fetchurl
+                              , lib
+                              , map
+                              , persist
+                              , plz }:
+      elpaBuild {
+        pname = "hyperdrive";
+        ename = "hyperdrive";
+        version = "0.1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/hyperdrive-0.1.0.tar";
+          sha256 = "1dawm6wxwik7jks0xc2ina2nikdg9x4cnnws4srcf15vwh40van4";
+        };
+        packageRequires = [ compat emacs map persist plz ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/hyperdrive.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    idle-highlight-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "idle-highlight-mode";
+        ename = "idle-highlight-mode";
+        version = "1.1.4";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/idle-highlight-mode-1.1.4.tar";
+          sha256 = "1j7y03b90gf3pl0xbfirm973k31l7nx90is69m3jrfai2f9qnflr";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/idle-highlight-mode.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1180,14 +1682,59 @@
       elpaBuild {
         pname = "inf-clojure";
         ename = "inf-clojure";
-        version = "3.1.0";
+        version = "3.2.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/inf-clojure-3.1.0.tar";
-          sha256 = "0jw6rzplicbv2l7si46naspzp5lqwj20b1nmfs9zal58z1gx6zjk";
+          url = "https://elpa.nongnu.org/nongnu/inf-clojure-3.2.1.tar";
+          sha256 = "0p1q51wn67abwhn6qa01f190czaq33nmy4ir1jrcxsny4vnbxvx4";
         };
         packageRequires = [ clojure-mode emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/inf-clojure.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    inf-ruby = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "inf-ruby";
+        ename = "inf-ruby";
+        version = "2.7.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/inf-ruby-2.7.0.tar";
+          sha256 = "0wzzhr10q8mnai024g5nprsnl0bcdlqfrh4nxf8qq43paah28i6f";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/inf-ruby.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    inkpot-theme = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "inkpot-theme";
+        ename = "inkpot-theme";
+        version = "0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/inkpot-theme-0.1.tar";
+          sha256 = "0ik7vkwqlsgxmdckd154kh82zg8jr41vwc0a200x9920l5mnfjq2";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/inkpot-theme.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    iwindow = callPackage ({ compat, elpaBuild, emacs, fetchurl, lib, seq }:
+      elpaBuild {
+        pname = "iwindow";
+        ename = "iwindow";
+        version = "1.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/iwindow-1.0.tar";
+          sha256 = "076i0p9kq48hxkkwzzapnni6cpdr25hdrw9bs2cly8w4v5rmd6rj";
+        };
+        packageRequires = [ compat emacs seq ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/iwindow.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1251,16 +1798,16 @@
           license = lib.licenses.free;
         };
       }) {};
-    keycast = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+    keycast = callPackage ({ compat, elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "keycast";
         ename = "keycast";
-        version = "1.2.0";
+        version = "1.3.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/keycast-1.2.0.tar";
-          sha256 = "0iiksz8lcz9y5yplw455v2zgvq2jz6jc2ic3ybax10v3wgxnhiad";
+          url = "https://elpa.nongnu.org/nongnu/keycast-1.3.2.tar";
+          sha256 = "0z8q1xxx02di0788kgc4xpvl43iyknkj57l9cwf6qq6hi032c9kj";
         };
-        packageRequires = [ emacs ];
+        packageRequires = [ compat emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/keycast.html";
           license = lib.licenses.free;
@@ -1270,10 +1817,10 @@
       elpaBuild {
         pname = "kotlin-mode";
         ename = "kotlin-mode";
-        version = "1.0.0";
+        version = "2.0.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/kotlin-mode-1.0.0.tar";
-          sha256 = "0ajnnsh6a8psfh7gd34d2wfii08jxr7x7k6na0assjldsxy7afwj";
+          url = "https://elpa.nongnu.org/nongnu/kotlin-mode-2.0.0.tar";
+          sha256 = "0q1pfjcsk6c17hs5xg7wb6f4i29hn3zxgznjcr3v11dm4xmrj9iv";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -1281,14 +1828,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    lorem-ipsum = callPackage ({ elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "lorem-ipsum";
+        ename = "lorem-ipsum";
+        version = "0.4";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/lorem-ipsum-0.4.tar";
+          sha256 = "05zk11g0w3bnabxf5937hrkc3k58vlrh1bk61dar9gfbfdq3ijyg";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/lorem-ipsum.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     lua-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "lua-mode";
         ename = "lua-mode";
-        version = "20210802";
+        version = "20221027";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/lua-mode-20210802.tar";
-          sha256 = "1yarwai9a0w4yywd0ajdkif4g26z98zw91lg1z78qw0k61qjmnh6";
+          url = "https://elpa.nongnu.org/nongnu/lua-mode-20221027.tar";
+          sha256 = "1irdlw77ny0a28msrbn4lm66ixrlf2grsj4izhpdm1n0yv66xvfc";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -1300,10 +1862,10 @@
       elpaBuild {
         pname = "macrostep";
         ename = "macrostep";
-        version = "0.9";
+        version = "0.9.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/macrostep-0.9.tar";
-          sha256 = "10crvq9xww4nvrswqq888y9ah3fl4prj0ha865aqbyrhhbpg18gd";
+          url = "https://elpa.nongnu.org/nongnu/macrostep-0.9.2.tar";
+          sha256 = "1257vz50k69wka756c9sjq86apvw876myl3wml55x5m8q328wbcf";
         };
         packageRequires = [ cl-lib ];
         meta = {
@@ -1360,14 +1922,34 @@
       elpaBuild {
         pname = "markdown-mode";
         ename = "markdown-mode";
-        version = "2.5";
+        version = "2.6";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/markdown-mode-2.5.tar";
-          sha256 = "195p4bz2k5rs6222pfxv6rk2r22snx33gvc1x3rs020lacppbhik";
+          url = "https://elpa.nongnu.org/nongnu/markdown-mode-2.6.tar";
+          sha256 = "1z1rzx1sc8hzvyqgnfdj64syr4pabv9grl57n4jis9arcqmx41zr";
         };
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/markdown-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    mastodon = callPackage ({ elpaBuild
+                            , emacs
+                            , fetchurl
+                            , lib
+                            , persist
+                            , request }:
+      elpaBuild {
+        pname = "mastodon";
+        ename = "mastodon";
+        version = "1.0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/mastodon-1.0.1.tar";
+          sha256 = "0xj5zsmacj68amcq9kshin5ddjhpyjyfhkc7nafzbjk63fnscjnb";
+        };
+        packageRequires = [ emacs persist request ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/mastodon.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1387,24 +1969,54 @@
         };
       }) {};
     mentor = callPackage ({ async
-                          , cl-lib ? null
                           , elpaBuild
                           , emacs
                           , fetchurl
                           , lib
                           , seq
+                          , url-scgi
                           , xml-rpc }:
       elpaBuild {
         pname = "mentor";
         ename = "mentor";
-        version = "0.3.5";
+        version = "0.5";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/mentor-0.3.5.tar";
-          sha256 = "01zrvfk2njzyzjzkvp5hv5cjl1k1qjrila1ab4bv26gf6bkq5xh3";
+          url = "https://elpa.nongnu.org/nongnu/mentor-0.5.tar";
+          sha256 = "1kkzm881fxhc5hb83x0j12lv22b72nzw45qrypbl1jf2siispz9l";
         };
-        packageRequires = [ async cl-lib emacs seq xml-rpc ];
+        packageRequires = [ async emacs seq url-scgi xml-rpc ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/mentor.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    meow = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "meow";
+        ename = "meow";
+        version = "1.4.4";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/meow-1.4.4.tar";
+          sha256 = "013nmc0jcvwfh6s1l59kld8393ld4sy5icbah9hzd0chj6l72mgh";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/meow.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    minibar = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "minibar";
+        ename = "minibar";
+        version = "0.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/minibar-0.3.tar";
+          sha256 = "1mgkkjaav9hkg1c0lvn887armxv18hn99zd3dy1dx2lnjv2kfdcp";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/minibar.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1513,10 +2125,10 @@
       elpaBuild {
         pname = "nix-mode";
         ename = "nix-mode";
-        version = "1.4.4";
+        version = "1.5.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/nix-mode-1.4.4.tar";
-          sha256 = "1nn74671273s5mjxzbdqvpwqx6w12zya21sxhzw51k2fs68vwh23";
+          url = "https://elpa.nongnu.org/nongnu/nix-mode-1.5.0.tar";
+          sha256 = "0zi7xmh777pqzgcv18jqwywvidpa984p0m705p6a9fns7dvv53j7";
         };
         packageRequires = [ emacs magit-section transient ];
         meta = {
@@ -1524,14 +2136,59 @@
           license = lib.licenses.free;
         };
       }) {};
+    oblivion-theme = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "oblivion-theme";
+        ename = "oblivion-theme";
+        version = "0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/oblivion-theme-0.1.tar";
+          sha256 = "0095sc82nl5qxz5nlf2bxbynkxa3plcqr8dq187r70p0775jw46m";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/oblivion-theme.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    opam-switch-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "opam-switch-mode";
+        ename = "opam-switch-mode";
+        version = "1.7";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/opam-switch-mode-1.7.tar";
+          sha256 = "19mg0k6ish0grhh4d9d9m634jkgbx80bgfwf4xh0q42piypyrmrj";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/opam-switch-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    org-auto-tangle = callPackage ({ async, elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "org-auto-tangle";
+        ename = "org-auto-tangle";
+        version = "0.6.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/org-auto-tangle-0.6.0.tar";
+          sha256 = "07g1cwsr8j1sd8whshi9y2b69qx10g9vd77pmwki9ba4sy0m7b0p";
+        };
+        packageRequires = [ async emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/org-auto-tangle.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     org-contrib = callPackage ({ elpaBuild, emacs, fetchurl, lib, org }:
       elpaBuild {
         pname = "org-contrib";
         ename = "org-contrib";
-        version = "0.3";
+        version = "0.4.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/org-contrib-0.3.tar";
-          sha256 = "0fqhyby7624drskfsasgvzyxbgjb42rd6vw8l6xgb3h22kaprl0q";
+          url = "https://elpa.nongnu.org/nongnu/org-contrib-0.4.2.tar";
+          sha256 = "058400h1c6ybkxjyxfkb43zwn90449zfhvbfvw70isf1l28l1rdz";
         };
         packageRequires = [ emacs org ];
         meta = {
@@ -1564,10 +2221,10 @@
       elpaBuild {
         pname = "org-journal";
         ename = "org-journal";
-        version = "2.1.2";
+        version = "2.2.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/org-journal-2.1.2.tar";
-          sha256 = "1s5hadcps283c5a1sy8fp1ih064l0hl97frj93jw3fkx6jwbqf0v";
+          url = "https://elpa.nongnu.org/nongnu/org-journal-2.2.0.tar";
+          sha256 = "1pikz9aqdch11zsya8j3gx44wfl2y5r0kym093pl7w6bjx9bgija";
         };
         packageRequires = [ emacs org ];
         meta = {
@@ -1579,10 +2236,10 @@
       elpaBuild {
         pname = "org-mime";
         ename = "org-mime";
-        version = "0.2.6";
+        version = "0.3.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/org-mime-0.2.6.tar";
-          sha256 = "1l6mniyhmw3vbkvahw24038isd4ysbx505c3r0ar1rh7fbdf58cf";
+          url = "https://elpa.nongnu.org/nongnu/org-mime-0.3.2.tar";
+          sha256 = "12crmbrjxac1ml2x1jh3wbpgh0fddhnl3gdmb5r9dlpkay1c5dxs";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -1624,10 +2281,10 @@
       elpaBuild {
         pname = "org-tree-slide";
         ename = "org-tree-slide";
-        version = "2.8.18";
+        version = "2.8.22";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/org-tree-slide-2.8.18.tar";
-          sha256 = "0xx8svbh6ks5112rac4chms0f8drhiwxnc3knrzaj8i1zb89l0n3";
+          url = "https://elpa.nongnu.org/nongnu/org-tree-slide-2.8.22.tar";
+          sha256 = "19y9lznk69k8s195z4s2h6s6y8vr7lzmr7x9pi5n67a7bapshs02";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -1635,18 +2292,44 @@
           license = lib.licenses.free;
         };
       }) {};
-    orgit = callPackage ({ elpaBuild, emacs, fetchurl, lib, magit, org }:
+    orgit = callPackage ({ compat
+                         , elpaBuild
+                         , emacs
+                         , fetchurl
+                         , lib
+                         , magit
+                         , org }:
       elpaBuild {
         pname = "orgit";
         ename = "orgit";
-        version = "1.8.0";
+        version = "1.9.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/orgit-1.8.0.tar";
-          sha256 = "03qjhiv3smnpjciz5sfri7v5gzgcnk5g0lhgm06flqnarfrrkn1h";
+          url = "https://elpa.nongnu.org/nongnu/orgit-1.9.0.tar";
+          sha256 = "1lwvmd0mri1vxqp5d8fqam1qhznfjq0bn5i5jjv15nqzcklsw7bm";
         };
-        packageRequires = [ emacs magit org ];
+        packageRequires = [ compat emacs magit org ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/orgit.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    package-lint = callPackage ({ cl-lib ? null
+                                , elpaBuild
+                                , emacs
+                                , fetchurl
+                                , let-alist
+                                , lib }:
+      elpaBuild {
+        pname = "package-lint";
+        ename = "package-lint";
+        version = "0.19";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/package-lint-0.19.tar";
+          sha256 = "0zq4kbir2l5fly8a37fdp4msygswl44vhjpwpcj1zqz13w30cd8h";
+        };
+        packageRequires = [ cl-lib emacs let-alist ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/package-lint.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1662,6 +2345,36 @@
         packageRequires = [ dash emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/pacmacs.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    page-break-lines = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "page-break-lines";
+        ename = "page-break-lines";
+        version = "0.15";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/page-break-lines-0.15.tar";
+          sha256 = "1i66254x49fwbzqrxmvp3v30aqas129kmy817rxbnqid7m5n1n7z";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/page-break-lines.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    paredit = callPackage ({ elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "paredit";
+        ename = "paredit";
+        version = "26";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/paredit-26.tar";
+          sha256 = "08f8nm3qyk0b4x7mkgra0zjpn9mmfnpr5g7yrvdzvms38y919qlh";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/paredit.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1710,6 +2423,21 @@
           license = lib.licenses.free;
         };
       }) {};
+    pcre2el = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "pcre2el";
+        ename = "pcre2el";
+        version = "1.12";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/pcre2el-1.12.tar";
+          sha256 = "0w2c9y4qrx8lm14jdjnax6wpwi5sw284brm4k1dwkrx8244krv8x";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/pcre2el.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     pdf-tools = callPackage ({ elpaBuild
                              , emacs
                              , fetchurl
@@ -1719,10 +2447,10 @@
       elpaBuild {
         pname = "pdf-tools";
         ename = "pdf-tools";
-        version = "1.0";
+        version = "1.1.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/pdf-tools-1.0.tar";
-          sha256 = "0cjr7y2ikf2al43wrzlqdpbksj0ww6m0nvmlz97slx8nk94k2qyf";
+          url = "https://elpa.nongnu.org/nongnu/pdf-tools-1.1.0.tar";
+          sha256 = "0gb8c7y55mmz69agg0rkdjrxg0abznl2mj2x8vw12x4x1ggmykkf";
         };
         packageRequires = [ emacs let-alist tablist ];
         meta = {
@@ -1734,14 +2462,29 @@
       elpaBuild {
         pname = "php-mode";
         ename = "php-mode";
-        version = "1.24.0";
+        version = "1.25.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/php-mode-1.24.0.tar";
-          sha256 = "158850zdmz5irjy6cjai1i8j7qs1vwp95a2dli9f341lbpv2jvzp";
+          url = "https://elpa.nongnu.org/nongnu/php-mode-1.25.0.tar";
+          sha256 = "05n53risvyzgyqr0r7v7bgd267dh30wq266mmfhj2q37v1gkfjiv";
         };
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/php-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    popon = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "popon";
+        ename = "popon";
+        version = "0.13";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/popon-0.13.tar";
+          sha256 = "1ifwkiq8viic4ymph0xrpyrmr946brp2cx48yqf4jrhknafqv5qf";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/popon.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1764,14 +2507,29 @@
       elpaBuild {
         pname = "projectile";
         ename = "projectile";
-        version = "2.5.0";
+        version = "2.7.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/projectile-2.5.0.tar";
-          sha256 = "09gsm6xbqj3357vlshs1w7ygfm004gpgs0pqrvwl6xmccxpqzmi0";
+          url = "https://elpa.nongnu.org/nongnu/projectile-2.7.0.tar";
+          sha256 = "1ibxsa1lv9aiplkfplamyn2wc2c6vfwfszyaicfx79aq2w9427bg";
         };
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/projectile.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    proof-general = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "proof-general";
+        ename = "proof-general";
+        version = "4.5";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/proof-general-4.5.tar";
+          sha256 = "13zy339yz6ijgkcnqxzcyg909z77w3capb3gim1riy3sqikvv04x";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/proof-general.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1787,6 +2545,24 @@
         packageRequires = [ cl-lib emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/prop-menu.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    racket-mode = callPackage ({ elpaBuild
+                               , emacs
+                               , fetchurl
+                               , lib }:
+      elpaBuild {
+        pname = "racket-mode";
+        ename = "racket-mode";
+        version = "1.0.20230905.102118";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/racket-mode-1.0.20230905.102118.tar";
+          sha256 = "1109aq0q81r6r79vpazrn2r1dwpzpxgashrz1p4lbjh4mk8a16ka";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/racket-mode.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1820,6 +2596,36 @@
           license = lib.licenses.free;
         };
       }) {};
+    recomplete = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "recomplete";
+        ename = "recomplete";
+        version = "0.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/recomplete-0.2.tar";
+          sha256 = "09n21mx90wr53xlhy5mlca675ah9ynnnc2afzjjml98ll81f4k23";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/recomplete.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    reformatter = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "reformatter";
+        ename = "reformatter";
+        version = "0.7";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/reformatter-0.7.tar";
+          sha256 = "17y61gqljc4r66dp3qbggvpgj8wacnhv7kq4pwkpbb1h5a5l5b6z";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/reformatter.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     request = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "request";
@@ -1832,6 +2638,21 @@
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/request.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    rfc-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "rfc-mode";
+        ename = "rfc-mode";
+        version = "1.4.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/rfc-mode-1.4.0.tar";
+          sha256 = "0036ypsjm35x8vwrlm346wcqmh85kbjmw0813q65z6k0gvmnwldj";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/rfc-mode.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1854,10 +2675,10 @@
       elpaBuild {
         pname = "rust-mode";
         ename = "rust-mode";
-        version = "1.0.4";
+        version = "1.0.5";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/rust-mode-1.0.4.tar";
-          sha256 = "137z04h29cgy1dmkf2cnchlfzqs4f5v3cc9gv9qxisw9dswlvdvk";
+          url = "https://elpa.nongnu.org/nongnu/rust-mode-1.0.5.tar";
+          sha256 = "16dw4mfgfazslsf8n9fir2xc3v3jpw9i7bbgcfbhgclm0g2w9j83";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -1884,6 +2705,21 @@
           license = lib.licenses.free;
         };
       }) {};
+    scad-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "scad-mode";
+        ename = "scad-mode";
+        version = "93.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/scad-mode-93.2.tar";
+          sha256 = "0gp7ghmch5wkbby0avmlgj5kajiccbarjrx1szh9r3f3gi1ahawj";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/scad-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     scala-mode = callPackage ({ elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "scala-mode";
@@ -1896,6 +2732,36 @@
         packageRequires = [];
         meta = {
           homepage = "https://elpa.gnu.org/packages/scala-mode.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    scroll-on-drag = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "scroll-on-drag";
+        ename = "scroll-on-drag";
+        version = "0.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/scroll-on-drag-0.1.tar";
+          sha256 = "06bpxfhdhsf6awhjcj21x8kb3g9n6j14s43cd03fp5gb0m5bs478";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/scroll-on-drag.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    scroll-on-jump = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "scroll-on-jump";
+        ename = "scroll-on-jump";
+        version = "0.2";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/scroll-on-jump-0.2.tar";
+          sha256 = "09yndis96ps18i252h66ins1hi3zn27410s5hahkj2989q4cqi1s";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/scroll-on-jump.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -1918,10 +2784,10 @@
       elpaBuild {
         pname = "shellcop";
         ename = "shellcop";
-        version = "0.0.9";
+        version = "0.1.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/shellcop-0.0.9.tar";
-          sha256 = "0rv98s3w3pd2l477100d8kn2kqx21xn3axzcfbxbkgl8bc78mvci";
+          url = "https://elpa.nongnu.org/nongnu/shellcop-0.1.0.tar";
+          sha256 = "0z0aml86y1m11lz8a8wdjfad5dzynjsqw69qin0a4vv2b8gy8mhr";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -1963,10 +2829,10 @@
       elpaBuild {
         pname = "smartparens";
         ename = "smartparens";
-        version = "4.7.1";
+        version = "1.11.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/smartparens-4.7.1.tar";
-          sha256 = "0si9wb7j760c4vdv7p049bgppppw5crrh50038bsh8sghq2gdld8";
+          url = "https://elpa.nongnu.org/nongnu/smartparens-1.11.0.tar";
+          sha256 = "1179wicy5nrjk2iq73rxkx6c44k9ybs1vz6llw0qbwc5l10diyvr";
         };
         packageRequires = [];
         meta = {
@@ -1978,10 +2844,10 @@
       elpaBuild {
         pname = "solarized-theme";
         ename = "solarized-theme";
-        version = "1.3.0";
+        version = "2.0.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/solarized-theme-1.3.0.tar";
-          sha256 = "0wa3wp9r0h4y3kkiw8s4pi1zvg22yhnpsp8ckv1hp4y6js5jbg65";
+          url = "https://elpa.nongnu.org/nongnu/solarized-theme-2.0.1.tar";
+          sha256 = "1kz34a7133l2dl09mvb8v79k693ypxk01bmqwm8cfa7icqq2ka98";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -2001,6 +2867,36 @@
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/spacemacs-theme.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    spell-fu = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "spell-fu";
+        ename = "spell-fu";
+        version = "0.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/spell-fu-0.3.tar";
+          sha256 = "0yr7m0i89ymp93p4qx8a0y1ghg7ydg1479xgvsz71n35x4sbiwba";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/spell-fu.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    sqlite3 = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "sqlite3";
+        ename = "sqlite3";
+        version = "0.17";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/sqlite3-0.17.tar";
+          sha256 = "04m53vn5cvcycv580q6zn5vw54ml7xmhs7bc88cwqj1z5vi3a85x";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/sqlite3.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -2038,10 +2934,10 @@
       elpaBuild {
         pname = "subed";
         ename = "subed";
-        version = "1.0.5";
+        version = "1.2.4";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/subed-1.0.5.tar";
-          sha256 = "1wpkwab6scmc9d3bzp5161d8agmcjacpijs8xqb1mpbyvl1jvavc";
+          url = "https://elpa.nongnu.org/nongnu/subed-1.2.4.tar";
+          sha256 = "05pnjdrf9gq32bayvbd0yvp1lxpwj2xsarcy3s2jjb6zcgm6djyb";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -2049,14 +2945,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    sweeprolog = callPackage ({ compat, elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "sweeprolog";
+        ename = "sweeprolog";
+        version = "0.24.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/sweeprolog-0.24.1.tar";
+          sha256 = "0aw8xzh72zwam0f91d9w1x43hi477xgh0qk4rv732j3hs3fbxb4z";
+        };
+        packageRequires = [ compat emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/sweeprolog.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     swift-mode = callPackage ({ elpaBuild, emacs, fetchurl, lib, seq }:
       elpaBuild {
         pname = "swift-mode";
         ename = "swift-mode";
-        version = "8.4.2";
+        version = "9.0.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/swift-mode-8.4.2.tar";
-          sha256 = "0rkri1414f2w2bw76dwnmylcdca6x9bkdvlq1aznz76ac259klji";
+          url = "https://elpa.nongnu.org/nongnu/swift-mode-9.0.0.tar";
+          sha256 = "1s69mm7yhz1dhxz118ik7nxqw6gliivbwv1qvylk8nz2lhr8sf9n";
         };
         packageRequires = [ emacs seq ];
         meta = {
@@ -2064,14 +2975,44 @@
           license = lib.licenses.free;
         };
       }) {};
+    swsw = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "swsw";
+        ename = "swsw";
+        version = "2.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/swsw-2.3.tar";
+          sha256 = "0qwdv174bh9k1bpd5szzmhk7hw89xf7rz2i2hzdrmlpvcs3ps653";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/swsw.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    symbol-overlay = callPackage ({ elpaBuild, emacs, fetchurl, lib, seq }:
+      elpaBuild {
+        pname = "symbol-overlay";
+        ename = "symbol-overlay";
+        version = "4.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/symbol-overlay-4.1.tar";
+          sha256 = "07gcg45y712dblidak2kxp7w0h0gf39hwzwbkpna66k4c4xjpig8";
+        };
+        packageRequires = [ emacs seq ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/symbol-overlay.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     systemd = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "systemd";
         ename = "systemd";
-        version = "1.6";
+        version = "1.6.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/systemd-1.6.tar";
-          sha256 = "1khfnx2qmg1i4m6axyya0xbzr3c9j136b8pzmqdnd6jamxh43wcg";
+          url = "https://elpa.nongnu.org/nongnu/systemd-1.6.1.tar";
+          sha256 = "0h6iwdi3j2ypgcwnyjs8rdlz5f8j25cya6z4v3n2phnkqbncmgx6";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -2130,6 +3071,21 @@
           license = lib.licenses.free;
         };
       }) {};
+    testcover-mark-line = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "testcover-mark-line";
+        ename = "testcover-mark-line";
+        version = "0.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/testcover-mark-line-0.3.tar";
+          sha256 = "18nlkm7p6fmaziqqbb4jmhpypn0b6233qd0c19xp16kjbxpg7ifh";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/testcover-mark-line.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     textile-mode = callPackage ({ elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "textile-mode";
@@ -2160,14 +3116,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    treeview = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "treeview";
+        ename = "treeview";
+        version = "1.1.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/treeview-1.1.1.tar";
+          sha256 = "0ryycz2n1kam3ji0ibpy99ll5l6xnx1mx9i9bgfvma61f0ppcppd";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/treeview.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     tuareg = callPackage ({ caml, elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "tuareg";
         ename = "tuareg";
-        version = "2.3.0";
+        version = "3.0.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/tuareg-2.3.0.tar";
-          sha256 = "0a24q64yk4bbgsvm56j1y68zs9yi25qyl83xydx3ff75sk27f1yb";
+          url = "https://elpa.nongnu.org/nongnu/tuareg-3.0.1.tar";
+          sha256 = "0y98gwnbrcj3csd9yilk1izgzmp1ds5dh3y1bxgb2fzrjir3i13f";
         };
         packageRequires = [ caml emacs ];
         meta = {
@@ -2205,14 +3176,44 @@
           license = lib.licenses.free;
         };
       }) {};
+    undo-fu = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "undo-fu";
+        ename = "undo-fu";
+        version = "0.5";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/undo-fu-0.5.tar";
+          sha256 = "0akn8gw3wavsfhxa9m426jkjacsw3k8vaxymhqrzy18lpvg5hysw";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/undo-fu.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    undo-fu-session = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "undo-fu-session";
+        ename = "undo-fu-session";
+        version = "0.6";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/undo-fu-session-0.6.tar";
+          sha256 = "0l54zqr481xlldfjllhsq4z6ccyzx0k3h7gm59pz32m7bd7zxggl";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/undo-fu-session.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     vc-fossil = callPackage ({ elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "vc-fossil";
         ename = "vc-fossil";
-        version = "20210928";
+        version = "20230504";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/vc-fossil-20210928.tar";
-          sha256 = "0n4h1cj1336mv5cswq0139bkry5gnv4hrrwzd4bqhrxp5kbhqa5y";
+          url = "https://elpa.nongnu.org/nongnu/vc-fossil-20230504.tar";
+          sha256 = "0s7mxi9qq5axv1prqgfi1d7yyrn0abal8y25d4l7n38qszixjlcd";
         };
         packageRequires = [];
         meta = {
@@ -2220,14 +3221,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    vcomplete = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "vcomplete";
+        ename = "vcomplete";
+        version = "2.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/vcomplete-2.0.tar";
+          sha256 = "0fh5rfvhjmpfdhp4k4b1y57zlsixiabhzca9329id48p8jm4rqyp";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/vcomplete.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     visual-fill-column = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "visual-fill-column";
         ename = "visual-fill-column";
-        version = "2.4";
+        version = "2.5.1";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/visual-fill-column-2.4.tar";
-          sha256 = "0100v17s9w9nqjpr7h3zianfy1i4i71idk2qrlzqzcd8qn1m3vjx";
+          url = "https://elpa.nongnu.org/nongnu/visual-fill-column-2.5.1.tar";
+          sha256 = "1q2cimrcr4knh716cdnhs8nspk08w8x7bsbhx69s9hpzgr7mjq58";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -2239,10 +3255,10 @@
       elpaBuild {
         pname = "web-mode";
         ename = "web-mode";
-        version = "17.2.0";
+        version = "17.3.14";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/web-mode-17.2.0.tar";
-          sha256 = "15m7rx7sz7f6h0x90811bcl8gdcpn216ia48nmkqhqrm85synlja";
+          url = "https://elpa.nongnu.org/nongnu/web-mode-17.3.14.tar";
+          sha256 = "1a13lra62vqcxr31ivx1r68wj1d59hkbrfxxmy8f7afm1v4aqbz2";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -2270,31 +3286,61 @@
           license = lib.licenses.free;
         };
       }) {};
-    wgrep = callPackage ({ elpaBuild, fetchurl, lib }:
+    wfnames = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "wfnames";
+        ename = "wfnames";
+        version = "1.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/wfnames-1.1.tar";
+          sha256 = "04plvqn4srv1v7d7zx6qb0xm62c1hwkiqpq34w17daw9si2pvpan";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/wfnames.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    wgrep = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "wgrep";
         ename = "wgrep";
-        version = "2.3.3";
+        version = "3.0.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/wgrep-2.3.3.tar";
-          sha256 = "12w9vsawqnd0rvsahx8vdiabds8rl1zkpmspmcqn28jprbql734r";
+          url = "https://elpa.nongnu.org/nongnu/wgrep-3.0.0.tar";
+          sha256 = "0vg23ydwkqrmhlll45gf2fjdxj9chx9bl9m0pgwrlkjw0ncxj3qp";
         };
-        packageRequires = [];
+        packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/wgrep.html";
           license = lib.licenses.free;
         };
       }) {};
-    with-editor = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+    why-this = callPackage ({ elpaBuild, emacs, fetchurl, lib }:
+      elpaBuild {
+        pname = "why-this";
+        ename = "why-this";
+        version = "2.0.4";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/why-this-2.0.4.tar";
+          sha256 = "0hqvqix9hqaki23vw3xilkcr84ak2vz4lwczr54s87x13idrg4px";
+        };
+        packageRequires = [ emacs ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/why-this.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    with-editor = callPackage ({ compat, elpaBuild, emacs, fetchurl, lib }:
       elpaBuild {
         pname = "with-editor";
         ename = "with-editor";
-        version = "3.2.0";
+        version = "3.3.2";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/with-editor-3.2.0.tar";
-          sha256 = "1rsggbhkngzbcmg3076jbi1sfkzz8p4s5i00sk0ywc6vkmsp6s1k";
+          url = "https://elpa.nongnu.org/nongnu/with-editor-3.3.2.tar";
+          sha256 = "1jxkl9y6k81hyswd7yqrigwqsrgi3d0k5iaab1pjqyaixm5hk0d2";
         };
-        packageRequires = [ emacs ];
+        packageRequires = [ compat emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/with-editor.html";
           license = lib.licenses.free;
@@ -2312,6 +3358,41 @@
         packageRequires = [ emacs ];
         meta = {
           homepage = "https://elpa.gnu.org/packages/with-simulated-input.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    workroom = callPackage ({ compat
+                            , elpaBuild
+                            , emacs
+                            , fetchurl
+                            , lib
+                            , project }:
+      elpaBuild {
+        pname = "workroom";
+        ename = "workroom";
+        version = "2.3";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/workroom-2.3.tar";
+          sha256 = "0c05pbxkrcgsjk7zcyxiacxrpxyvf85rf38nhaqhxbywh4j071fg";
+        };
+        packageRequires = [ compat emacs project ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/workroom.html";
+          license = lib.licenses.free;
+        };
+      }) {};
+    writegood-mode = callPackage ({ elpaBuild, fetchurl, lib }:
+      elpaBuild {
+        pname = "writegood-mode";
+        ename = "writegood-mode";
+        version = "2.2.0";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/writegood-mode-2.2.0.tar";
+          sha256 = "08b1650v6qsb3x1s5k4n5m2aqx1n26gc4wj822fm9s49k8vcpzl8";
+        };
+        packageRequires = [];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/writegood-mode.html";
           license = lib.licenses.free;
         };
       }) {};
@@ -2337,10 +3418,10 @@
       elpaBuild {
         pname = "xah-fly-keys";
         ename = "xah-fly-keys";
-        version = "17.7.20220429090059";
+        version = "24.10.20230911080522";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/xah-fly-keys-17.7.20220429090059.tar";
-          sha256 = "006lqjx88b0g0szxai82qdn3bv8qajp2x281arpmp3rpb7faggvq";
+          url = "https://elpa.nongnu.org/nongnu/xah-fly-keys-24.10.20230911080522.tar";
+          sha256 = "07k3v9gf7hbnicrggspd8xx2qwmd5x0vrfmy0x8fx21d61fylqvh";
         };
         packageRequires = [ emacs ];
         meta = {
@@ -2348,14 +3429,29 @@
           license = lib.licenses.free;
         };
       }) {};
+    xkcd = callPackage ({ elpaBuild, fetchurl, json ? null, lib }:
+      elpaBuild {
+        pname = "xkcd";
+        ename = "xkcd";
+        version = "1.1";
+        src = fetchurl {
+          url = "https://elpa.nongnu.org/nongnu/xkcd-1.1.tar";
+          sha256 = "1yszrba4cvisiy7m16rzpj7plbnafj4c7bdgxvqwxwhsasfmh6ag";
+        };
+        packageRequires = [ json ];
+        meta = {
+          homepage = "https://elpa.gnu.org/packages/xkcd.html";
+          license = lib.licenses.free;
+        };
+      }) {};
     xml-rpc = callPackage ({ elpaBuild, fetchurl, lib }:
       elpaBuild {
         pname = "xml-rpc";
         ename = "xml-rpc";
-        version = "1.6.15";
+        version = "1.6.16";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/xml-rpc-1.6.15.tar";
-          sha256 = "0z87rn7zbd8335iqfvk16zpvby66l0izzw438pxdr7kf60i5vgwl";
+          url = "https://elpa.nongnu.org/nongnu/xml-rpc-1.6.16.tar";
+          sha256 = "0gglrrnicbsf1lrk4pwmif5658yrhx80ixgi5hm85p8yxarn3ynm";
         };
         packageRequires = [];
         meta = {
@@ -2397,10 +3493,10 @@
       elpaBuild {
         pname = "zenburn-theme";
         ename = "zenburn-theme";
-        version = "2.7.0";
+        version = "2.8.0";
         src = fetchurl {
-          url = "https://elpa.nongnu.org/nongnu/zenburn-theme-2.7.0.tar";
-          sha256 = "1x7gd5w0g47kcam88lm605b35y35iq3q5f991a84l050c8syrkpy";
+          url = "https://elpa.nongnu.org/nongnu/zenburn-theme-2.8.0.tar";
+          sha256 = "1jbkh09r6sxb0iv9cdxi6k33kz3hldc6hcvyqljf733rdxykpskv";
         };
         packageRequires = [];
         meta = {

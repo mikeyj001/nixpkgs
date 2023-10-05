@@ -4,6 +4,7 @@
 , fetchpatch
 , scfbuild
 , fontforge
+, node-glob
 , libuninameslist
 , nodejs
 , nodePackages
@@ -47,21 +48,27 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "openmoji";
-  version = "13.1.0";
+  version = "14.0.0";
 
   src = fetchFromGitHub {
     owner = "hfg-gmuend";
     repo = pname;
     rev = version;
-    sha256 = "sha256-7G6a+LFq79njyPhnDhhSJ98Smw5fWlfcsFj6nWBPsSk=";
+    sha256 = "sha256-XnSRSlWXOMeSaO6dKaOloRg3+sWS4BSaro4bPqOyKmE=";
   };
 
   nativeBuildInputs = [
     scfbuild-with-fontforge-20201107
     nodejs
-    nodePackages.glob
+    node-glob
     nodePackages.lodash
   ];
+
+  postPatch = ''
+    # this is API change in glob >9
+    substituteInPlace helpers/generate-font-glyphs.js \
+      --replace "require('glob').sync" "require('glob').globSync"
+  '';
 
   buildPhase = ''
     runHook preBuild

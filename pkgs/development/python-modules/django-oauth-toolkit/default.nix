@@ -1,6 +1,7 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
+, pythonRelaxDepsHook
 
 # propagates
 , django
@@ -18,14 +19,14 @@
 
 buildPythonPackage rec {
   pname = "django-oauth-toolkit";
-  version = "1.7.0";
+  version = "2.3.0";
   format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "jazzband";
     repo = pname;
-    rev = version;
-    sha256 = "0rp7pjif54yvdxfxn0pnf8ha3fjxspnx1ijyr1f8npwk2x5vnvhb";
+    rev = "refs/tags/${version}";
+    hash = "sha256-oGg5MD9p4PSUVkt5pGLwjAF4SHHf4Aqr+/3FsuFaybY=";
   };
 
   postPatch = ''
@@ -39,12 +40,19 @@ buildPythonPackage rec {
     requests
   ];
 
+  nativeBuildInputs = [ pythonRelaxDepsHook ];
+  pythonRelaxDeps = [
+    "django"
+  ];
+
   DJANGO_SETTINGS_MODULE = "tests.settings";
 
-  checkInputs = [
+  # xdist is disabled right now because it can cause race conditions on high core machines
+  # https://github.com/jazzband/django-oauth-toolkit/issues/1300
+  nativeCheckInputs = [
     djangorestframework
     pytest-django
-    pytest-xdist
+    # pytest-xdist
     pytest-mock
     pytestCheckHook
   ];

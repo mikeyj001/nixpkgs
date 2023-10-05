@@ -3,7 +3,6 @@
 , fetchFromGitLab
 , pkg-config
 , autoreconfHook
-, qmake
 , rake
 , boost
 , cmark
@@ -47,13 +46,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "mkvtoolnix";
-  version = "67.0.0";
+  version = "79.0";
 
   src = fetchFromGitLab {
     owner = "mbunkus";
     repo = "mkvtoolnix";
     rev = "release-${version}";
-    sha256 = "0gyjgp5iyr9kvgpgl064w025ji1w8dy0cnw4fmbp71wis7qp7yl1";
+    sha256 = "sha256-M+CST7A/obfuGH4lyV68vrhmzEIFCa7DRgApKbPh/uQ=";
   };
 
   nativeBuildInputs = [
@@ -102,8 +101,9 @@ stdenv.mkDerivation rec {
     "--disable-precompiled-headers"
     "--disable-profiling"
     "--disable-static-qt"
+    "--disable-update-check"
     "--enable-optimization"
-    "--with-boost-libdir=${boost.out}/lib"
+    "--with-boost-libdir=${lib.getLib boost}/lib"
     "--with-docbook-xsl-root=${docbook_xsl}/share/xml/docbook-xsl"
     "--with-gettext"
     (enableFeature withGUI "gui")
@@ -127,6 +127,7 @@ stdenv.mkDerivation rec {
     description = "Cross-platform tools for Matroska";
     homepage = "https://mkvtoolnix.download/";
     license = licenses.gpl2Only;
+    mainProgram = if withGUI then "mkvtoolnix-gui" else "mkvtoolnix";
     maintainers = with maintainers; [ codyopel rnhmjoj ];
     platforms = platforms.unix;
   };

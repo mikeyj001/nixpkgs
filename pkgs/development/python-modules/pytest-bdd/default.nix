@@ -1,48 +1,56 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, execnet
-, glob2
-, Mako
-, mock
+, fetchpatch
+, mako
 , parse
 , parse-type
-, py
+, poetry-core
 , pytest
 , pytestCheckHook
 , pythonOlder
+, typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "pytest-bdd";
-  version = "5.0.0";
-  format = "setuptools";
+  version = "6.1.1";
+  format = "pyproject";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "pytest-dev";
     repo = pname;
-    rev = version;
-    sha256 = "sha256-3P9ongMAsLITOCRPmME492xnkdVc8IdOVrINK57gfOY=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-+76jIgfDQPdIoesTr1+QUu8wmOnrdf4KT+TJr9F2Hqk=";
   };
+
+  patches = [
+    (fetchpatch {
+      name = "remove-setuptools.patch";
+      url = "https://github.com/pytest-dev/pytest-bdd/commit/5d8eda3a30b47d3bd27849884a851adafca765cb.patch";
+      hash = "sha256-G2WHaRKlQ9HINufh8wl7+ly7HfDGobMLzzlbwDwd+o8=";
+    })
+  ];
+
+  nativeBuildInputs = [
+    poetry-core
+  ];
 
   buildInputs = [
     pytest
   ];
 
   propagatedBuildInputs = [
-    glob2
-    Mako
+    mako
     parse
     parse-type
-    py
+    typing-extensions
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
-    execnet
-    mock
   ];
 
   preCheck = ''

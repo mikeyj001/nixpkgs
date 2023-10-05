@@ -8,20 +8,20 @@
 
 # tests
 , pyqt5
-, pyside
+, pyside2
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "QtPy";
-  version = "2.0.1";
+  version = "2.4.0";
   format = "setuptools";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "13zbhnl2rm30xafwrzfwdb4mjp7gk4s9h2xagbf83pnjzczhgzdd";
+    hash = "sha256-2y1QgWeqYQZ4FWXI2lxvFIfeusujNRnO3DX6iZfUJNQ=";
   };
 
   propagatedBuildInputs = [
@@ -29,8 +29,8 @@ buildPythonPackage rec {
   ];
 
   doCheck = false; # ModuleNotFoundError: No module named 'PyQt5.QtConnectivity'
-  checkInputs = [
-    pyside
+  nativeCheckInputs = [
+    pyside2
     (pyqt5.override {
       withConnectivity = true;
       withMultimedia = true;

@@ -1,15 +1,15 @@
-{ stdenv, lib, callPackage, buildMozillaMach }:
+{ stdenv, lib, callPackage, buildMozillaMach, nixosTests }:
 
 let
   librewolf-src = callPackage ./librewolf.nix { };
 in
-(buildMozillaMach rec {
+((buildMozillaMach rec {
   pname = "librewolf";
   applicationName = "LibreWolf";
   binaryName = "librewolf";
   version = librewolf-src.packageVersion;
   src = librewolf-src.firefox;
-  inherit (librewolf-src) extraConfigureFlags extraPostPatch extraPassthru;
+  inherit (librewolf-src) extraConfigureFlags extraPatches extraPostPatch extraPassthru;
 
   meta = {
     description = "A fork of Firefox, focused on privacy, security and freedom";
@@ -22,11 +22,13 @@ in
     maxSilent = 14400; # 4h, double the default of 7200s (c.f. #129212, #129115)
     license = lib.licenses.mpl20;
   };
+  tests = [ nixosTests.librewolf ];
   updateScript = callPackage ./update.nix {
     attrPath = "librewolf-unwrapped";
   };
 }).override {
   crashreporterSupport = false;
   enableOfficialBranding = false;
-  pgoSupport = false; # Profiling gets stuck and doesn't terminate.
-}
+}).overrideAttrs (prev: {
+  MOZ_REQUIRE_SIGNING = "";
+})

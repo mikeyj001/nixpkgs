@@ -15,12 +15,21 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake ];
 
   cmakeFlags = [
-    "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_INSTALL_LIBDIR=lib"
     "-DBUILD_SHARED_LIBS=ON"
     "-DREPROC++=ON"
     "-DREPROC_TEST=ON"
   ];
+
+  # https://github.com/DaanDeMeyer/reproc/issues/81
+  postPatch = ''
+    substituteInPlace reproc++/reproc++.pc.in \
+      --replace '$'{exec_prefix}/@CMAKE_INSTALL_LIBDIR@ @CMAKE_INSTALL_FULL_LIBDIR@ \
+      --replace '$'{prefix}/@CMAKE_INSTALL_INCLUDEDIR@ @CMAKE_INSTALL_FULL_INCLUDEDIR@
+    substituteInPlace reproc/reproc.pc.in \
+      --replace '$'{exec_prefix}/@CMAKE_INSTALL_LIBDIR@ @CMAKE_INSTALL_FULL_LIBDIR@ \
+      --replace '$'{prefix}/@CMAKE_INSTALL_INCLUDEDIR@ @CMAKE_INSTALL_FULL_INCLUDEDIR@
+  '';
 
   meta = with lib; {
     homepage = "https://github.com/DaanDeMeyer/reproc";

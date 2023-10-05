@@ -4,7 +4,7 @@
 , python
 , xvfb-run
 , matplotlib
-, scikitimage
+, scikit-image
 , numpy
 , pandas
 , imageio
@@ -12,26 +12,26 @@
 , fn
 , pyopengl
 , seaborn
-, pytorch
+, torch
 , pythonOlder
 , torchvision
 }:
 
 buildPythonPackage rec {
   pname = "boxx";
-  version = "0.10.1";
+  version = "0.10.10";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-YYR13JS9otoylS3ds0jK7d0jOxbhafaQd8fSxIiREi4=";
+    hash = "sha256-7A5qFpISrjVrqQfKk6BPb7RhDWd9f90eF3bku+LsCcc=";
   };
 
   propagatedBuildInputs = [
     matplotlib
-    scikitimage
+    scikit-image
     numpy
     pandas
     imageio
@@ -41,9 +41,9 @@ buildPythonPackage rec {
     seaborn
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     xvfb-run
-    pytorch
+    torch
     torchvision
   ];
 

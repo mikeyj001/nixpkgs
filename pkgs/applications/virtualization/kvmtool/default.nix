@@ -1,23 +1,34 @@
-{ stdenv, fetchgit, lib }:
+{ stdenv, fetchgit, lib, dtc }:
 
 stdenv.mkDerivation {
   pname = "kvmtool";
-  version = "unstable-2022-04-04";
+  version = "unstable-2023-07-12";
 
   src = fetchgit {
     url = "https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git";
-    rev = "5657dd3e48b41bc6db38fa657994bc0e030fd31f";
-    sha256 = "1y1j44lk9957f2dmyrscbxl4zncp4ibvvcdj6bwylb8jsvmd5fs2";
+    rev = "106e2ea7756d980454d68631b87d5e25ba4e4881";
+    sha256 = "sha256-wpc5DfHnui0lBVH4uOq6a7pXVUZStjNLRvauu6QpRvE=";
   };
 
+  buildInputs = lib.optionals stdenv.hostPlatform.isAarch64 [ dtc ];
+
   enableParallelBuilding = true;
-  makeFlags = [ "prefix=${placeholder "out"}" ];
+
+  makeFlags = [
+    "prefix=${placeholder "out"}"
+  ] ++ lib.optionals stdenv.hostPlatform.isAarch64 ([
+    "LIBFDT_DIR=${dtc}/lib"
+  ] ++ lib.optionals (stdenv.buildPlatform != stdenv.hostPlatform) [
+    "CROSS_COMPILE=aarch64-unknown-linux-gnu-"
+    "ARCH=arm64"
+  ]);
 
   meta = with lib; {
     description = "A lightweight tool for hosting KVM guests";
     homepage = "https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/tree/README";
     license = licenses.gpl2Only;
-    maintainers = with maintainers; [ astro ];
-    platforms = [ "x86_64-linux" ];
+    maintainers = with maintainers; [ astro mfrw ];
+    platforms = [ "x86_64-linux" "aarch64-linux" ];
+    mainProgram = "lkvm";
   };
 }

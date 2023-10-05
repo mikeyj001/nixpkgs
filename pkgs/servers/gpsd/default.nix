@@ -10,7 +10,7 @@
 , dbus
 , libusb1
 , ncurses
-, pps-tools
+, kppsSupport ? stdenv.isLinux, pps-tools
 , python3Packages
 
 # optional deps for GUI packages
@@ -32,11 +32,11 @@
 
 stdenv.mkDerivation rec {
   pname = "gpsd";
-  version = "3.23.1";
+  version = "3.25";
 
   src = fetchurl {
     url = "mirror://savannah/${pname}/${pname}-${version}.tar.gz";
-    sha256 = "sha256-C5kc6aRlOMTqRQ96juQo/0T7T41mX93y/+QP4K6abAk=";
+    sha256 = "sha256-s2i2owXj96Y4LSOgy/wdeJIwYLa39Uz3mHpzx7Spr8I=";
   };
 
   # TODO: render & install HTML documentation using asciidoctor
@@ -53,13 +53,13 @@ stdenv.mkDerivation rec {
     dbus
     libusb1
     ncurses
-    pps-tools
     python3Packages.python
+  ] ++ lib.optionals kppsSupport [
+    pps-tools
   ] ++ lib.optionals guiSupport [
     atk
     dbus-glib
     gdk-pixbuf
-    gobject-introspection
     libX11
     libXaw
     libXext
@@ -81,6 +81,7 @@ stdenv.mkDerivation rec {
     patchShebangs .
     sed -e "s|systemd_dir = .*|systemd_dir = '$out/lib/systemd/system'|" -i SConscript
     export TAR=noop
+    substituteInPlace SConscript --replace "env['CCVERSION']" "env['CC']"
 
     sconsFlags+=" udevdir=$out/lib/udev"
     sconsFlags+=" python_libdir=$out/lib/${python3Packages.python.libPrefix}/site-packages"
@@ -109,7 +110,6 @@ stdenv.mkDerivation rec {
 
   # remove binaries for x-less install because xgps sconsflag is partially broken
   postFixup = ''
-    ${if guiSupport then "" else "rm $out/bin/xgps*"}
     wrapPythonProgramsIn $out/bin "$out $pythonPath"
   '';
 
@@ -136,7 +136,7 @@ stdenv.mkDerivation rec {
     homepage = "https://gpsd.gitlab.io/gpsd/index.html";
     changelog = "https://gitlab.com/gpsd/gpsd/-/blob/release-${version}/NEWS";
     license = licenses.bsd2;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
     maintainers = with maintainers; [ bjornfor rasendubi ];
   };
 }

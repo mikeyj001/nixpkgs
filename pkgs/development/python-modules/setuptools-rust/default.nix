@@ -7,17 +7,16 @@
 , setuptools
 , setuptools-scm
 , typing-extensions
-, toml
 }:
 
 buildPythonPackage rec {
   pname = "setuptools-rust";
-  version = "1.3.0";
+  version = "1.6.0";
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-lYxb9Ktkg9Wdq4iFOBIYccxQBjVKQvsPvVCs8Dyq0d4=";
+    hash = "sha256-yG5zTerDMFl5mL+8CNpFGH5rJ4N+I72R6tsyBzI5ImI=";
   };
 
   nativeBuildInputs = [ setuptools-scm ];
@@ -34,6 +33,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/PyO3/setuptools-rust";
     changelog = "https://github.com/PyO3/setuptools-rust/releases/tag/v${version}";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

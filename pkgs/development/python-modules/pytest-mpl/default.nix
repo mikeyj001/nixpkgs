@@ -12,11 +12,11 @@
 
 buildPythonPackage rec {
   pname = "pytest-mpl";
-  version = "0.15.0";
+  version = "0.16.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-p5/UKLVoDYclp2o/MBb2oX1pHzxsQpHjmfwU1kFSKbw=";
+    hash = "sha256-LVcWgRJOj/X04rnA0EfTfQSZ1rbY8vSaG1DN2ZMQRGk=";
   };
 
   nativeBuildInputs = [
@@ -36,7 +36,7 @@ buildPythonPackage rec {
     pillow
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -63,6 +63,6 @@ buildPythonPackage rec {
     description = "Pytest plugin to help with testing figures output from Matplotlib";
     homepage = "https://github.com/matplotlib/pytest-mpl";
     license = licenses.bsd3;
-    maintainers = [ maintainers.costrouc ];
+    maintainers = [ ];
   };
 }

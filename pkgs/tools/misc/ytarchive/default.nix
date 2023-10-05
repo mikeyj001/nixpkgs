@@ -1,21 +1,21 @@
-{ lib, buildGoModule, fetchFromGitHub, makeWrapper, ffmpeg }:
+{ lib, buildGoModule, fetchFromGitHub, makeBinaryWrapper, ffmpeg }:
 
 buildGoModule rec {
   pname = "ytarchive";
-  version = "unstable-2022-03-11";
+  version = "unstable-2023-02-21";
 
   src = fetchFromGitHub {
     owner = "Kethsar";
     repo = "ytarchive";
-    rev = "34825e8777637ca114a0ab394a4b4fead6ad7c88";
-    sha256 = "sha256-/x6YcF2EyjOFnIHlsh+ZESF+7AYO3QRNaqbJgycQai4=";
+    rev = "90aaf17b5e86eec52a95752e3c2dba4f54ee1068";
+    hash = "sha256-JRjQRbMqtd04/aO6NkInoDqfOrHnDrXj4C4/URiU6yo=";
   };
 
-  vendorSha256 = "sha256-r9fDFSCDItQ7YSj9aTY1LXRrFE9T3XD0X36ywCfu0R8=";
+  vendorHash = "sha256-sjwQ/zEYJRkeWUDB7TzV8z+kET8lVRnQkXYbZbcUeHY=";
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [ makeBinaryWrapper ];
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [ "-s" "-w" "-X main.Commit=-${src.rev}" ];
 
   postInstall = ''
     wrapProgram $out/bin/ytarchive --prefix PATH : ${lib.makeBinPath [ ffmpeg ]}

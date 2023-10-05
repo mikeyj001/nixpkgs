@@ -5,26 +5,29 @@
 , decorator
 , numpy
 , platformdirs
+, typing-extensions
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "pytools";
-  version = "2022.1.2";
+  version = "2023.1.1";
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-XoJBAYgKJGNUdWNliAplu0FvaoyrZRO2j8u0j7oJD8s=";
+    hash = "sha256-gGN4c9IG9rzt9820atk+horLTqIlbbBS38yocr3QMh8=";
   };
 
   propagatedBuildInputs = [
     decorator
     numpy
     platformdirs
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    typing-extensions
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

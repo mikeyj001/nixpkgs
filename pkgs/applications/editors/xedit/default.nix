@@ -22,6 +22,13 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-WF+4avzRRL0+OA3KxzK7JwmArkPu9fEl+728R6ouXmg=";
   };
 
+  # ./lisp/mathimp.c:493:10: error: implicitly declaring library function 'finite' with type 'int (double)'
+  postPatch = lib.optionalString stdenv.isDarwin ''
+    for i in $(find . -type f -name "*.c"); do
+      substituteInPlace $i --replace "finite" "isfinite"
+    done
+  '';
+
   nativeBuildInputs = [ autoreconfHook pkg-config utilmacros ];
   buildInputs = [
     libX11
@@ -40,6 +47,8 @@ stdenv.mkDerivation rec {
     homepage = "https://gitlab.freedesktop.org/xorg/app/xedit";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ shamilton ];
-    platforms = platforms.linux;
+    platforms = platforms.unix;
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

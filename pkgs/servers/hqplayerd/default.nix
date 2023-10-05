@@ -5,28 +5,34 @@
 , cairo
 , fetchurl
 , flac
-, gcc11
-, gnome
+, gcc12
 , gssdp
 , gupnp
 , gupnp-av
 , lame
 , libgmpris
 , libusb-compat-0_1
-, llvmPackages_10
+, llvmPackages_14
 , meson
 , mpg123
 , ninja
 , rpmextract
 , wavpack
-}:
+
+, callPackage
+, rygel ? null
+}@inputs:
+let
+  # FIXME: Replace with gnome.rygel once hqplayerd releases a new version.
+  rygel-hqplayerd = inputs.rygel or (callPackage ./rygel.nix { });
+in
 stdenv.mkDerivation rec {
   pname = "hqplayerd";
-  version = "4.31.0-89";
+  version = "4.34.0-100sse42";
 
   src = fetchurl {
-    url = "https://www.signalyst.eu/bins/${pname}/fc35/${pname}-${version}.fc35.x86_64.rpm";
-    hash = "sha256-L9S3MIbvvBViKSxu0x/GkE/pa61NETtw4vA8xM4rJEg=";
+    url = "https://www.signalyst.eu/bins/${pname}/fc36/${pname}-${version}.fc36.x86_64.rpm";
+    hash = "sha256-MCRZ0XKi6pztVTuPQpPEn6wHsOwtSxR0Px9r12jnC9U=";
   };
 
   unpackPhase = ''
@@ -39,15 +45,15 @@ stdenv.mkDerivation rec {
     alsa-lib
     cairo
     flac
-    gcc11.cc.lib
-    gnome.rygel
+    gcc12.cc.lib
+    rygel-hqplayerd
     gssdp
     gupnp
     gupnp-av
     lame
     libgmpris
     libusb-compat-0_1
-    llvmPackages_10.openmp
+    llvmPackages_14.openmp
     mpg123
     wavpack
   ];
@@ -69,14 +75,6 @@ stdenv.mkDerivation rec {
     # configuration
     mkdir -p $out/etc
     cp -rv ./etc/hqplayer $out/etc/
-
-    # udev rules
-    mkdir -p $out/etc/udev
-    cp -rv ./etc/udev/rules.d $out/etc/udev/
-
-    # kernel module cfgs
-    mkdir -p $out/etc
-    cp -rv ./etc/modules-load.d $out/etc/
 
     # systemd service file
     mkdir -p $out/lib/systemd
@@ -106,9 +104,14 @@ stdenv.mkDerivation rec {
     $out/bin/hqplayerd --version
   '';
 
+  passthru = {
+    rygel = rygel-hqplayerd;
+  };
+
   meta = with lib; {
     homepage = "https://www.signalyst.com/custom.html";
     description = "High-end upsampling multichannel software embedded HD-audio player";
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.unfree;
     platforms = [ "x86_64-linux" ];
     maintainers = with maintainers; [ lovesegfault ];

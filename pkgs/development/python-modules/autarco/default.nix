@@ -3,6 +3,7 @@
 , aresponses
 , buildPythonPackage
 , fetchFromGitHub
+, fetchpatch
 , poetry-core
 , pytest-asyncio
 , pytestCheckHook
@@ -12,7 +13,7 @@
 
 buildPythonPackage rec {
   pname = "autarco";
-  version = "0.1.0";
+  version = "0.2.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.9";
@@ -21,8 +22,24 @@ buildPythonPackage rec {
     owner = "klaasnicolaas";
     repo = "python-autarco";
     rev = "v${version}";
-    hash = "sha256-ID1lCGfF6XHVv8Azd34a30hcsX17uMXo22stAhYH1Uo=";
+    hash = "sha256-3f6N4b6WZPAUUQTuGeb20q0f7ZqDR+O24QRze5RpRlw=";
   };
+
+  patches = [
+    # https://github.com/klaasnicolaas/python-autarco/pull/265
+    (fetchpatch {
+      name = "remove-setuptools-dependency.patch";
+      url = "https://github.com/klaasnicolaas/python-autarco/commit/bf40e8a4f64cd9c9cf72930260895537ea5b2adc.patch";
+      hash = "sha256-Fgijy7sd67LUIqh3qjQjyothnjdW7Zcil/bQSuVsBR8=";
+    })
+  ];
+
+  postPatch = ''
+    # Upstream doesn't set a version for the pyproject.toml
+    substituteInPlace pyproject.toml \
+      --replace "0.0.0" "${version}" \
+      --replace "--cov" ""
+  '';
 
   nativeBuildInputs = [
     poetry-core
@@ -33,18 +50,13 @@ buildPythonPackage rec {
     yarl
   ];
 
-  checkInputs = [
+  __darwinAllowLocalNetworking = true;
+
+  nativeCheckInputs = [
     aresponses
     pytest-asyncio
     pytestCheckHook
   ];
-
-  postPatch = ''
-    # Upstream doesn't set a version for the pyproject.toml
-    substituteInPlace pyproject.toml \
-      --replace "0.0.0" "${version}" \
-      --replace "--cov" ""
-  '';
 
   pythonImportsCheck = [
     "autarco"

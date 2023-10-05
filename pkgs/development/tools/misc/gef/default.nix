@@ -21,13 +21,13 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "gef";
-  version = "2022.01";
+  version = "2023.08";
 
   src = fetchFromGitHub {
     owner = "hugsy";
     repo = "gef";
     rev = version;
-    sha256 = "sha256-Ot0OYMbXFGCzJdmDHD+LoZRDShCbYJ+IGzLTcU2Rfd4=";
+    sha256 = "sha256-MqpII3jhSc6aP/WQDktom2wxAvCkxCwfs1AFWij5J7A=";
   };
 
   dontBuild = true;
@@ -48,7 +48,7 @@ in stdenv.mkDerivation rec {
       ]}
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     gdb
     file
     ps

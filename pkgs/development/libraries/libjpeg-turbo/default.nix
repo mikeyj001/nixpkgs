@@ -9,25 +9,41 @@
 , enableJpeg8 ? false # whether to build libjpeg with v8 compatibility
 , enableStatic ? stdenv.hostPlatform.isStatic
 , enableShared ? !stdenv.hostPlatform.isStatic
+
+# for passthru.tests
+, dvgrab
+, epeg
+, freeimage
+, gd
+, graphicsmagick
+, imagemagick
+, imlib2
+, jhead
+, libjxl
+, mjpegtools
+, opencv
+, python3
+, vips
+, testers
 }:
 
 assert !(enableJpeg7 && enableJpeg8);  # pick only one or none, not both
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
 
   pname = "libjpeg-turbo";
-  version = "2.1.3";
+  version = "2.1.5.1";
 
   src = fetchFromGitHub {
     owner = "libjpeg-turbo";
     repo = "libjpeg-turbo";
-    rev = version;
-    sha256 = "sha256-GbOYoCNAsOESXrEsBb6OHVB4TKhPUEU04PBp8qXVMug=";
+    rev = finalAttrs.version;
+    sha256 = "sha256-96SBBZp+/4WkXLvHKSPItNi5WuzdVccI/ZcbJOFjYYk=";
   };
 
   # This is needed by freeimage
   patches = [ ./0001-Compile-transupp.c-as-part-of-the-library.patch ]
-    ++ lib.optional (stdenv.hostPlatform.libc or null == "msvcrt")
+    ++ lib.optional stdenv.hostPlatform.isMinGW
     ./mingw-boolean.patch;
 
   outputs = [ "bin" "dev" "dev_private" "out" "man" "doc" ];
@@ -61,11 +77,30 @@ stdenv.mkDerivation rec {
   doInstallCheck = true;
   installCheckTarget = "test";
 
+  passthru.tests = {
+    inherit
+      dvgrab
+      epeg
+      freeimage
+      gd
+      graphicsmagick
+      imagemagick
+      imlib2
+      jhead
+      libjxl
+      mjpegtools
+      opencv
+      vips;
+    inherit (python3.pkgs) pillow imread pyturbojpeg;
+    pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+  };
+
   meta = with lib; {
     homepage = "https://libjpeg-turbo.org/";
     description = "A faster (using SIMD) libjpeg implementation";
     license = licenses.ijg; # and some parts under other BSD-style licenses
+    pkgConfigModules = [ "libjpeg" "libturbojpeg" ];
     maintainers = with maintainers; [ vcunat colemickens kamadorueda ];
     platforms = platforms.all;
   };
-}
+})

@@ -1,13 +1,13 @@
-{ lib
+ { lib
 , aiohttp
 , async-timeout
 , buildPythonPackage
 , crcmod
 , defusedxml
 , fetchFromGitHub
+, freezegun
 , jsonpickle
 , munch
-, mypy
 , pyserial
 , pytest-aiohttp
 , pytest-asyncio
@@ -20,7 +20,7 @@
 
 buildPythonPackage rec {
   pname = "plugwise";
-  version = "0.18.5";
+  version = "0.33.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -29,7 +29,7 @@ buildPythonPackage rec {
     owner = pname;
     repo = "python-plugwise";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-J6RwPkObcoXIQ93nD8FNNjwllHoID4nFzqilArBS1C8=";
+    hash = "sha256-uJBUim5FlS+Jw3rGEKuorksVIgI5tVRAI7tESeYnGUc=";
   };
 
   propagatedBuildInputs = [
@@ -44,9 +44,9 @@ buildPythonPackage rec {
     semver
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
+    freezegun
     jsonpickle
-    mypy
     pytest-aiohttp
     pytest-asyncio
     pytestCheckHook
@@ -61,6 +61,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python module for Plugwise Smiles, Stretch and USB stick";
     homepage = "https://github.com/plugwise/python-plugwise";
+    changelog = "https://github.com/plugwise/python-plugwise/releases/tag/v${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

@@ -1,6 +1,7 @@
 { stdenv
 , lib
 , fetchFromGitHub
+, fetchpatch
 , glib
 , gobject-introspection
 , intltool
@@ -8,7 +9,7 @@
 , gtk3
 , wrapGAppsHook
 , libxml2
-, xapps
+, xapp
 , meson
 , pkg-config
 , cairo
@@ -16,7 +17,7 @@
 , poppler
 , libspectre
 , libgxps
-, webkitgtk
+, webkitgtk_4_1
 , nodePackages
 , ninja
 , gsettings-desktop-schemas
@@ -26,14 +27,23 @@
 
 stdenv.mkDerivation rec {
   pname = "xreader";
-  version = "3.3.0";
+  version = "3.8.2";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    sha256 = "sha256-wBrP5SHGPvH/Gz9QY253zQuf8WSjV19oNB5aIqXGLZ8=";
+    sha256 = "sha256-2zqlfoN4L+V237cQ3PVh49YaZfNKGiLqh2JIiGJE340=";
   };
+
+  patches = [
+    # Fix build with meson 1.2, can be dropped on next bump
+    # https://github.com/linuxmint/xreader/issues/612
+    (fetchpatch {
+      url = "https://github.com/linuxmint/xreader/commit/06b18a884c8cf3257ea1f053a82784da078999ed.patch";
+      sha256 = "sha256-+LXEW3OkfhkIcbxtvfQYjdaC18O8imOx22t91ad/XZw=";
+    })
+  ];
 
   nativeBuildInputs = [
     shared-mime-info
@@ -47,20 +57,19 @@ stdenv.mkDerivation rec {
 
   mesonFlags = [
     "-Dmathjax-directory=${nodePackages.mathjax}"
-    "-Dc_args=-I${glib.dev}/include/gio-unix-2.0"
   ] ++ (map (x: "-D${x}=true") backends);
 
   buildInputs = [
     glib
     gtk3
-    xapps
+    xapp
     cairo
     libxml2
     libsecret
     poppler
     libspectre
     libgxps
-    webkitgtk
+    webkitgtk_4_1
     nodePackages.mathjax
     djvulibre
   ];

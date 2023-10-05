@@ -12,7 +12,7 @@ The `wrapFirefox` function allows to pass policies, preferences and extensions t
       (fetchFirefoxAddon {
         name = "ublock"; # Has to be unique!
         url = "https://addons.mozilla.org/firefox/downloads/file/3679754/ublock_origin-1.31.0-an+fx.xpi";
-        sha256 = "1h768ljlh3pi23l27qp961v1hd0nbj2vasgy11bmcrlqp40zgvnr";
+        hash = "sha256-2e73AbmYZlZXCP5ptYVcFjQYdjDp4iPoEPEOSCVF5sA=";
       })
     ];
 
@@ -26,10 +26,14 @@ The `wrapFirefox` function allows to pass policies, preferences and extensions t
         Pocket = false;
         Snippets = false;
       };
-       UserMessaging = {
-         ExtensionRecommendations = false;
-         SkipOnboarding = true;
-       };
+      UserMessaging = {
+        ExtensionRecommendations = false;
+        SkipOnboarding = true;
+      };
+      SecurityDevices = {
+        # Use a proxy module rather than `nixpkgs.config.firefox.smartcardSupport = true`
+        "PKCS#11 Proxy Module" = "${pkgs.p11-kit}/lib/p11-kit-proxy.so";
+      };
     };
 
     extraPrefs = ''

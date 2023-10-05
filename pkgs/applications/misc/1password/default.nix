@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, fetchzip, autoPatchelfHook, installShellFiles, cpio, xar }:
+{ lib, stdenv, fetchurl, fetchzip, autoPatchelfHook, installShellFiles, cpio, xar, _1password, testers }:
 
 let
   inherit (stdenv.hostPlatform) system;
@@ -12,12 +12,12 @@ let
     if extension == "zip" then fetchzip args else fetchurl args;
 
   pname = "1password-cli";
-  version = "2.3.1";
+  version = "2.21.0";
   sources = rec {
-    aarch64-linux = fetch "linux_arm64" "sha256-MikzcVqlhVSKzr1ttOCAg4p57sjsalSuwcqBhVUr5Ng=" "zip";
-    i686-linux = fetch "linux_386" "sha256-ElOhd3n38xAPtVePjQb8qMUCCAWqEfBKlX9Vuz5/Zns=" "zip";
-    x86_64-linux = fetch "linux_amd64" "sha256-r8yl9dDiiIQBooePrq/dGw2RU9tJXmeblx+qk3qq5Ys=" "zip";
-    aarch64-darwin = fetch "apple_universal" "sha256-sXdYInNBOEW/zIEPjhKbFOMxZdrMlE8pOwhmXLUJgsk=" "pkg";
+    aarch64-linux = fetch "linux_arm64" "sha256-pXGBlduNOvxpPMd/BObHVXXGQ0ZTlIkqZ3jYyoGXnqA=" "zip";
+    i686-linux = fetch "linux_386" "sha256-iePA4nzwBtAlYWybmQdV7Zvvnv+jPqrndB4aabf/JMM=" "zip";
+    x86_64-linux = fetch "linux_amd64" "sha256-wevv0KYe01ZL70zL4BNti/oCcAzNJ3EO97QIU1BYQRE=" "zip";
+    aarch64-darwin = fetch "apple_universal" "sha256-AViR53q1/jZtzpFZ7FaBwoZAGuXsGHfULEIuIrTqgSs=" "pkg";
     x86_64-darwin = aarch64-darwin;
   };
   platforms = builtins.attrNames sources;
@@ -48,6 +48,7 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
+    HOME=$TMPDIR
     installShellCompletion --cmd ${mainProgram} \
       --bash <($out/bin/${mainProgram} completion bash) \
       --fish <($out/bin/${mainProgram} completion fish) \
@@ -62,11 +63,16 @@ stdenv.mkDerivation {
     $out/bin/${mainProgram} --version
   '';
 
+  passthru.tests.version = testers.testVersion {
+    package = _1password;
+  };
+
   meta = with lib; {
     description = "1Password command-line tool";
     homepage = "https://developer.1password.com/docs/cli/";
     downloadPage = "https://app-updates.agilebits.com/product_history/CLI2";
     maintainers = with maintainers; [ joelburget marsam ];
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.unfree;
     inherit mainProgram platforms;
   };

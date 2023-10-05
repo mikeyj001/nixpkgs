@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchFromGitHub, jdk, gradle, makeDesktopItem, copyDesktopItems, perl, writeText, runtimeShell, makeWrapper }:
+{ lib, stdenv, fetchFromGitHub, openjdk, openjfx, gradle_7, makeDesktopItem, perl, writeText, makeWrapper }:
 let
+  jdk = openjdk.override (lib.optionalAttrs stdenv.isLinux {
+    enableJavaFX = true;
+    openjfx = openjfx.override { withWebKit = true; };
+  });
+
   pname = "scenic-view";
   version = "11.0.2";
 
@@ -9,6 +14,8 @@ let
     rev = version;
     sha256 = "1idfh9hxqs4fchr6gvhblhvjqk4mpl4rnpi84vn1l3yb700z7dwy";
   };
+
+  gradle = gradle_7;
 
   deps = stdenv.mkDerivation {
     name = "${pname}-deps";
@@ -104,6 +111,10 @@ in stdenv.mkDerivation rec {
       This lets you find bugs and get things pixel perfect without having to do the compile-check-compile dance.
     '';
     homepage = "https://github.com/JonathanGiles/scenic-view/";
+    sourceProvenance = with sourceTypes; [
+      fromSource
+      binaryBytecode  # deps
+    ];
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ wirew0rm ];
     platforms = platforms.all;

@@ -6,11 +6,12 @@
 , pytestCheckHook
 , pythonOlder
 , pyyaml
+, toml
 }:
 
 buildPythonPackage rec {
   pname = "pydeps";
-  version = "1.10.18";
+  version = "1.12.17";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -18,8 +19,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "thebjorn";
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-AKpaGXUaKCVk1C8GqtWayZEU2xbz3eqbUenjZCtsAUY=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-DVSZeNuDz/y0jh/HimV+jFgNFevMhUKOu6EhZytMMqQ=";
   };
 
   buildInputs = [
@@ -31,9 +32,10 @@ buildPythonPackage rec {
     stdlib-list
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pyyaml
+    toml
   ];
 
   postPatch = ''
@@ -54,6 +56,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python module dependency visualization";
     homepage = "https://github.com/thebjorn/pydeps";
+    changelog = "https://github.com/thebjorn/pydeps/releases/tag/v${version}";
     license = licenses.bsd2;
     maintainers = with maintainers; [ fab ];
   };

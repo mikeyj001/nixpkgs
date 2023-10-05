@@ -1,28 +1,44 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{ lib, stdenv, buildGoModule, fetchFromGitHub, installShellFiles, testers, dagger }:
 
 buildGoModule rec {
   pname = "dagger";
-  version = "0.2.12";
+  version = "0.8.7";
 
   src = fetchFromGitHub {
     owner = "dagger";
     repo = "dagger";
     rev = "v${version}";
-    sha256 = "sha256-t58+dfsf6A38RG4uT8SJPi07gkC9dGZo0WpVwN9N31k=";
+    hash = "sha256-vlHLqqUMZAuBgI5D1L2g6u3PDZsUp5oUez4x9ydOUtM=";
   };
 
-  vendorSha256 = "sha256-7YKuOApIw4SG39BLb4kh7ZuZjhCBduzKo3iS8v8KZZU=";
+  vendorHash = "sha256-B8Qvyvh9MRGFDBvc/Hu+IitBBdHvEU3QjLJuIy1S04A=";
+  proxyVendor = true;
 
   subPackages = [
     "cmd/dagger"
   ];
 
-  ldflags = [ "-s" "-w" "-X go.dagger.io/dagger/version.Revision=${version}" ];
+  ldflags = [ "-s" "-w" "-X github.com/dagger/dagger/engine.Version=${version}" ];
+
+  nativeBuildInputs = [ installShellFiles ];
+
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    installShellCompletion --cmd dagger \
+      --bash <($out/bin/dagger completion bash) \
+      --fish <($out/bin/dagger completion fish) \
+      --zsh <($out/bin/dagger completion zsh)
+  '';
+
+  passthru.tests.version = testers.testVersion {
+    package = dagger;
+    command = "dagger version";
+    version = "v${version}";
+  };
 
   meta = with lib; {
     description = "A portable devkit for CICD pipelines";
     homepage = "https://dagger.io";
     license = licenses.asl20;
-    maintainers = with maintainers; [ jfroche ];
+    maintainers = with maintainers; [ jfroche sagikazarmark ];
   };
 }

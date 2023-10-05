@@ -1,21 +1,21 @@
 { lib
-, asynctest
+, stdenv
 , aiohttp
 , blinker
 , buildPythonPackage
 , certifi
 , ecs-logging
 , fetchFromGitHub
-, fetchpatch
 , httpx
 , jinja2
 , jsonschema
-, Logbook
+, logbook
 , mock
 , pytest-asyncio
 , pytest-bdd
 , pytest-localserver
 , pytest-mock
+, pytest-random-order
 , pytestCheckHook
 , pythonOlder
 , sanic
@@ -25,11 +25,12 @@
 , tornado
 , urllib3
 , webob
+, wrapt
 }:
 
 buildPythonPackage rec {
   pname = "elastic-apm";
-  version = "6.9.1";
+  version = "6.18.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.8";
@@ -37,17 +38,9 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "elastic";
     repo = "apm-agent-python";
-    rev = "v${version}";
-    sha256 = "sha256-IaCl39rhsFLQwvQdPcqKruV/Mo3f7WH91UVgMG/cnOc=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-s4aM2HuagqcF2sLHHRh2kj1tglf+JZ7hXT4PcAeFStQ=";
   };
-
-  patches = [
-    (fetchpatch {
-      # fix tests with sanic>=22.3.0
-      url = "https://github.com/elastic/apm-agent-python/commit/114ee6ca998b4d6a5cb075a289af39cb963cf08a.patch";
-      hash = "sha256-M6yEHjThKDCRQOmR0L94KEt8tUun1tPRULI6PNIlE/8=";
-    })
-  ];
 
   propagatedBuildInputs = [
     aiohttp
@@ -57,22 +50,23 @@ buildPythonPackage rec {
     starlette
     tornado
     urllib3
+    wrapt
   ];
 
-  checkInputs = [
-    asynctest
+  nativeCheckInputs = [
     ecs-logging
+    httpx
     jinja2
     jsonschema
-    Logbook
+    logbook
     mock
-    httpx
     pytest-asyncio
     pytest-bdd
-    pytest-mock
     pytest-localserver
-    sanic-testing
+    pytest-mock
+    pytest-random-order
     pytestCheckHook
+    sanic-testing
     structlog
     webob
   ];
@@ -84,6 +78,9 @@ buildPythonPackage rec {
   disabledTestPaths = [
     # Exclude tornado tests
     "tests/contrib/asyncio/tornado/tornado_tests.py"
+  ] ++ lib.optionals stdenv.isDarwin [
+    # Flaky tests on Darwin
+    "tests/utils/threading_tests.py"
   ];
 
   pythonImportsCheck = [
@@ -93,7 +90,9 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python agent for the Elastic APM";
     homepage = "https://github.com/elastic/apm-agent-python";
+    changelog = "https://github.com/elastic/apm-agent-python/releases/tag/v${version}";
     license = with licenses; [ bsd3 ];
     maintainers = with maintainers; [ fab ];
+    mainProgram = "elasticapm-run";
   };
 }

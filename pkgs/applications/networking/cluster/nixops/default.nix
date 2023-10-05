@@ -10,6 +10,7 @@ let
   interpreter = (
     poetry2nix.mkPoetryPackages {
       projectDir = ./.;
+      python = pkgs.python310;
       overrides = [
         poetry2nix.defaultPoetryOverrides
         (import ./poetry-git-overlay.nix { inherit pkgs; })
@@ -30,6 +31,7 @@ let
                   maintainers = with lib.maintainers; [ adisbladis aminechikhaoui eelco rob domenkozar ];
                   platforms = lib.platforms.unix;
                   license = lib.licenses.lgpl3;
+                  mainProgram = "nixops";
                 };
 
               }
@@ -41,12 +43,22 @@ let
         overrides
 
         # Make nixops pluginable
-        (self: super: {
+        (self: super: let
+          # Create a fake sphinx directory that doesn't pull the entire setup hook and incorrect python machinery
+          sphinx = pkgs.runCommand "sphinx" {} ''
+            mkdir -p $out/bin
+            for f in ${pkgs.python3.pkgs.sphinx}/bin/*; do
+              ln -s $f $out/bin/$(basename $f)
+            done
+          '';
+
+        in {
           nixops = super.__toPluginAble {
             drv = super.nixops;
             finalDrv = self.nixops;
 
-            nativeBuildInputs = [ self.sphinx ];
+            nativeBuildInputs = [ sphinx ];
+
             postInstall = ''
               doc_cache=$(mktemp -d)
               sphinx-build -b man -d $doc_cache doc/ $out/share/man/man1
@@ -58,11 +70,26 @@ let
           };
         })
 
+        (self: super: {
+          cryptography = super.cryptography.overridePythonAttrs (old: {
+            meta = old.meta // {
+              knownVulnerabilities = old.meta.knownVulnerabilities or [ ]
+                ++ lib.optionals (lib.versionOlder old.version "41.0.0") [
+                  "CVE-2023-2650"
+                  "CVE-2023-2975"
+                  "CVE-2023-3446"
+                  "CVE-2023-3817"
+                  "CVE-2023-38325"
+                ];
+            };
+          });
+        })
+
       ];
     }
   ).python;
 
-  pkg = interpreter.pkgs.nixops.withPlugins(ps: [
+  pkg = (interpreter.pkgs.nixops.withPlugins(ps: [
     ps.nixops-aws
     ps.nixops-digitalocean
     ps.nixops-encrypted-links
@@ -71,11 +98,11 @@ let
     ps.nixops-hetzner
     ps.nixopsvbox
     ps.nixops-virtd
-  ]) // rec {
-    # Workaround for https://github.com/NixOS/nixpkgs/issues/119407
-    # TODO after #1199407: Use .overrideAttrs(pkg: old: { passthru.tests = .....; })
-    tests = nixosTests.nixops.unstable.override { nixopsPkg = pkg; };
-    # Not strictly necessary, but probably expected somewhere; part of the workaround:
-    passthru.tests = tests;
-  };
+    ps.nixops-hetznercloud
+  ])).overrideAttrs (finalAttrs: prevAttrs: {
+    passthru = prevAttrs.passthru or {} // {
+      tests = prevAttrs.passthru.tests or {} //
+        nixosTests.nixops.unstable.passthru.override { nixopsPkg = pkg; };
+    };
+  });
 in pkg

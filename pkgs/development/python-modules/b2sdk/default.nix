@@ -1,9 +1,11 @@
 { lib
-, arrow
+, stdenv
 , buildPythonPackage
 , fetchPypi
+, glibcLocales
 , importlib-metadata
 , logfury
+, pyfakefs
 , pytestCheckHook
 , pytest-lazy-fixture
 , pytest-mock
@@ -11,18 +13,19 @@
 , requests
 , setuptools-scm
 , tqdm
+, typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "b2sdk";
-  version = "1.14.1";
+  version = "1.24.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-fYOeyhKm9mRT61NcQVaXFKeRC8AS9lfIZMO/s6iFaeg=";
+    hash = "sha256-Tp9RjtybqCSxB1gFZXrjwNJ4mmwl+OWTzVyHd250Jas=";
   };
 
   nativeBuildInputs = [
@@ -30,26 +33,34 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    arrow
     logfury
     requests
     tqdm
   ] ++ lib.optionals (pythonOlder "3.8") [
     importlib-metadata
+  ] ++ lib.optionals (pythonOlder "3.12") [
+    typing-extensions
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-lazy-fixture
     pytest-mock
+    pyfakefs
+  ] ++ lib.optionals stdenv.isLinux [
+    glibcLocales
   ];
 
   postPatch = ''
     substituteInPlace setup.py \
       --replace 'setuptools_scm<6.0' 'setuptools_scm'
-    substituteInPlace requirements.txt \
-      --replace 'arrow>=0.8.0,<1.0.0' 'arrow'
   '';
+
+  disabledTestPaths = [
+    # requires aws s3 auth
+    "test/integration/test_download.py"
+    "test/integration/test_upload.py"
+  ];
 
   disabledTests = [
     # Test requires an API key
@@ -65,6 +76,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Client library and utilities for access to B2 Cloud Storage (backblaze)";
     homepage = "https://github.com/Backblaze/b2-sdk-python";
+    changelog = "https://github.com/Backblaze/b2-sdk-python/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ ];
   };

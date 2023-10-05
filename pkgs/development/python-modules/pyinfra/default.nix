@@ -18,7 +18,7 @@
 
 buildPythonPackage rec {
   pname = "pyinfra";
-  version = "2.1";
+  version = "2.7";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -26,8 +26,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "Fizzadar";
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-frjPxSATvXgeACT4kThoiPu04Ez8bs8FIPdf5PVuiSg=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-drfxNpdhqSxCeB0SbwyKOd3DDA7bFkmDmFQJS3JwOlA=";
   };
 
   propagatedBuildInputs = [
@@ -44,7 +44,7 @@ buildPythonPackage rec {
     setuptools
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -63,7 +63,9 @@ buildPythonPackage rec {
       pyinfra automates/provisions/manages/deploys infrastructure. It can be used for
       ad-hoc command execution, service deployment, configuration management and more.
     '';
-    homepage = "https://github.com/Fizzadar/pyinfra";
+    homepage = "https://pyinfra.com";
+    downloadPage = "https://pyinfra.com/Fizzadar/pyinfra/releases";
+    changelog = "https://github.com/Fizzadar/pyinfra/blob/v${version}/CHANGELOG.md";
     maintainers = with maintainers; [ totoroot ];
     license = licenses.mit;
   };

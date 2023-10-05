@@ -3,7 +3,7 @@
 , fetchurl
 , runCommand
 , makeWrapper
-, buildFHSUserEnv
+, buildFHSEnv
 , libselinux
 , libarchive
 , libGL
@@ -42,7 +42,7 @@ let
         zlib # libz.so.1
       ];
     in
-      runCommand "conda-install" { buildInputs = [ makeWrapper zlib]; }
+      runCommand "conda-install" { nativeBuildInputs = [ makeWrapper ]; buildInputs = [ zlib]; }
         # on line 10, we have 'unset LD_LIBRARY_PATH'
         # we have to comment it out however in a way that the number of bytes in the
         # file does not change. So we replace the 'u' in the line with a '#'
@@ -63,7 +63,7 @@ let
             --prefix "LD_LIBRARY_PATH" : "${libPath}"
         '');
 in
-  buildFHSUserEnv {
+  buildFHSEnv {
     name = "conda-shell";
     targetPkgs = pkgs: (builtins.concatLists [ [ conda ] condaDeps extraPkgs]);
     profile = ''

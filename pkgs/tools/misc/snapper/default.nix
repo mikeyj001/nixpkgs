@@ -6,13 +6,13 @@
 
 stdenv.mkDerivation rec {
   pname = "snapper";
-  version = "0.10.2";
+  version = "0.10.6";
 
   src = fetchFromGitHub {
     owner = "openSUSE";
     repo = "snapper";
     rev = "v${version}";
-    sha256 = "0x9anracaa19yqkc0x8wangrkdrx01kdy07c55lvlqrjyimfm4ih";
+    sha256 = "sha256-tKxjzJ69wr48QQEgYLp7G6aOqxs9CCUiTHV1kaRCiHM=";
   };
 
   nativeBuildInputs = [
@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  NIX_CFLAGS_COMPILE = "-I${libxml2.dev}/include/libxml2";
+  env.NIX_CFLAGS_COMPILE = "-I${libxml2.dev}/include/libxml2";
 
   postInstall = ''
     rm -r $out/etc/cron.*
@@ -62,7 +62,8 @@ stdenv.mkDerivation rec {
     description = "Tool for Linux filesystem snapshot management";
     homepage = "http://snapper.io";
     license = licenses.gpl2Only;
+    mainProgram = "snapper";
+    maintainers = with maintainers; [ markuskowa ];
     platforms = platforms.linux;
-    maintainers = with maintainers; [ tstrobel markuskowa ];
   };
 }

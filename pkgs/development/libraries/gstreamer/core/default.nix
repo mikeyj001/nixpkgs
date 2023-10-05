@@ -11,32 +11,37 @@
 , makeWrapper
 , libcap
 , libunwind
-, darwin
 , elfutils # for libdw
 , bash-completion
 , lib
+, Cocoa
 , CoreServices
-, withIntrospection ? stdenv.buildPlatform == stdenv.hostPlatform
 , gobject-introspection
+, testers
+# Checks meson.is_cross_build(), so even canExecute isn't enough.
+, enableDocumentation ? stdenv.hostPlatform == stdenv.buildPlatform, hotdoc
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "gstreamer";
-  version = "1.20.1";
+  version = "1.22.5";
 
   outputs = [
     "bin"
     "out"
     "dev"
-    # "devdoc" # disabled until `hotdoc` is packaged in nixpkgs, see:
-    # - https://github.com/NixOS/nixpkgs/pull/98767
-    # - https://github.com/NixOS/nixpkgs/issues/98769#issuecomment-702296551
   ];
 
-  src = fetchurl {
+  src = let
+    inherit (finalAttrs) pname version;
+  in fetchurl {
     url = "https://gstreamer.freedesktop.org/src/${pname}/${pname}-${version}.tar.xz";
-    sha256 = "0cghi6n4nhdbajz3wqcgbh5xm94myvnqgsi9g2bz9n1s9904l2fy";
+    hash = "sha256-RAjXkw84GAnoWReswZcS8XMmG6hb3yDFVnsqIbEZO2E=";
   };
+
+  depsBuildBuild = [
+    pkg-config
+  ];
 
   strictDeps = true;
   nativeBuildInputs = [
@@ -50,13 +55,11 @@ stdenv.mkDerivation rec {
     makeWrapper
     glib
     bash-completion
-
-    # documentation
-    # TODO add hotdoc here
+    gobject-introspection
   ] ++ lib.optionals stdenv.isLinux [
     libcap # for setcap binary
-  ] ++ lib.optionals withIntrospection [
-    gobject-introspection
+  ] ++ lib.optionals enableDocumentation [
+    hotdoc
   ];
 
   buildInputs = [
@@ -65,9 +68,8 @@ stdenv.mkDerivation rec {
     libcap
     libunwind
     elfutils
-  ] ++ lib.optionals withIntrospection [
-    gobject-introspection
   ] ++ lib.optionals stdenv.isDarwin [
+    Cocoa
     CoreServices
   ];
 
@@ -78,8 +80,7 @@ stdenv.mkDerivation rec {
   mesonFlags = [
     "-Ddbghelp=disabled" # not needed as we already provide libunwind and libdw, and dbghelp is a fallback to those
     "-Dexamples=disabled" # requires many dependencies and probably not useful for our users
-    "-Ddoc=disabled" # `hotdoc` not packaged in nixpkgs as of writing
-    "-Dintrospection=${if withIntrospection then "enabled" else "disabled"}"
+    (lib.mesonEnable "doc" enableDocumentation)
   ] ++ lib.optionals stdenv.isDarwin [
     # darwin.libunwind doesn't have pkg-config definitions so meson doesn't detect it.
     "-Dlibunwind=disabled"
@@ -108,11 +109,16 @@ stdenv.mkDerivation rec {
 
   setupHook = ./setup-hook.sh;
 
-  meta = with lib ;{
+  passthru.tests.pkg-config = testers.testMetaPkgConfig finalAttrs.finalPackage;
+
+  meta = with lib; {
     description = "Open source multimedia framework";
     homepage = "https://gstreamer.freedesktop.org";
     license = licenses.lgpl2Plus;
+    pkgConfigModules = [
+      "gstreamer-controller-1.0"
+    ];
     platforms = platforms.unix;
-    maintainers = with maintainers; [ ttuegel matthewbauer ];
+    maintainers = with maintainers; [ ttuegel matthewbauer lilyinstarlight ];
   };
-}
+})

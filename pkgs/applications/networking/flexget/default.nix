@@ -1,42 +1,56 @@
 { lib
-, python3Packages
+, python3
+, fetchPypi
 , fetchFromGitHub
 }:
 
-python3Packages.buildPythonApplication rec {
+let
+  python = python3.override {
+    # FlexGet doesn't support transmission-rpc>=5 yet
+    # https://github.com/NixOS/nixpkgs/issues/258504
+    packageOverrides = self: super: {
+      transmission-rpc = super.transmission-rpc.overridePythonAttrs (old: rec {
+        version = "4.3.1";
+        src = fetchPypi {
+          pname = "transmission_rpc";
+          inherit version;
+          hash = "sha256-Kh2eARIfM6MuXu7RjPPVhvPZ+bs0AXkA4qUCbfu5hHU=";
+        };
+        doCheck = false;
+      });
+    };
+  };
+in
+python.pkgs.buildPythonApplication rec {
   pname = "flexget";
-  version = "3.3.14";
+  version = "3.9.11";
+  format = "pyproject";
 
   # Fetch from GitHub in order to use `requirements.in`
   src = fetchFromGitHub {
-    owner = "flexget";
-    repo = "flexget";
+    owner = "Flexget";
+    repo = "Flexget";
     rev = "refs/tags/v${version}";
-    hash = "sha256-v52QVyd2Rl1nixKD1TY1YQaSPKRsbw4BCtfRly9aMrM=";
+    hash = "sha256-0ONjRIMSfHKvaO05hhurfnS/waNNRZEVq7BodeV00kU=";
   };
 
   postPatch = ''
-    # Symlink requirements.in because upstream uses `pip-compile` which yields
-    # python-version dependent requirements
-    ln -sf requirements.in requirements.txt
-
-    # remove dependency constraints
-    sed 's/[~<>=].*//' -i requirements.txt
-
-    # "zxcvbn-python" was renamed to "zxcvbn", and we don't have the former in
-    # nixpkgs. See: https://github.com/NixOS/nixpkgs/issues/62110
-    substituteInPlace requirements.txt --replace "zxcvbn-python" "zxcvbn"
+    # remove dependency constraints but keep environment constraints
+    sed 's/[~<>=][^;]*//' -i requirements.txt
   '';
 
-  # ~400 failures
-  doCheck = false;
+  nativeBuildInputs = with python.pkgs; [
+    setuptools
+    wheel
+  ];
 
-  propagatedBuildInputs = with python3Packages; [
-    # See https://github.com/Flexget/Flexget/blob/master/requirements.in
-    APScheduler
+  propagatedBuildInputs = with python.pkgs; [
+    # See https://github.com/Flexget/Flexget/blob/master/requirements.txt
+    apscheduler
     beautifulsoup4
     click
     colorama
+    commonmark
     feedparser
     guessit
     html5lib
@@ -44,9 +58,11 @@ python3Packages.buildPythonApplication rec {
     jsonschema
     loguru
     more-itertools
+    packaging
     psutil
     pynzb
-    PyRSS2Gen
+    pyrsistent
+    pyrss2gen
     python-dateutil
     pyyaml
     rebulk
@@ -54,12 +70,13 @@ python3Packages.buildPythonApplication rec {
     rich
     rpyc
     sqlalchemy
+    typing-extensions
 
     # WebUI requirements
     cherrypy
     flask-compress
     flask-cors
-    flask_login
+    flask-login
     flask-restful
     flask-restx
     flask
@@ -71,8 +88,17 @@ python3Packages.buildPythonApplication rec {
     transmission-rpc
   ];
 
+  pythonImportsCheck = [
+    "flexget"
+    "flexget.plugins.clients.transmission"
+  ];
+
+  # ~400 failures
+  doCheck = false;
+
   meta = with lib; {
     homepage = "https://flexget.com/";
+    changelog = "https://github.com/Flexget/Flexget/releases/tag/v${version}";
     description = "Multipurpose automation tool for all of your media";
     license = licenses.mit;
     maintainers = with maintainers; [ marsam ];

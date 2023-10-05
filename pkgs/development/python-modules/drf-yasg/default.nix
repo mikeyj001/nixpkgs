@@ -14,16 +14,16 @@
 
 buildPythonPackage rec {
   pname = "drf-yasg";
-  version = "1.20.0";
+  version = "1.21.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "d50f197c7f02545d0b736df88c6d5cf874f8fea2507ad85ad7de6ae5bf2d9e5a";
+    hash = "sha256-TDuTBos9/KaWmrERFV5N1vey1oC5h3jej9Rgt4N72w0=";
   };
 
   postPatch = ''
     # https://github.com/axnsan12/drf-yasg/pull/710
-    substituteInPlace requirements/base.txt --replace packaging ""
+    sed -i "/packaging/d" requirements/base.txt
   '';
 
   nativeBuildInputs = [
@@ -38,7 +38,7 @@ buildPythonPackage rec {
     djangorestframework
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-django
     datadiff

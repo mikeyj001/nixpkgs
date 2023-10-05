@@ -6,20 +6,30 @@
 , fetchFromGitHub
 , protobuf
 , pythonOlder
+, mysql80
+, openssl
+, pkgs
 }:
 
 buildPythonPackage rec {
   pname = "mysql-connector";
-  version = "8.0.29";
+  version = "8.0.33";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
+
+  setupPyBuildFlags = [
+    "--with-mysql-capi=\"${mysql80}\""
+    "--with-openssl-include-dir=\"${openssl.dev}/include\""
+    "--with-openssl-lib-dir=\"${lib.getLib openssl}/lib\""
+    "-L \"${lib.getLib pkgs.zstd}/lib:${lib.getLib mysql80}/lib\""
+  ];
 
   src = fetchFromGitHub {
     owner = "mysql";
     repo = "mysql-connector-python";
     rev = version;
-    hash = "sha256-X0qiXNYkNoR00ESUdByPj4dPnEnjLyopm25lm1JvkAk=";
+    hash = "sha256-GtMq7E2qBqFu54hjUotzPyxScTKXNdEQcmgHnS7lBhc=";
   };
 
   patches = [
@@ -31,9 +41,17 @@ buildPythonPackage rec {
     ./0001-Revert-Fix-MacOS-wheels-platform-tag.patch
   ];
 
+  nativeBuildInputs = [
+    mysql80
+  ];
+
+
   propagatedBuildInputs = [
     dnspython
     protobuf
+    mysql80
+    openssl
+    pkgs.zstd
   ];
 
   pythonImportsCheck = [
@@ -44,7 +62,6 @@ buildPythonPackage rec {
   doCheck = false;
 
   meta = with lib; {
-    broken = stdenv.isDarwin;
     description = "A MySQL driver";
     longDescription = ''
       A MySQL driver that does not depend on MySQL C client libraries and

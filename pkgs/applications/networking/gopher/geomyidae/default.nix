@@ -3,11 +3,11 @@
 
 stdenv.mkDerivation rec {
   pname = "geomyidae";
-  version = "0.50.1";
+  version = "0.69";
 
   src = fetchurl {
     url = "gopher://bitreich.org/9/scm/geomyidae/tag/geomyidae-v${version}.tar.gz";
-    sha512 = "2a71b12f51c2ef8d6e791089f9eea49eb90a36be45b874d4234eba1e673186be945711be1f92508190f5c0a6f502f132c4b7cb82caf805a39a3f31903032ac47";
+    hash = "sha256-C0mAjyS2wZVipXP/sKxa/d7gDyYQ/MvmwqQ/QMzmcRE=";
   };
 
   buildInputs = [ libressl ];

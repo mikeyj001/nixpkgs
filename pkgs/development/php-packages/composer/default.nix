@@ -1,35 +1,35 @@
-{ mkDerivation, fetchurl, makeWrapper, unzip, lib, php }:
-let
-  pname = "composer";
-  version = "2.3.5";
-in
-mkDerivation {
-  inherit pname version;
+{ lib, callPackage, fetchgit, php, unzip, _7zz, xz, git, curl, cacert, makeBinaryWrapper }:
 
-  src = fetchurl {
-    url = "https://getcomposer.org/download/${version}/composer.phar";
-    sha256 = "sha256-OztaiZwGpGrsKAcnvfUKrRQzT2vEBDbqdrB7ZQhw2PQ=";
+php.buildComposerProject (finalAttrs: {
+  composer = callPackage ../../../build-support/php/pkgs/composer-phar.nix { };
+
+  pname = "composer";
+  version = "2.6.4";
+
+
+  # We use `fetchgit` instead of `fetchFromGitHub` to ensure the existence
+  # of the `composer.lock` file, which is omitted in the archive downloaded
+  # via `fetchFromGitHub`.
+  src = fetchgit {
+    url = "https://github.com/composer/composer.git";
+    rev = finalAttrs.version;
+    hash = "sha256-8lylMfTARff+gBZpIRqttmE0jeXdJnLHZKVmqHY3p+s=";
   };
 
-  dontUnpack = true;
+  nativeBuildInputs = [ makeBinaryWrapper ];
 
-  nativeBuildInputs = [ makeWrapper ];
-
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out/bin
-    install -D $src $out/libexec/composer/composer.phar
-    makeWrapper ${php}/bin/php $out/bin/composer \
-      --add-flags "$out/libexec/composer/composer.phar" \
-      --prefix PATH : ${lib.makeBinPath [ unzip ]}
-    runHook postInstall
+  postInstall = ''
+    wrapProgram $out/bin/composer \
+      --prefix PATH : ${lib.makeBinPath [ _7zz cacert curl git unzip xz ]}
   '';
 
-  meta = with lib; {
+  vendorHash = "sha256-SG5RsKaP7zqJY2vjvULuNdf7w6tAGh7/dlxx2Pkfj2A=";
+
+  meta = {
+    changelog = "https://github.com/composer/composer/releases/tag/${finalAttrs.version}";
     description = "Dependency Manager for PHP";
-    license = licenses.mit;
     homepage = "https://getcomposer.org/";
-    changelog = "https://github.com/composer/composer/releases/tag/${version}";
-    maintainers = with maintainers; [ offline ] ++ teams.php.members;
+    license = lib.licenses.mit;
+    maintainers = lib.teams.php.members;
   };
-}
+})

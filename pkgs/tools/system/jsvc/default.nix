@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "jsvc";
-  version = "1.3.0";
+  version = "1.3.4";
 
   src = fetchurl {
     url = "https://downloads.apache.org//commons/daemon/source/commons-daemon-${version}-src.tar.gz";
-    sha256 = "sha256-UzzXb+MRPVNTE8HYsB/yPK9rq8zGmbGmi0RGk3zER0s=";
+    sha256 = "sha256-30hJ0F5YFmEOZ4IYg/T8HhFySgu4t4uEsh7dUDns674=";
   };
 
   buildInputs = [ commonsDaemon ];

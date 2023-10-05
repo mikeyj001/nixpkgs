@@ -1,18 +1,24 @@
 { lib
+, aiohttp
+, aioresponses
 , beautifulsoup4
 , buildPythonPackage
 , fetchFromGitHub
 , html5lib
+, pytest-asyncio
+, pytest-aiohttp
 , pytestCheckHook
 , pythonOlder
 , requests
 , requests-mock
+, setuptools
+, setuptools-scm
 , urllib3
 }:
 
 buildPythonPackage rec {
   pname = "raincloudy";
-  version = "1.1.1";
+  version = "1.2.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -20,31 +26,46 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "vanstinator";
     repo = pname;
-    rev = version;
-    hash = "sha256-c6tux0DZY56a4BpuiMXtaqm8+JKNDiyMxrFUju3cp2Y=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-qCkBVirM09iA1sXiOB9FJns8bHjQq7rRk8XbRWrtBDI=";
   };
 
+  nativeBuildInputs = [
+    setuptools
+    setuptools-scm
+  ];
+
+  SETUPTOOLS_SCM_PRETEND_VERSION = version;
+
+  postPatch = ''
+    # https://github.com/vanstinator/raincloudy/pull/60
+    substituteInPlace setup.py \
+      --replace "bs4" "beautifulsoup4" \
+
+    # fix raincloudy.aio package discovery, by relying on
+    # autodiscovery instead.
+    sed -i '/packages=/d' setup.py
+  '';
+
   propagatedBuildInputs = [
+    aiohttp
     requests
     beautifulsoup4
     urllib3
     html5lib
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
+    aioresponses
+    pytest-asyncio
+    pytest-aiohttp
     pytestCheckHook
     requests-mock
   ];
 
-  postPatch = ''
-    # https://github.com/vanstinator/raincloudy/pull/60
-    substituteInPlace setup.py \
-      --replace "bs4" "beautifulsoup4" \
-      --replace "html5lib==1.0.1" "html5lib"
-  '';
-
   pythonImportsCheck = [
     "raincloudy"
+    "raincloudy.aio"
   ];
 
   disabledTests = [

@@ -7,20 +7,20 @@
 
 buildPythonPackage rec {
   pname = "pyrfxtrx";
-  version = "0.29.0";
+  version = "0.30.1";
 
   src = fetchFromGitHub {
     owner = "Danielhiversen";
     repo = "pyRFXtrx";
-    rev = version;
-    hash = "sha256-0tdT7UIT9F2z9+ufnzaACVxRybWxFjZObYQCd3hcXTk=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-sxxGu1ON5fhUCaONYJdsUFHraTh5NAdXzj7Cai9k5yc=";
   };
 
   propagatedBuildInputs = [
     pyserial
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

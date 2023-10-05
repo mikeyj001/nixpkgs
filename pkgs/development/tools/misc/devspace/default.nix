@@ -1,21 +1,20 @@
-{
-  lib,
-  buildGoModule,
-  fetchFromGitHub
+{ lib
+, buildGoModule
+, fetchFromGitHub
 }:
 
 buildGoModule rec {
   pname = "devspace";
-  version = "5.18.5";
+  version = "6.3.3";
 
   src = fetchFromGitHub {
     owner = "loft-sh";
     repo = "devspace";
     rev = "v${version}";
-    sha256 = "1i4ir8p3xpfy8z8w8gzpk1hyzs04b5llrjd6hl2hzrxd1likl0sh";
+    sha256 = "sha256-xAK06bpl8BGsVUu6O1C2l+tzeiCQoRUMIUtwntUZVvU=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
   ldflags = [
     "-s"

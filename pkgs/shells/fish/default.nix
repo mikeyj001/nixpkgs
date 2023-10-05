@@ -25,6 +25,7 @@
 , runCommand
 , writeText
 , nixosTests
+, nix-update-script
 , useOperatingSystemEtc ? true
   # An optional string containing Fish code that initializes the environment.
   # This is run at the very beginning of initialization. If it sets $NIX_PROFILES
@@ -134,7 +135,7 @@ let
 
   fish = stdenv.mkDerivation rec {
     pname = "fish";
-    version = "3.4.1";
+    version = "3.6.1";
 
     src = fetchurl {
       # There are differences between the release tarball and the tarball GitHub
@@ -144,7 +145,7 @@ let
       # --version`), as well as the local documentation for all builtins (and
       # maybe other things).
       url = "https://github.com/fish-shell/fish-shell/releases/download/${version}/${pname}-${version}.tar.xz";
-      sha256 = "sha256-tvI7OEOwTbawqQ/qH28NDkDMAntKcyCYIAhj8oZKlOo=";
+      hash = "sha256-VUArtHymc52KuiXkF4CQW1zhvOCl4N0X3KkItbwLSbI=";
     };
 
     # Fix FHS paths in tests
@@ -180,8 +181,12 @@ let
       rm tests/pexpects/exit.py
       rm tests/pexpects/job_summary.py
       rm tests/pexpects/signals.py
-    '' + lib.optionalString (stdenv.isLinux && stdenv.isAarch64) ''
-      # pexpect tests are flaky on aarch64-linux
+
+      # pexpect tests are flaky in general
+      # See https://github.com/fish-shell/fish-shell/issues/8789
+      rm tests/pexpects/bind.py
+    '' + lib.optionalString stdenv.isLinux ''
+      # pexpect tests are flaky on aarch64-linux (also x86_64-linux)
       # See https://github.com/fish-shell/fish-shell/issues/8789
       rm tests/pexpects/exit_handlers.py
     '';
@@ -205,6 +210,12 @@ let
       "-DMAC_CODESIGN_ID=OFF"
     ];
 
+    # Fish’s test suite needs to be able to look up process information and send signals.
+    sandboxProfile = lib.optionalString stdenv.isDarwin ''
+      (allow mach-lookup mach-task-name)
+      (allow signal (target children))
+    '';
+
     # The optional string is kind of an inelegant way to get fish to cross compile.
     # Fish needs coreutils as a runtime dependency, and it gets put into
     # CMAKE_PREFIX_PATH, which cmake uses to look up build time programs, so it
@@ -226,7 +237,7 @@ let
 
     doCheck = true;
 
-    checkInputs = [
+    nativeCheckInputs = [
       coreutils
       (python3.withPackages (ps: [ ps.pexpect ]))
       procps
@@ -287,7 +298,8 @@ let
       homepage = "https://fishshell.com/";
       license = licenses.gpl2;
       platforms = platforms.unix;
-      maintainers = with maintainers; [ cole-h ];
+      maintainers = with maintainers; [ cole-h winter srapenne ];
+      mainProgram = "fish";
     };
 
     passthru = {
@@ -326,6 +338,7 @@ let
             ${fish}/bin/fish ${fishScript} && touch $out
           '';
       };
+      updateScript = nix-update-script { };
     };
   };
 in

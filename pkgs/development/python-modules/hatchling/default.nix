@@ -5,42 +5,39 @@
 
 # runtime
 , editables
-, importlib-metadata # < 3.8
 , packaging
 , pathspec
 , pluggy
 , tomli
+, trove-classifiers
 
 # tests
 , build
 , python
 , requests
-, toml
 , virtualenv
 }:
 
-let
+buildPythonPackage rec {
   pname = "hatchling";
-  version = "0.25.0";
-in
-buildPythonPackage {
-  inherit pname version;
+  version = "1.18.0";
   format = "pyproject";
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-k/bjZvGaOjZshVr6w3Jb7XaC1dAOlIaraFQKCth2ZII=";
+    hash = "sha256-UOmcMRDOCvw/e9ut/xxxwXdY5HZzHCdgeUDPpmhkico=";
   };
 
-  # listed in backend/src/hatchling/ouroboros.py
+  # listed in backend/pyproject.toml
   propagatedBuildInputs = [
     editables
     packaging
     pathspec
     pluggy
+    trove-classifiers
+  ] ++ lib.optionals (pythonOlder "3.11") [
     tomli
-  ] ++ lib.optionals (pythonOlder "3.8") [
-    importlib-metadata
   ];
 
   pythonImportsCheck = [
@@ -52,11 +49,9 @@ buildPythonPackage {
   doCheck = false;
 
   # listed in /backend/tests/downstream/requirements.txt
-  checkInputs = [
+  nativeCheckInputs = [
     build
-    packaging
     requests
-    toml
     virtualenv
   ];
 
@@ -72,7 +67,8 @@ buildPythonPackage {
 
   meta = with lib; {
     description = "Modern, extensible Python build backend";
-    homepage = "https://ofek.dev/hatch/latest/";
+    homepage = "https://hatch.pypa.io/latest/";
+    changelog = "https://github.com/pypa/hatch/releases/tag/hatchling-v${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ hexa ofek ];
   };

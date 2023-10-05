@@ -16,12 +16,12 @@ let
   info = splitString "-" stdenv.hostPlatform.system;
   arch = elemAt info 0;
   plat = elemAt info 1;
-  shas =
+  hashes =
     {
-      x86_64-linux   = "1s16l95wc589cr69pfbgmkn9rkvxn6sd6jlbiqpm6p6iyxiaxd6c";
-      x86_64-darwin  = "05h7pvq4pb816wgcymnfklp3w6sv54x6138v2infw5219dnk8pfs";
-      aarch64-linux  = "0q4xnjzhlx1b2lkikca88qh9glfxaifsm419k2bxxlrfrx31zlkq";
-      aarch64-darwin = "067mb1dianwiarw8cz1va4g6zfhp9ls4s174xbpkxwsknvvyhgz6";
+      x86_64-linux   = "sha512-eiAT5Dx/w56GoxpzPMdMWH7yu6DAE/lc6HT5i0iKT48Ob7JUoe7dXAsOIQrtmgGV9zWPqWU8iQ4jRBP/kxkIBw==";
+      x86_64-darwin  = "sha512-5vSefA9Z4mCz49Q+Vzdck1KXbE9REYAF46kSf0G1n5XlHqFYzTGOmUEObZhGTqH4RDLJBdEqhLj2iyzjWQX5RA==";
+      aarch64-linux  = "sha512-8nkPSbecOBJGu/h0MZGUUq+Tqk/YqmvJwfkDHn7V2cZJ9bq4Z8KKfRYC4ihdP0pfePgJrAV0SwKtZ9aGELtnfQ==";
+      aarch64-darwin = "sha512-dbZrYGULuC3FF/SllPpAgW077Lkr87NJ8+gyTMayl8i8rOvAjnZhiR/U7eA6CZ/qVsFQkpGATdAzRXF8NlZBcg==";
     };
 in
 stdenv.mkDerivation rec {
@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://artifacts.elastic.co/downloads/elasticsearch/${pname}-${version}-${plat}-${arch}.tar.gz";
-    sha256 = shas.${stdenv.hostPlatform.system} or (throw "Unknown architecture");
+    hash = hashes.${stdenv.hostPlatform.system} or (throw "Unknown architecture");
   };
 
   patches = [ ./es-home-6.x.patch ];
@@ -72,7 +72,11 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Open Source, Distributed, RESTful Search Engine";
-    license = licenses.elastic;
+    sourceProvenance = with lib.sourceTypes; [
+      binaryBytecode
+      binaryNativeCode
+    ];
+    license = licenses.elastic20;
     platforms = platforms.unix;
     maintainers = with maintainers; [ apeschar basvandijk ];
   };

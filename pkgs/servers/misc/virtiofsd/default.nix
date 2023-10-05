@@ -2,16 +2,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "virtiofsd";
-  version = "1.2.0";
+  version = "1.8.0";
 
   src = fetchFromGitLab {
     owner = "virtio-fs";
     repo = "virtiofsd";
     rev = "v${version}";
-    sha256 = "161z88nx2x2j4q8fbxryv7v63f9aw7wpvl6vg6x4xzllnrw6p607";
+    sha256 = "sha256-tbM2JWoub789s3YanT/lqCKl6JkY+FahSYb+lHvF7W8=";
   };
 
-  cargoSha256 = "0ma3kaaa4bl11015gxijwzyxhixz947k8byaypmmw0dj9m1vhv77";
+  cargoHash = "sha256-l2rWR9HAXTuNEarj2hWaZxpTdUNGoCnNfsZs8Y+of+s=";
 
   LIBCAPNG_LIB_PATH = "${lib.getLib libcap_ng}/lib";
   LIBCAPNG_LINK_TYPE =
@@ -22,7 +22,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     homepage = "https://gitlab.com/virtio-fs/virtiofsd";
     description = "vhost-user virtio-fs device backend written in Rust";
-    maintainers = with maintainers; [ qyliss ];
+    maintainers = with maintainers; [ qyliss astro ];
     platforms = platforms.linux;
     license = with licenses; [ asl20 /* and */ bsd3 ];
   };

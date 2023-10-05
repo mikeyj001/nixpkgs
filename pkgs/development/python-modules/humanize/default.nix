@@ -2,40 +2,44 @@
 , buildPythonPackage
 , fetchFromGitHub
 , freezegun
-, importlib-metadata
+, gettext
 , pytestCheckHook
 , pythonOlder
-, setuptools
-, setuptools-scm
+, hatch-vcs
+, hatchling
 }:
 
 buildPythonPackage rec {
-  version = "4.1.0";
   pname = "humanize";
+  version = "4.8.0";
   format = "pyproject";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "python-humanize";
     repo = pname;
-    rev = version;
-    hash = "sha256-5xL3gfEohDjnF085Pgx/PBXWWM76X4FU2KR+8OGshMw=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-bKTzygQtZ/0UB+zM9735a/xwH4KaoU6C8kUGurbHs2Y=";
   };
 
   SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
-    setuptools-scm
+    hatch-vcs
+    hatchling
+    gettext
   ];
 
-  propagatedBuildInputs = [
-    setuptools
-  ] ++ lib.optionals (pythonOlder "3.8") [
-    importlib-metadata
-  ];
+  postBuild = ''
+    scripts/generate-translation-binaries.sh
+  '';
 
-  checkInputs = [
+  postInstall = ''
+    cp -r 'src/humanize/locale' "$out/lib/"*'/site-packages/humanize/'
+  '';
+
+  nativeCheckInputs = [
     freezegun
     pytestCheckHook
   ];
@@ -47,7 +51,8 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python humanize utilities";
     homepage = "https://github.com/python-humanize/humanize";
+    changelog = "https://github.com/python-humanize/humanize/releases/tag/${version}";
     license = licenses.mit;
-    maintainers = with maintainers; [ rmcgibbo ];
+    maintainers = with maintainers; [ rmcgibbo Luflosi ];
   };
 }

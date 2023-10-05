@@ -1,28 +1,48 @@
 { lib
+, stdenv
 , rustPlatform
 , fetchgit
 , makeWrapper
+, pkg-config
+, glib
+, libopus
+, vips
 , ffmpeg
 , callPackage
 , unstableGitUpdater
+, darwin
 }:
 
 rustPlatform.buildRustPackage {
   pname = "faircamp";
-  version = "unstable-2022-03-20";
+  version = "unstable-2023-04-10";
 
   # TODO when switching to a stable release, use fetchFromGitea and add a
   # version test. Meanwhile, fetchgit is used to make unstableGitUpdater work.
   src = fetchgit {
     url = "https://codeberg.org/simonrepp/faircamp.git";
-    rev = "863cecb468a58a774bd2d1d93f99f3c8ecd8205c";
-    sha256 = "sha256-JodIo601BYesbiHarnBk4/GuFR/bpCswxQbaysRP+CI=";
+    rev = "21f775dc35a88c54015694f9757e81c97fa860ea";
+    hash = "sha256-aMSMMIGfoiqtg8Dj8QiCbUE40OKQXMXt4hvlvbXQLls=";
   };
 
-  cargoHash = "sha256-XqsUUc+s01t4KHtktbNhm52r0NeLbcBg5DVw3Xn0oZk=";
+  cargoLock = {
+    lockFile = ./Cargo.lock;
+    outputHashes = {
+      "enolib-0.1.0" = "sha256-0+T8RRQnqbIiIup/aDJgvxeV8sRV4YrlA9JVbQxMfF0=";
+    };
+  };
 
   nativeBuildInputs = [
     makeWrapper
+    pkg-config
+  ];
+
+  buildInputs = [
+    glib
+    libopus
+    vips
+  ] ++ lib.optionals stdenv.isDarwin [
+    darwin.apple_sdk.frameworks.CoreServices
   ];
 
   postInstall = ''
@@ -48,7 +68,7 @@ rustPlatform.buildRustPackage {
       website for you automatically, otherwise you can use FTP or whichever
       means you prefer to do that manually.
     '';
-    homepage = "https://codeberg.org/simonrepp/faircamp";
+    homepage = "https://simonrepp.com/faircamp/";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ fgaz ];
     platforms = platforms.all;

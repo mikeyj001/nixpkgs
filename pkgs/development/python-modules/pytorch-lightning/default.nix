@@ -1,47 +1,65 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, isPy27
-, future
+, pythonOlder
 , fsspec
+, lightning-utilities
+, numpy
 , packaging
-, pytestCheckHook
-, pytorch
 , pyyaml
-, tensorboard
+, tensorboardx
+, torch
 , torchmetrics
-, tqdm }:
+, tqdm
+, traitlets
+
+# tests
+, psutil
+, pytestCheckHook
+}:
 
 buildPythonPackage rec {
   pname = "pytorch-lightning";
-  version = "1.6.3";
-
-  disabled = isPy27;
+  version = "2.0.9";
+  format = "pyproject";
 
   src = fetchFromGitHub {
-    owner = "PyTorchLightning";
-    repo = pname;
-    rev = version;
-    hash = "sha256-MEUFrj84y5lQfwbC9s9fJNOKo+Djeh+E/eDc8KeX7V4=";
+    owner = "Lightning-AI";
+    repo = "pytorch-lightning";
+    rev = "refs/tags/${version}";
+    hash = "sha256-2HjdqC7JU28nVAJdaEkwmJOTfWBCqHcM1a1sHIfF3ME=";
   };
 
+  preConfigure = ''
+    export PACKAGE_NAME=pytorch
+ '';
+
   propagatedBuildInputs = [
-    packaging
-    future
     fsspec
-    pytorch
+    numpy
+    packaging
     pyyaml
-    tensorboard
+    tensorboardx
+    torch
+    lightning-utilities
     torchmetrics
     tqdm
+    traitlets
+  ]
+  ++ fsspec.optional-dependencies.http;
+
+  nativeCheckInputs = [
+    psutil
+    pytestCheckHook
   ];
 
-  checkInputs = [ pytestCheckHook ];
   # Some packages are not in NixPkgs; other tests try to build distributed
   # models, which doesn't work in the sandbox.
   doCheck = false;
 
-  pythonImportsCheck = [ "pytorch_lightning" ];
+  pythonImportsCheck = [
+    "pytorch_lightning"
+  ];
 
   meta = with lib; {
     description = "Lightweight PyTorch wrapper for machine learning researchers";

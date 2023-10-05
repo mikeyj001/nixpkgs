@@ -1,105 +1,130 @@
 { lib
-, mkDerivation
+, stdenv
 , fetchFromGitHub
 , SDL2
 , cmake
+, copyDesktopItems
+, cubeb
 , curl
 , extra-cmake-modules
-, gtk3
-, libevdev
-, libpulseaudio
-, mesa
+, libXrandr
+, libbacktrace
+, makeDesktopItem
 , ninja
 , pkg-config
 , qtbase
+, qtsvg
 , qttools
-, sndio
+, qtwayland
+, substituteAll
 , vulkan-loader
 , wayland
 , wrapQtAppsHook
+, enableWayland ? true
 }:
 
-mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "duckstation";
-  version = "0.pre+date=2022-01-18";
+  version = "unstable-2023-09-30";
 
   src = fetchFromGitHub {
     owner = "stenzek";
-    repo = pname;
-    rev = "51041e47f70123eda41d999701f5651830a0a95e";
-    sha256 = "sha256-nlF6ctDU8KCK7MN2pniPLLqUbPUygX9rl0hjzVQ+mPo=";
+    repo = "duckstation";
+    rev = "d5608bf12df7a7e03750cb94a08a3d7999034ae2";
+    hash = "sha256-ktfZgacjkN6GQb1vLmyTZMr8QmmH12qAvFSIBTjgRSs=";
   };
+
+  patches = [
+    # Tests are not built by default
+    ./001-fix-test-inclusion.diff
+    # Patching yet another script that fills data based on git commands...
+    (substituteAll {
+      src = ./002-hardcode-vars.diff;
+      gitHash = finalAttrs.src.rev;
+      gitBranch = "master";
+      gitTag = "0.1-5889-gd5608bf1";
+      gitDate = "2023-09-30T23:20:09+10:00";
+    })
+  ];
 
   nativeBuildInputs = [
     cmake
-    extra-cmake-modules
+    copyDesktopItems
     ninja
     pkg-config
     qttools
     wrapQtAppsHook
+  ]
+  ++ lib.optionals enableWayland [
+    extra-cmake-modules
   ];
 
   buildInputs = [
     SDL2
     curl
-    gtk3
-    libevdev
-    libpulseaudio
-    mesa
+    libXrandr
+    libbacktrace
     qtbase
-    sndio
+    qtsvg
     vulkan-loader
+  ]
+  ++ lib.optionals enableWayland [
+    qtwayland
     wayland
-  ];
+  ]
+  ++ cubeb.passthru.backendLibs;
+
+  strictDeps = true;
 
   cmakeFlags = [
-    "-DUSE_DRMKMS=ON"
-    "-DUSE_WAYLAND=ON"
+    (lib.cmakeBool "BUILD_TESTS" true)
+    (lib.cmakeBool "ENABLE_WAYLAND" enableWayland)
   ];
 
-  postPatch = ''
-    substituteInPlace extras/linux-desktop-files/duckstation-qt.desktop \
-      --replace "duckstation-qt" "duckstation" \
-      --replace "TryExec=duckstation" "tryExec=duckstation-qt" \
-      --replace "Exec=duckstation" "Exec=duckstation-qt"
-    substituteInPlace extras/linux-desktop-files/duckstation-nogui.desktop \
-      --replace "duckstation-nogui" "duckstation" \
-      --replace "TryExec=duckstation" "tryExec=duckstation-nogui" \
-      --replace "Exec=duckstation" "Exec=duckstation-nogui"
+  desktopItems = [
+    (makeDesktopItem {
+      name = "duckstation-qt";
+      desktopName = "DuckStation";
+      genericName = "PlayStation 1 Emulator";
+      icon = "duckstation";
+      tryExec = "duckstation-qt";
+      exec = "duckstation-qt %f";
+      comment = "Fast PlayStation 1 emulator";
+      categories = [ "Game" "Emulator" "Qt" ];
+      type = "Application";
+    })
+  ];
+
+  doCheck = true;
+  checkPhase = ''
+    runHook preCheck
+    bin/common-tests
+    runHook postCheck
   '';
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/bin $out/share $out/share/pixmaps $out/share/applications
-    rm bin/common-tests
+    mkdir -p $out/bin $out/share
 
     cp -r bin $out/share/duckstation
-    ln -s $out/share/duckstation/duckstation-{qt,nogui} $out/bin/
+    ln -s $out/share/duckstation/duckstation-qt $out/bin/
 
-    cp ../extras/icons/icon-256px.png $out/share/pixmaps/duckstation.png
-    cp ../extras/linux-desktop-files/* $out/share/applications/
+    install -Dm644 bin/resources/images/duck.png $out/share/pixmaps/duckstation.png
 
     runHook postInstall
   '';
 
-  doCheck = true;
-  checkPhase = ''
-    runHook preCheck
-    ./bin/common-tests
-    runHook postCheck
-  '';
-
-  # Libpulseaudio fixes https://github.com/NixOS/nixpkgs/issues/171173
   qtWrapperArgs = [
-    "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ libpulseaudio vulkan-loader ]}"
+    "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([ vulkan-loader ] ++ cubeb.passthru.backendLibs)}"
   ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/stenzek/duckstation";
     description = "Fast PlayStation 1 emulator for x86-64/AArch32/AArch64";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [ guibou AndersonTorres ];
-    platforms = platforms.linux;
+    license = lib.licenses.gpl3Only;
+    mainProgram = "duckstation-qt";
+    maintainers = with lib.maintainers; [ guibou AndersonTorres ];
+    platforms = lib.platforms.linux;
   };
-}
+})

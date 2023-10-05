@@ -2,28 +2,19 @@
 
 buildGoModule rec {
   pname = "runitor";
-  version = "0.9.2";
-  vendorSha256 = null;
+  version = "1.2.0";
+  vendorHash = null;
 
   src = fetchFromGitHub {
     owner = "bdd";
     repo = "runitor";
     rev = "v${version}";
-    sha256 = "sha256-LuCxn4j0MlnJjSh3d18YNzNrtbqtMPxgkZttqKUGJd4";
+    sha256 = "sha256-lL9yfiqPIIfEvjiWcG6e1NrURHJFdk4x/od/w7/i2DE=";
   };
 
   ldflags = [
     "-s" "-w" "-X main.Version=v${version}"
   ];
-
-  # TODO(cole-h):
-  # End-to-end tests requiring localhost networking currently under
-  # OfBorg's Linux builders, while passing under Darwin.
-  #
-  # Ref: https://github.com/NixOS/nixpkgs/pull/170566#issuecomment-1114034891
-  #
-  # Temporarily disable tests.
-  doCheck = false;
 
   passthru.tests.version = testers.testVersion {
     package = runitor;

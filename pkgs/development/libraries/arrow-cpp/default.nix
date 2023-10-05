@@ -3,7 +3,6 @@
 , fetchurl
 , fetchFromGitHub
 , fixDarwinDylibNames
-, abseil-cpp
 , autoconf
 , aws-sdk-cpp
 , boost
@@ -18,7 +17,6 @@
 , google-cloud-cpp
 , grpc
 , gtest
-, jemalloc
 , libbacktrace
 , lz4
 , minio
@@ -40,12 +38,9 @@
 , zstd
 , enableShared ? !stdenv.hostPlatform.isStatic
 , enableFlight ? true
-, enableJemalloc ? !(stdenv.isAarch64 && stdenv.isDarwin)
-  # boost/process is broken in 1.69 on darwin, but fixed in 1.70 and
-  # non-existent in older versions
-  # see https://github.com/boostorg/process/issues/55
-, enableS3 ? (!stdenv.isDarwin) || (lib.versionOlder boost.version "1.69" || lib.versionAtLeast boost.version "1.70")
-, enableGcs ? !stdenv.isDarwin # google-cloud-cpp is not supported on darwin
+, enableJemalloc ? !stdenv.isDarwin
+, enableS3 ? true
+, enableGcs ? !stdenv.isDarwin
 }:
 
 assert lib.asserts.assertMsg
@@ -54,59 +49,79 @@ assert lib.asserts.assertMsg
 
 let
   arrow-testing = fetchFromGitHub {
+    name = "arrow-testing";
     owner = "apache";
     repo = "arrow-testing";
-    rev = "634739c664433cec366b4b9a81d1e1044a8c5eda";
-    hash = "sha256-r1WVgJJsI7v485L6Qb+5i7kFO4Tvxyk1T0JBb4og6pg=";
+    rev = "47f7b56b25683202c1fd957668e13f2abafc0f12";
+    hash = "sha256-ZDznR+yi0hm5O1s9as8zq5nh1QxJ8kXCRwbNQlzXpnI=";
   };
 
   parquet-testing = fetchFromGitHub {
+    name = "parquet-testing";
     owner = "apache";
     repo = "parquet-testing";
-    rev = "acd375eb86a81cd856476fca0f52ba6036a067ff";
-    hash = "sha256-z/kmi+4dBO/dsVkJA4NgUoxl0pXi8RWIGvI8MGu/gcc=";
+    rev = "b2e7cc755159196e3a068c8594f7acbaecfdaaac";
+    hash = "sha256-IFvGTOkaRSNgZOj8DziRj88yH5JRF+wgSDZ5N0GNvjk=";
+  };
+
+  aws-sdk-cpp-arrow = aws-sdk-cpp.override {
+    apis = [
+      "cognito-identity"
+      "config"
+      "identity-management"
+      "s3"
+      "sts"
+      "transfer"
+    ];
   };
 
 in
 stdenv.mkDerivation rec {
   pname = "arrow-cpp";
-  version = "8.0.0";
+  version = "13.0.0";
 
   src = fetchurl {
     url = "mirror://apache/arrow/arrow-${version}/apache-arrow-${version}.tar.gz";
-    hash = "sha256-rZoFcFEXyYnBFrrprHBJL+AVBQ4bgPsOOP3ktdhjqqM=";
+    hash = "sha256-Nd/aGRJip1a+k07viv7o0JdiytJQIdqmJuskniUayeY=";
   };
+
   sourceRoot = "apache-arrow-${version}/cpp";
 
-  ${if enableJemalloc then "ARROW_JEMALLOC_URL" else null} = jemalloc.src;
-
   # versions are all taken from
-  # https://github.com/apache/arrow/blob/apache-arrow-8.0.0/cpp/thirdparty/versions.txt
+  # https://github.com/apache/arrow/blob/apache-arrow-${version}/cpp/thirdparty/versions.txt
 
+  # jemalloc: arrow uses a custom prefix to prevent default allocator symbol
+  # collisions as well as custom build flags
+  ${if enableJemalloc then "ARROW_JEMALLOC_URL" else null} = fetchurl {
+    url = "https://github.com/jemalloc/jemalloc/releases/download/5.3.0/jemalloc-5.3.0.tar.bz2";
+    hash = "sha256-LbgtHnEZ3z5xt2QCGbbf6EeJvAU3mDw7esT3GJrs/qo=";
+  };
+
+  # mimalloc: arrow uses custom build flags for mimalloc
   ARROW_MIMALLOC_URL = fetchFromGitHub {
     owner = "microsoft";
     repo = "mimalloc";
-    rev = "v1.7.3";
-    hash = "sha256-Ca877VitpWyKmZNHavqgewk/P+tyd2xHDNVqveKh87M=";
+    rev = "v2.0.6";
+    hash = "sha256-u2ITXABBN/dwU+mCIbL3tN1f4c17aBuSdNTV+Adtohc=";
   };
 
   ARROW_XSIMD_URL = fetchFromGitHub {
     owner = "xtensor-stack";
     repo = "xsimd";
-    rev = "7d1778c3b38d63db7cec7145d939f40bc5d859d1";
-    hash = "sha256-89AysBUVnTdWyMPazeJegnQ6WEH90Ns7qQInZLMSXY4=";
+    rev = "9.0.1";
+    hash = "sha256-onALN6agtrHWigtFlCeefD9CiRZI4Y690XTzy2UDnrk=";
   };
 
   ARROW_SUBSTRAIT_URL = fetchFromGitHub {
     owner = "substrait-io";
     repo = "substrait";
-    rev = "e1b4c04a1b518912f4c4065b16a1b2c0ac8e14cf";
-    hash = "sha256-56FSjDngsROSHLjMv+OYAIYqphEu3GzgIMHbgh/ZQw0=";
+    rev = "v0.20.0";
+    hash = "sha256-71hAwJ0cGvpwK/ibeeQt82e9uqxcu9sM1rPtPENMPfs=";
   };
 
   patches = [
-    # patch to fix python-test
-    ./darwin.patch
+    # Protobuf switched to lower case project name.
+    ./cmake-find-protobuf.patch
   ];
 
   nativeBuildInputs = [
@@ -133,19 +148,17 @@ stdenv.mkDerivation rec {
     utf8proc
     zlib
     zstd
-  ] ++ lib.optionals enableShared [
-    python3.pkgs.python
-    python3.pkgs.numpy
   ] ++ lib.optionals enableFlight [
     grpc
     openssl
     protobuf
-  ] ++ lib.optionals enableS3 [ aws-sdk-cpp openssl ]
+    sqlite
+  ] ++ lib.optionals enableS3 [ aws-sdk-cpp-arrow openssl ]
   ++ lib.optionals enableGcs [
-    abseil-cpp
     crc32c
     curl
     google-cloud-cpp
+    grpc
     nlohmann_json
   ];
 
@@ -165,21 +178,17 @@ stdenv.mkDerivation rec {
     "-DARROW_EXTRA_ERROR_CONTEXT=ON"
     "-DARROW_VERBOSE_THIRDPARTY_BUILD=ON"
     "-DARROW_DEPENDENCY_SOURCE=SYSTEM"
-    "-DThrift_SOURCE=AUTO" # search for Thrift using pkg-config (ThriftConfig.cmake requires OpenSSL and libevent)
+    "-Dxsimd_SOURCE=AUTO"
     "-DARROW_DEPENDENCY_USE_SHARED=${if enableShared then "ON" else "OFF"}"
     "-DARROW_COMPUTE=ON"
     "-DARROW_CSV=ON"
     "-DARROW_DATASET=ON"
-    "-DARROW_ENGINE=ON"
     "-DARROW_FILESYSTEM=ON"
     "-DARROW_FLIGHT_SQL=${if enableFlight then "ON" else "OFF"}"
     "-DARROW_HDFS=ON"
     "-DARROW_IPC=ON"
     "-DARROW_JEMALLOC=${if enableJemalloc then "ON" else "OFF"}"
     "-DARROW_JSON=ON"
-    "-DARROW_PLASMA=ON"
-    # Disable Python for static mode because openblas is currently broken there.
-    "-DARROW_PYTHON=${if enableShared then "ON" else "OFF"}"
     "-DARROW_USE_GLOG=ON"
     "-DARROW_WITH_BACKTRACE=ON"
     "-DARROW_WITH_BROTLI=ON"
@@ -190,21 +199,21 @@ stdenv.mkDerivation rec {
     "-DARROW_WITH_ZLIB=ON"
     "-DARROW_WITH_ZSTD=ON"
     "-DARROW_MIMALLOC=ON"
-    # Parquet options:
-    "-DARROW_PARQUET=ON"
     "-DARROW_SUBSTRAIT=ON"
-    "-DPARQUET_BUILD_EXECUTABLES=ON"
     "-DARROW_FLIGHT=${if enableFlight then "ON" else "OFF"}"
     "-DARROW_FLIGHT_TESTING=${if enableFlight then "ON" else "OFF"}"
     "-DARROW_S3=${if enableS3 then "ON" else "OFF"}"
     "-DARROW_GCS=${if enableGcs then "ON" else "OFF"}"
+    # Parquet options:
+    "-DARROW_PARQUET=ON"
+    "-DPARQUET_BUILD_EXECUTABLES=ON"
+    "-DPARQUET_REQUIRE_ENCRYPTION=ON"
   ] ++ lib.optionals (!enableShared) [
     "-DARROW_TEST_LINKAGE=static"
   ] ++ lib.optionals stdenv.isDarwin [
-    "-DCMAKE_SKIP_BUILD_RPATH=OFF" # needed for tests
     "-DCMAKE_INSTALL_RPATH=@loader_path/../lib" # needed for tools executables
-  ] ++ lib.optional (!stdenv.isx86_64) "-DARROW_USE_SIMD=OFF"
-  ++ lib.optional enableS3 "-DAWSSDK_CORE_HEADER_FILE=${aws-sdk-cpp}/include/aws/core/Aws.h";
+  ] ++ lib.optionals (!stdenv.isx86_64) [ "-DARROW_USE_SIMD=OFF" ]
+  ++ lib.optionals enableS3 [ "-DAWSSDK_CORE_HEADER_FILE=${aws-sdk-cpp-arrow}/include/aws/core/Aws.h" ];
 
   doInstallCheck = true;
   ARROW_TEST_DATA = lib.optionalString doInstallCheck "${arrow-testing}/data";
@@ -224,31 +233,39 @@ stdenv.mkDerivation rec {
         "TestMinioServer.Connect"
         "TestS3FS.*"
         "TestS3FSGeneric.*"
+      ] ++ lib.optionals stdenv.isDarwin [
+        # TODO: revisit at 12.0.0 or when
+        # https://github.com/apache/arrow/commit/295c6644ca6b67c95a662410b2c7faea0920c989
+        # is available, see
+        # https://github.com/apache/arrow/pull/15288#discussion_r1071244661
+        "ExecPlanExecution.StressSourceSinkStopped"
       ];
     in
-    lib.optionalString doInstallCheck "-${builtins.concatStringsSep ":" filteredTests}";
-  installCheckInputs = [ perl which sqlite ] ++ lib.optional enableS3 minio;
-  installCheckPhase =
-    let
-      excludedTests = lib.optionals stdenv.isDarwin [
-        # Some plasma tests need to be patched to use a shorter AF_UNIX socket
-        # path on Darwin. See https://github.com/NixOS/nix/pull/1085
-        "plasma-external-store-tests"
-        "plasma-client-tests"
-      ] ++ [ "arrow-gcsfs-test" ];
-    in
-    ''
-      runHook preInstallCheck
+    lib.optionalString doInstallCheck "-${lib.concatStringsSep ":" filteredTests}";
 
-      ctest -L unittest \
-        --exclude-regex '^(${builtins.concatStringsSep "|" excludedTests})$'
+  __darwinAllowLocalNetworking = true;
 
-      runHook postInstallCheck
-    '';
+  nativeInstallCheckInputs = [ perl which sqlite ]
+    ++ lib.optionals enableS3 [ minio ]
+    ++ lib.optionals enableFlight [ python3 ];
+
+  disabledTests = [
+    # requires networking
+    "arrow-gcsfs-test"
+    "arrow-flight-integration-test"
+  ];
+
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    ctest -L unittest --exclude-regex '^(${lib.concatStringsSep "|" disabledTests})$'
+
+    runHook postInstallCheck
+  '';
 
   meta = with lib; {
     description = "A cross-language development platform for in-memory data";
-    homepage = "https://arrow.apache.org/";
+    homepage = "https://arrow.apache.org/docs/cpp/";
     license = licenses.asl20;
     platforms = platforms.unix;
     maintainers = with maintainers; [ tobim veprbl cpcloud ];

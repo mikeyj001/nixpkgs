@@ -4,11 +4,11 @@
 
 stdenv.mkDerivation rec {
   pname = "sacc";
-  version = "1.05";
+  version = "1.06";
 
   src = fetchurl {
     url = "ftp://bitreich.org/releases/sacc/sacc-${version}.tar.gz";
-    sha512 = "080vpacipdis396lrw3fxc1z7h2d0njm2zi63kvlk0n2m1disv97c968zx8dp76kfw1s03nvvr6v3vnpfkkywiz1idjc92s5rgcbsk1";
+    hash = "sha512-eoleQy4dKLfZsrsqUybKMjUIdqLIDTncbBnnU0fXKkhH8apP8R8H6Kmt6hTqcbhNcIkNzBcP9s4Ld54dZYa0+g==";
   };
 
   inherit patches;

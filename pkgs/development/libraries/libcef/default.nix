@@ -61,26 +61,21 @@ let
       platformStr = "linuxarm64";
       projectArch = "arm64";
     };
-    "i686-linux" = {
-      platformStr = "linux32";
-      projectArch = "x86";
-    };
     "x86_64-linux" = {
       platformStr = "linux64";
       projectArch = "x86_64";
     };
   };
-  platforms."aarch64-linux".sha256 = "0gmnmr0zn2ffn7xbhmfh6rhmwmxy5zzlj0s3lyp99knjn47lg2fg";
-  platforms."i686-linux".sha256 = "1lp2z9db89qk2wh900c2dzlhflwmcbmp4m7xnlj04pq4q2kgfm9p";
-  platforms."x86_64-linux".sha256 = "1ljrp0iky7rrj04sbqicrg1jr938xnid6jlirbf7gwlmzliz3wfs";
+  platforms."aarch64-linux".sha256 = "0c034h0hcsff4qmibizjn2ik5pq1jb4p6f0a4k6nrkank9m0x7ap";
+  platforms."x86_64-linux".sha256 = "02pj4dgfswpaglxkmbd9970znixlv82wna4xxhwjh7i5ps24a0n6";
 
   platformInfo = builtins.getAttr stdenv.targetPlatform.system platforms;
 in
 stdenv.mkDerivation rec {
   pname = "cef-binary";
-  version = "100.0.24";
-  gitRevision = "0783cf8";
-  chromiumVersion = "100.0.4896.127";
+  version = "117.1.5";
+  gitRevision = "f1b94ea";
+  chromiumVersion = "117.0.5938.132";
 
   src = fetchurl {
     url = "https://cef-builds.spotifycdn.com/cef_binary_${version}+g${gitRevision}+chromium-${chromiumVersion}_${platformInfo.platformStr}_minimal.tar.bz2";
@@ -88,7 +83,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  cmakeFlags = "-DPROJECT_ARCH=${platformInfo.projectArch}";
+  cmakeFlags = [ "-DPROJECT_ARCH=${platformInfo.projectArch}" ];
   makeFlags = [ "libcef_dll_wrapper" ];
   dontStrip = true;
   dontPatchELF = true;
@@ -112,7 +107,11 @@ stdenv.mkDerivation rec {
     description = "Simple framework for embedding Chromium-based browsers in other applications";
     homepage = "https://cef-builds.spotifycdn.com/index.html";
     maintainers = with maintainers; [ puffnfresh ];
+    sourceProvenance = with sourceTypes; [
+      fromSource
+      binaryNativeCode
+    ];
     license = licenses.bsd3;
-    platforms = [ "i686-linux" "x86_64-linux" "aarch64-linux" ];
+    platforms = [ "x86_64-linux" "aarch64-linux" ];
   };
 }

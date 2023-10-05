@@ -5,13 +5,15 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "getmail6";
-  version = "6.18.9";
+  version = "6.18.13";
+
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-qzlURYdE7nv+/wxK3B6WddmhW6xiLS7em3X5O5+CBbI=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-cyX+3LsXqBpAvaOPVpT4EuPzqJm9kki1uNTG+7k3Q28=";
   };
 
   # needs a Docker setup
@@ -23,6 +25,7 @@ python3.pkgs.buildPythonApplication rec {
     # getmail spends a lot of effort to build an absolute path for
     # documentation installation; too bad it is counterproductive now
     sed -e '/datadir or prefix,/d' -i setup.py
+    sed -e 's,/usr/bin/getmail,$(dirname $0)/getmail,' -i getmails
   '';
 
   meta = with lib; {

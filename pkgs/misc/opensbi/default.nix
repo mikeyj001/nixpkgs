@@ -1,4 +1,7 @@
-{ lib, stdenv, fetchFromGitHub
+{ lib
+, stdenv
+, fetchFromGitHub
+, python3
 , withPlatform ? "generic"
 , withPayload ? null
 , withFDT ? null
@@ -6,14 +9,20 @@
 
 stdenv.mkDerivation rec {
   pname = "opensbi";
-  version = "1.0";
+  version = "1.3.1";
 
   src = fetchFromGitHub {
     owner = "riscv-software-src";
     repo = "opensbi";
     rev = "v${version}";
-    sha256 = "sha256-OgzcH+RLU680qF3+lUiWFFbif6YtjIknJriGlRqcOGs=";
+    hash = "sha256-JNkPvmKYd5xbGB2lsZKWrpI6rBIckWbkLYu98bw7+QY=";
   };
+
+  postPatch = ''
+    patchShebangs ./scripts
+  '';
+
+  nativeBuildInputs = [ python3 ];
 
   installFlags = [
     "I=$(out)"

@@ -1,74 +1,94 @@
 { lib
-, async_generator
-, buildPythonPackage
-, pythonOlder
-, fetchFromGitHub
-, certifi
-, charset-normalizer
-, httpcore
-, rfc3986
-, sniffio
-, h2
-, socksio
-, isPyPy
+, stdenv
 , brotli
 , brotlicffi
+, buildPythonPackage
+, certifi
+, chardet
 , click
-, rich
+, fetchFromGitHub
+, h2
+, hatch-fancy-pypi-readme
+, hatchling
+, httpcore
+, isPyPy
+, multipart
 , pygments
 , python
+, pythonOlder
+, rfc3986
+, rich
+, sniffio
+, socksio
 , pytestCheckHook
 , pytest-asyncio
 , pytest-trio
-, typing-extensions
 , trustme
 , uvicorn
 }:
 
 buildPythonPackage rec {
   pname = "httpx";
-  version = "0.22.0";
-  format = "setuptools";
+  version = "0.24.1";
+  format = "pyproject";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "encode";
     repo = pname;
-    rev = version;
-    sha256 = "sha256-hQmQodGpVG23IZSsWV7rB1iB6QAudDao/8YshIgpmas=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-qG6fgijNgQKjpSG6sg0+0yqeAU6qV7czR8NgWe63LIg=";
   };
+
+  nativeBuildInputs = [
+    hatch-fancy-pypi-readme
+    hatchling
+  ];
 
   propagatedBuildInputs = [
     certifi
-    charset-normalizer
     httpcore
     rfc3986
     sniffio
-  ] ++ lib.optionals (pythonOlder "3.7") [
-    async_generator
   ];
 
   passthru.optional-dependencies = {
-    http2 = [ h2 ];
-    socks = [ socksio ];
-    brotli = if isPyPy then [ brotlicffi ] else [ brotli ];
-    cli = [ click rich pygments ];
+    http2 = [
+      h2
+    ];
+    socks = [
+      socksio
+    ];
+    brotli = if isPyPy then [
+      brotlicffi
+    ] else [
+      brotli
+    ];
+    cli = [
+      click
+      rich
+      pygments
+    ];
   };
 
-  checkInputs = [
+  # trustme uses pyopenssl
+  doCheck = !(stdenv.isDarwin && stdenv.isAarch64);
+
+  nativeCheckInputs = [
+    chardet
+    multipart
     pytestCheckHook
     pytest-asyncio
     pytest-trio
     trustme
-    typing-extensions
     uvicorn
   ] ++ passthru.optional-dependencies.http2
     ++ passthru.optional-dependencies.brotli
     ++ passthru.optional-dependencies.socks;
 
   postPatch = ''
-    substituteInPlace setup.py \
+    substituteInPlace pyproject.toml \
       --replace "rfc3986[idna2008]>=1.3,<2" "rfc3986>=1.3"
   '';
 
@@ -78,8 +98,8 @@ buildPythonPackage rec {
   '';
 
   pytestFlagsArray = [
-    "-W"
-    "ignore::DeprecationWarning"
+    "-W" "ignore::DeprecationWarning"
+    "-W" "ignore::trio.TrioDeprecationWarning"
   ];
 
   disabledTests = [
@@ -88,9 +108,6 @@ buildPythonPackage rec {
     # httpcore.ConnectError: [Errno -2] Name or service not known
     "test_async_proxy_close"
     "test_sync_proxy_close"
-    # sensitive to charset_normalizer output
-    "iso-8859-1"
-    "test_response_no_charset_with_iso_8859_1_content"
   ];
 
   disabledTestPaths = [
@@ -104,9 +121,10 @@ buildPythonPackage rec {
   __darwinAllowLocalNetworking = true;
 
   meta = with lib; {
+    changelog = "https://github.com/encode/httpx/blob/${src.rev}/CHANGELOG.md";
     description = "The next generation HTTP client";
     homepage = "https://github.com/encode/httpx";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ costrouc fab ];
+    maintainers = with maintainers; [ fab ];
   };
 }

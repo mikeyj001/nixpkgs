@@ -3,6 +3,7 @@
 , fetchFromGitHub
 , wrapGAppsHook
 , python3
+, gobject-introspection
 , gsettings-desktop-schemas
 , gettext
 , gtk3
@@ -12,19 +13,20 @@
 
 stdenv.mkDerivation rec {
   pname = "bulky";
-  version = "1.9";
+  version = "2.10";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = "bulky";
     rev = version;
-    hash = "sha256-OCBFhlnEXZROp47KDiy7Y6l4GDVCCP+i1IFYQa7esyg=";
+    hash = "sha256-3hpg9a5HU7mSSlMOWvmB/p0Mlyla5PDiS0J9iYJLr6Q=";
   };
 
   nativeBuildInputs = [
     wrapGAppsHook
     gsettings-desktop-schemas
     gettext
+    gobject-introspection
   ];
 
   buildInputs = [
@@ -48,6 +50,10 @@ stdenv.mkDerivation rec {
     cp -ra usr $out
     ln -sf $out/lib/bulky/bulky.py $out/bin/bulky
     runHook postInstall
+  '';
+
+  postInstall = ''
+    glib-compile-schemas $out/share/glib-2.0/schemas
   '';
 
   meta = with lib; {

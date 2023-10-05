@@ -11,13 +11,13 @@
 
 buildPythonPackage rec {
   pname = "pygraphviz";
-  version = "1.9";
+  version = "1.11";
 
   disabled = !isPy3k;
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-+hj3xs6ig0Gk5GbtDPBWgrCmgoiv6N18lCZ4L3wa4Bw=";
+    hash = "sha256-qX61ztJm9FBT67HyxsbSkJFpBQPjpcFL5/kIs3sG8tQ=";
     extension = "zip";
   };
 
@@ -33,7 +33,7 @@ buildPythonPackage rec {
 
   buildInputs = [ graphviz ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     runHook preCheck

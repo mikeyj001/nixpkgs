@@ -1,5 +1,4 @@
 { lib
-, appdirs
 , buildPythonPackage
 , defusedxml
 , fetchFromGitHub
@@ -20,7 +19,7 @@
 
 buildPythonPackage rec {
   pname = "pytenable";
-  version = "1.4.6";
+  version = "1.4.13";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -28,31 +27,27 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "tenable";
     repo = "pyTenable";
-    rev = version;
-    hash = "sha256-0isXHh0b2l8Br4XXR1y8A+zu8vkJjEsJ6faNNEx12lM=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-UY3AFnPplmU0jrV4LIKH4+2tcJEFkKMqO2GWVkgaHYE=";
   };
 
   propagatedBuildInputs = [
-    semver
-  ];
-
-  buildInputs = [
-    appdirs
     defusedxml
     marshmallow
     python-box
     python-dateutil
     requests
-    requests-pkcs12
     restfly
+    semver
     typing-extensions
   ];
 
-  checkInputs = [
-    responses
+  nativeCheckInputs = [
     pytest-datafiles
     pytest-vcr
     pytestCheckHook
+    requests-pkcs12
+    responses
   ];
 
   disabledTests = [
@@ -70,6 +65,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library for the Tenable.io and TenableSC API";
     homepage = "https://github.com/tenable/pyTenable";
+    changelog = "https://github.com/tenable/pyTenable/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

@@ -6,11 +6,11 @@
 
 stdenv.mkDerivation rec {
   pname = "clamav";
-  version = "0.105.0";
+  version = "1.2.0";
 
   src = fetchurl {
     url = "https://www.clamav.net/downloads/production/${pname}-${version}.tar.gz";
-    sha256 = "sha256-JwIDpUxFgEnbVPzZNoP/Wy2xkVHzY8SOgs7O/d4rNdQ=";
+    hash = "sha256-l6GS3/4UFIC1bKvxBj15qfxVzVkgMkH6Qb/HqYpUgCA=";
   };
 
   patches = [
@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.clamav.net";
     description = "Antivirus engine designed for detecting Trojans, viruses, malware and other malicious threats";
     license = licenses.gpl2;
-    maintainers = with maintainers; [ robberer qknight fpletz globin ];
+    maintainers = with maintainers; [ robberer qknight globin ];
     platforms = platforms.unix;
   };
 }

@@ -21,13 +21,13 @@
 
 stdenv.mkDerivation rec {
   pname = "opendht";
-  version = "2.4.0";
+  version = "2.5.5";
 
   src = fetchFromGitHub {
     owner = "savoirfairelinux";
     repo = "opendht";
-    rev = version;
-    sha256 = "sha256-vfMzUzTfz8G+E4W/1pX5v2P0RntgSTR61urmxtsrOWM=";
+    rev = "v${version}";
+    sha256 = "sha256-OXLVuyPFlo7VD8f9wAN71p4PZpfM2ISq9UoUiAYEXUQ=";
   };
 
   nativeBuildInputs = [
@@ -58,6 +58,13 @@ stdenv.mkDerivation rec {
   ] ++ lib.optionals enablePushNotifications [
     "-DOPENDHT_PUSH_NOTIFICATIONS=ON"
   ];
+
+  # https://github.com/savoirfairelinux/opendht/issues/612
+  postPatch = ''
+    substituteInPlace CMakeLists.txt \
+      --replace '\$'{exec_prefix}/'$'{CMAKE_INSTALL_LIBDIR} '$'{CMAKE_INSTALL_FULL_LIBDIR} \
+      --replace '\$'{prefix}/'$'{CMAKE_INSTALL_INCLUDEDIR} '$'{CMAKE_INSTALL_FULL_INCLUDEDIR}
+  '';
 
   outputs = [ "out" "lib" "dev" "man" ];
 

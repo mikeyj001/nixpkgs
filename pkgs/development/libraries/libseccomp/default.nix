@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "libseccomp";
-  version = "2.5.3";
+  version = "2.5.4";
 
   src = fetchurl {
     url = "https://github.com/seccomp/libseccomp/releases/download/v${version}/libseccomp-${version}.tar.gz";
-    sha256 = "sha256-WQZchzM2RyXpchukjDqZu8Uq+SHa9I30seAS+8exCnY=";
+    sha256 = "sha256-2CkCQAQFzwBoV07z3B/l9ZJiB1Q7oa5vjnoVdjUdy9s=";
   };
 
   outputs = [ "out" "lib" "dev" "man" "pythonsrc" ];
@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
     patchShebangs .
   '';
 
-  checkInputs = [ util-linuxMinimal which ];
+  nativeCheckInputs = [ util-linuxMinimal which ];
   doCheck = true;
 
   # Hack to ensure that patchelf --shrink-rpath get rids of a $TMPDIR reference.
@@ -32,9 +32,7 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = pname;
-    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {
@@ -44,6 +42,7 @@ stdenv.mkDerivation rec {
     platforms = platforms.linux;
     badPlatforms = [
       "alpha-linux"
+      "loongarch64-linux"
       "riscv32-linux"
       "sparc-linux"
       "sparc64-linux"

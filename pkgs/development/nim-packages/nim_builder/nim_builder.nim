@@ -119,8 +119,8 @@ proc buildPhase*() =
     binDir = getOutputDir("bin") / "bin"
   if bins != @[]:
     for bin in bins:
-      cmds.add("nim compile $# --outdir:$# $#" %
-          [getenv"nimFlags", binDir, normalizedPath(srcDir / bin)])
+      cmds.add("nim compile $# --parallelBuild:$# --outdir:$# $#" %
+          [getenv("nimFlags"), getenv("NIX_BUILD_CORES","1"), binDir, normalizedPath(srcDir / bin)])
   if getEnvBool"nimDoc":
     echo "generating documentation"
     let docDir = getOutputDir("doc") / "doc"
@@ -150,7 +150,7 @@ proc checkPhase*() =
   proc before(idx: int) =
     echo "check job ", idx, ": ", cmds[idx]
   for path in walkPattern("tests/t*.nim"):
-    cmds.add("nim r $#" % [path])
+    cmds.add("nim r $# $#" % [getenv("nimFlags"), path])
   let err = execProcesses(
     cmds, n = 1,
     beforeRunEvent = before)

@@ -6,10 +6,9 @@
 , lzo
 , openssl
 , pam
-, useSystemd ? stdenv.isLinux
+, useSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd
 , systemd
 , update-systemd-resolved
-, util-linux
 , pkcs11Support ? false
 , pkcs11helper
 }:
@@ -17,7 +16,7 @@
 let
   inherit (lib) versionOlder optional optionals optionalString;
 
-  generic = { version, sha256 }:
+  generic = { version, sha256, extraBuildInputs ? [] }:
     let
       withIpRoute = stdenv.isLinux && (versionOlder version "2.5.4");
     in
@@ -33,11 +32,12 @@ let
 
         nativeBuildInputs = [ pkg-config ];
 
-        buildInputs = [ lzo openssl ]
+        buildInputs = [ lzo ]
           ++ optional stdenv.isLinux pam
           ++ optional withIpRoute iproute2
           ++ optional useSystemd systemd
-          ++ optional pkcs11Support pkcs11helper;
+          ++ optional pkcs11Support pkcs11helper
+          ++ extraBuildInputs;
 
         configureFlags = optionals withIpRoute [
           "--enable-iproute2"
@@ -72,13 +72,9 @@ let
 
 in
 {
-  openvpn_24 = generic {
-    version = "2.4.12";
-    sha256 = "1vjx82nlkxrgzfiwvmmlnz8ids5m2fiqz7scy1smh3j9jnf2v5b6";
-  };
-
   openvpn = generic {
-    version = "2.5.6";
-    sha256 = "0gdd88rcan9vfiwkzsqn6fxxdim7kb1bsxrcra59c5xksprpwfik";
+    version = "2.5.8";
+    sha256 = "1cixqm4gn2d1v8qkbww75j30fzvxz13gc7whcmz54i0x4fvibwx6";
+    extraBuildInputs = [ openssl ];
   };
 }

@@ -1,20 +1,29 @@
 { lib
 , fetchFromGitHub
 , rustPlatform
+, python3
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "sad";
-  version = "0.4.21";
+  version = "0.4.23";
 
   src = fetchFromGitHub {
     owner = "ms-jpq";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-kM5jeoFmDOwgnzdSwfPJfZhpBS8RPMNt143S5iYYrF4=";
+    hash = "sha256-LNMc+3pXx7VyNq0dws+s13ZA3+f8aJzgbAxzI71NKx0=";
   };
 
-  cargoSha256 = "sha256-JwYUM4o4I3dC1HgG4bkUS1PH4MsxcvwdefjefnEZQFs=";
+  cargoHash = "sha256-UjXJmH4UI5Vey2rBy57CI1r13bpGYhIozEoOoyoRDLQ=";
+
+  nativeBuildInputs = [ python3 ];
+
+  # fix for compilation on aarch64
+  # see https://github.com/NixOS/nixpkgs/issues/145726
+  prePatch = ''
+    rm .cargo/config.toml
+  '';
 
   meta = with lib; {
     description = "CLI tool to search and replace";

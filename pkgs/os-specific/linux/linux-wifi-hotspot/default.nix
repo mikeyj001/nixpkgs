@@ -14,17 +14,25 @@
 , iproute2
 , flock
 , iptables
-, gawk }:
+, gawk
+, coreutils
+, gnugrep
+, gnused
+, kmod
+, networkmanager
+, procps
+}:
+
 
 stdenv.mkDerivation rec {
   pname = "linux-wifi-hotspot";
-  version = "4.4.0";
+  version = "4.5.0";
 
   src = fetchFromGitHub {
     owner = "lakinduakash";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-XCgYWOX7QSdANG6DqYk0yZZqnvZGDl3GaF9KtYRmpJ0=";
+    sha256 = "sha256-cCVJPEAZZzOGCf45oo1J7wWtYn/IJfcASHnKR+R0Ge4=";
   };
 
   nativeBuildInputs = [
@@ -47,6 +55,10 @@ stdenv.mkDerivation rec {
       --replace "etc" "$out/etc"
     substituteInPlace ./src/scripts/wihotspot \
       --replace "/usr" "$out"
+    substituteInPlace ./src/desktop/wifihotspot.desktop \
+      --replace "/usr" "$out"
+    substituteInPlace ./src/scripts/policies/polkit.policy \
+      --replace "/usr" "$out"
   '';
 
   makeFlags = [
@@ -56,7 +68,21 @@ stdenv.mkDerivation rec {
   postInstall = ''
     wrapProgram $out/bin/create_ap \
       --prefix PATH : ${lib.makeBinPath [
-          hostapd getopt iw which dnsmasq iproute2 flock iptables gawk
+          coreutils
+          dnsmasq
+          flock
+          gawk
+          getopt
+          gnugrep
+          gnused
+          hostapd
+          iproute2
+          iptables
+          iw
+          kmod
+          networkmanager
+          procps
+          which
         ]}
 
     wrapProgram $out/bin/wihotspot-gui \

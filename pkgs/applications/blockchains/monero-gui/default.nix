@@ -14,13 +14,13 @@
 
 stdenv.mkDerivation rec {
   pname = "monero-gui";
-  version = "0.17.3.2";
+  version = "0.18.2.2";
 
   src = fetchFromGitHub {
-    owner  = "monero-project";
-    repo   = "monero-gui";
-    rev    = "v${version}";
-    sha256 = "10gincmgc0qpsgm94m1fqfy9j8jn9g1gjk12lcqnf77kvcnz37hq";
+    owner = "monero-project";
+    repo = "monero-gui";
+    rev = "v${version}";
+    sha256 = "c5+bgu+hF3mOwF3ZxksPMiYUFyDRMFLA3f5FWeLsSBU=";
   };
 
   nativeBuildInputs = [
@@ -99,5 +99,6 @@ stdenv.mkDerivation rec {
     license      = licenses.bsd3;
     platforms    = platforms.all;
     maintainers  = with maintainers; [ rnhmjoj ];
+    mainProgram  = "monero-wallet-gui";
   };
 }

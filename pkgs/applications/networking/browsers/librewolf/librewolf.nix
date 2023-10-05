@@ -6,7 +6,7 @@ rec {
 
   inherit (src) packageVersion firefox source;
 
-  extraPatches = [ ./verify-telemetry-macros.patch ];
+  extraPatches = [ ];
 
   extraConfigureFlags = [
     "--with-app-name=librewolf"
@@ -29,9 +29,9 @@ rec {
     sed -i '/MOZ_NORMANDY/ s/True/False/' browser/moz.configure
   '';
 
-  extraPrefsFiles = [ "${source}/submodules/settings/librewolf.cfg" ];
+  extraPrefsFiles = [ "${src.settings}/librewolf.cfg" ];
 
-  extraPoliciesFiles = [ "${source}/submodules/settings/distribution/policies.json" ];
+  extraPoliciesFiles = [ "${src.settings}/distribution/policies.json" ];
 
   extraPassthru = {
     librewolf = { inherit src extraPatches; };

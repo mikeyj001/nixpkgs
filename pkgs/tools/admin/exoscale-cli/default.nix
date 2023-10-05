@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "exoscale-cli";
-  version = "1.54.0";
+  version = "1.73.0";
 
   src = fetchFromGitHub {
     owner = "exoscale";
     repo = "cli";
     rev = "v${version}";
-    sha256 = "sha256-uvPJ1cOKMpDf1KfEPkSTWMIMNojUlfpqI1ESomX1MlM=";
+    sha256 = "sha256-46NRA+5SOJ451jF0KlTWu4STiTmRD1BjL3iQcGjdu2c=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -40,7 +40,7 @@ buildGoModule rec {
     description = "Command-line tool for everything at Exoscale: compute, storage, dns";
     homepage = "https://github.com/exoscale/cli";
     license = lib.licenses.asl20;
-    maintainers = with lib.maintainers; [ dramaturg viraptor ];
+    maintainers = with lib.maintainers; [ viraptor ];
     mainProgram = "exo";
   };
 }

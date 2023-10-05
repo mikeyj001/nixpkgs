@@ -4,23 +4,23 @@
 , stdenv
 , makeWrapper
 , fetchurl
-, nodejs-16_x
+, nodejs_16
 , coreutils
 , which
 }:
 
-with lib;
 let
-  nodejs = nodejs-16_x;
+  nodejs = nodejs_16;
   inherit (builtins) elemAt;
-  info = splitString "-" stdenv.hostPlatform.system;
+  info = lib.splitString "-" stdenv.hostPlatform.system;
   arch = elemAt info 0;
   plat = elemAt info 1;
-  shas =
+  hashes =
     {
-      x86_64-linux  = "0jivwsrq31n0qfznrsjfsn65sg3wpbd990afn2wzjnj4drq7plz6";
-      x86_64-darwin = "02483aqzrccq1x6rwznmcazijdd46yxj9vnbihnvp2xyp3w9as45";
-      aarch64-linux = "0iw155gkkl1hshc80lfj95rssg039ig21wz1l3srmmf2x4f934s9";
+      x86_64-linux  = "sha512-09XokG5krjxGnk34DhxpLOGRLjb2jd82uZtwGfrzSuuqMpBhkEptK2oySGxuGdHF8uowwlR5p5YO2TvBwMsWkQ==";
+      x86_64-darwin = "sha512-cqRJnvu730Jfkr6vwbHUFuZube1g522cmvnDwTzhGGK6VN/7+9XL3vavqtUPDVdTLTUk+DrNiIQK7MaJH3SHMg==";
+      aarch64-linux = "sha512-zhtYThz5j4+w5gI1JWSnHv709Tk23eegVsrtYmdaYhZiTw2yvCTYI5uNAfBjBr8XPdp6CKF4e6Bh2wHKDYg1mg==";
+      aarch64-darwin = "sha512-cqRJnvu730Jfkr6vwbHUFuZube1g522cmvnDwTzhGGK6VN/7+9XL3vavqtUPDVdTLTUk+DrNiIQK7MaJH3SHMg==";
     };
 
 in stdenv.mkDerivation rec {
@@ -29,7 +29,7 @@ in stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://artifacts.elastic.co/downloads/kibana/${pname}-${version}-${plat}-${arch}.tar.gz";
-    sha256 = shas.${stdenv.hostPlatform.system} or (throw "Unknown architecture");
+    hash = hashes.${stdenv.hostPlatform.system} or (throw "Unknown architecture");
   };
 
   patches = [
@@ -50,10 +50,10 @@ in stdenv.mkDerivation rec {
     sed -i 's@NODE=.*@NODE=${nodejs}/bin/node@' $out/libexec/kibana/bin/kibana
   '';
 
-  meta = {
+  meta = with lib; {
     description = "Visualize logs and time-stamped data";
     homepage = "http://www.elasticsearch.org/overview/kibana";
-    license = licenses.elastic;
+    license = licenses.elastic20;
     maintainers = with maintainers; [ offline basvandijk ];
     platforms = with platforms; unix;
   };

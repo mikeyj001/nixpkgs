@@ -5,26 +5,25 @@
 , pkg-config
 , openssl
   # darwin dependencies
-, Security
-, CoreFoundation
+, darwin
 , libiconv
 , curl
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "cargo-geiger";
-  version = "0.11.3";
+  version = "0.11.6";
 
   src = fetchFromGitHub {
     owner = "rust-secure-code";
     repo = pname;
     rev = "${pname}-${version}";
-    sha256 = "sha256-xymDV/FHJABw1s94m8fl8D51PQwkF5dX+1XD96++RX8=";
+    sha256 = "sha256-rGZJyCWGk2RUr52ICp4dVER3JMBrnLdOMusRm/GG2PE=";
   };
-  cargoSha256 = "sha256-2szgR9N3PGjGCIjqgtGNFSnzfSv57sGfslZ/PZyqMjI=";
+  cargoHash = "sha256-B6Ka35y2fJEDVd891P60TNppr5HGFnzVjLhhfoFCYUA=";
 
   buildInputs = [ openssl ]
-    ++ lib.optionals stdenv.isDarwin [ CoreFoundation Security libiconv curl ];
+    ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ CoreFoundation Security libiconv curl ]);
   nativeBuildInputs = [ pkg-config ]
     # curl-sys wants to run curl-config on darwin
     ++ lib.optionals stdenv.isDarwin [ curl.dev ];
@@ -37,9 +36,8 @@ rustPlatform.buildRustPackage rec {
     "--skip serialize_test2_report"
     "--skip serialize_test3_report"
     "--skip serialize_test6_report"
-    "--skip test_package::case_2"
-    "--skip test_package::case_3"
-    "--skip test_package::case_6"
+    # multiple test cases that time-out or cause memory leaks
+    "--skip test_package"
     "--skip test_package_update_readme::case_2"
     "--skip test_package_update_readme::case_3"
     "--skip test_package_update_readme::case_5"
@@ -56,6 +54,6 @@ rustPlatform.buildRustPackage rec {
       code is appropriate.
     '';
     license = with licenses; [ asl20 /* or */ mit ];
-    maintainers = with maintainers; [ evanjs jk ];
+    maintainers = with maintainers; [ evanjs jk matthiasbeyer ];
   };
 }

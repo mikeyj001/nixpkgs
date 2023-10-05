@@ -9,7 +9,8 @@
 , click
 , cryptography
 , ecdsa
-  # , eth-abi
+, eth-abi
+, eth-account
 , flatbuffers
 , jinja2
 , hkdf
@@ -18,14 +19,14 @@
 , mock
 , msgpack
 , passlib
-  # , py-ecc
-  # , py-eth-sig-utils
+, py-ecc
+# , py-eth-sig-utils
 , py-multihash
 , py-ubjson
 , pynacl
 , pygobject3
 , pyopenssl
-, pyqrcode
+, qrcode
 , pytest-asyncio
 , python-snappy
 , pytestCheckHook
@@ -47,15 +48,20 @@
 
 buildPythonPackage rec {
   pname = "autobahn";
-  version = "22.3.2";
+  version = "23.6.2";
   format = "setuptools";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-WKiHx6GWuwjYtmJMs2lfSTqeXJ8A/TUNjW+Cm0f/kDY=";
+    hash = "sha256-7JQhxSohAzZNHvBGgDbmAZ7oT3FyHoazb+Ga1pZsEYE=";
   };
+
+  postPatch = ''
+    substituteInPlace setup.py \
+      --replace "pytest>=2.8.6,<3.3.0" "pytest"
+  '';
 
   propagatedBuildInputs = [
     cryptography
@@ -64,17 +70,13 @@ buildPythonPackage rec {
     txaio
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytest-asyncio
     pytestCheckHook
   ] ++ passthru.optional-dependencies.scram
-  ++ passthru.optional-dependencies.serialization;
-
-  postPatch = ''
-    substituteInPlace setup.py \
-      --replace "pytest>=2.8.6,<3.3.0" "pytest"
-  '';
+  ++ passthru.optional-dependencies.serialization
+  ++ passthru.optional-dependencies.xbr;
 
   preCheck = ''
     # Run asyncio tests (requires twisted)
@@ -93,19 +95,19 @@ buildPythonPackage rec {
     all = accelerate ++ compress ++ encryption ++ nvx ++ serialization ++ scram ++ twisted ++ ui ++ xbr;
     accelerate = [ /* wsaccel */ ];
     compress = [ python-snappy ];
-    encryption = [ pynacl pyopenssl pyqrcode /* pytrie */ service-identity ];
+    encryption = [ pynacl pyopenssl qrcode /* pytrie */ service-identity ];
     nvx = [ cffi ];
     scram = [ argon2-cffi cffi passlib ];
     serialization = [ cbor2 flatbuffers msgpack ujson py-ubjson ];
     twisted = [ attrs args.twisted zope_interface ];
     ui = [ pygobject3 ];
-    xbr = [ base58 cbor2 click ecdsa /* eth-abi */ jinja2 hkdf mnemonic /* py-ecc py-eth-sig-utils */ py-multihash rlp spake2 twisted /* web3 xbr */ yapf /* zlmdb */ ];
+    xbr = [ base58 cbor2 click ecdsa eth-abi jinja2 hkdf mnemonic py-ecc /* py-eth-sig-utils */ py-multihash rlp spake2 twisted /* web3 xbr */ yapf /* zlmdb */ ];
   };
 
   meta = with lib; {
     description = "WebSocket and WAMP in Python for Twisted and asyncio";
     homepage = "https://crossbar.io/autobahn";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

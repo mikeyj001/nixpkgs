@@ -1,21 +1,20 @@
-{ stdenv, lib, fetchFromGitHub, cmake, openmp }:
+{ stdenv, lib, fetchFromGitHub, cmake, gtest, openmp }:
 
 stdenv.mkDerivation rec {
   pname = "spglib";
-  version = "1.16.5"; # N.B: if you change this, please update: pythonPackages.spglib
+  version = "2.1.0"; # N.B: if you change this, please update: pythonPackages.spglib
 
   src = fetchFromGitHub {
     owner = "spglib";
     repo = "spglib";
     rev = "v${version}";
-    sha256 = "sha256-BbqyL7WJ/jpOls1MmY7VNCN+OlF6u4uz/pZjMAqk87w=";
+    hash = "sha256-EL3jkzyurc8fnzk9kAdTaEtLfLlLtmaVDFwChfCDOrQ=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [ cmake gtest ];
 
   buildInputs = lib.optionals stdenv.isDarwin [ openmp ];
 
-  checkTarget = "check";
   doCheck = true;
 
   meta = with lib; {

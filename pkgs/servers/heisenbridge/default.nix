@@ -1,13 +1,14 @@
-{ lib, fetchFromGitHub, fetchpatch, python3 }:
+{ lib, fetchFromGitHub, python3 }:
+
 python3.pkgs.buildPythonApplication rec {
   pname = "heisenbridge";
-  version = "1.13.0";
+  version = "1.14.5";
 
   src = fetchFromGitHub {
     owner = "hifi";
     repo = pname;
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-3YCYLhJqZAWIwpwOd8J1+uYsxw0q6jQy35Vp+ttVKhI=";
+    sha256 = "sha256-OmAmgHM+EmJ3mUY4lPBxIv2rAq8j2QEeTUMux7ZBfRE=";
   };
 
   postPatch = ''
@@ -15,14 +16,13 @@ python3.pkgs.buildPythonApplication rec {
   '';
 
   propagatedBuildInputs = with python3.pkgs; [
-    aiohttp
     irc
+    ruamel-yaml
     mautrix
     python-socks
-    pyyaml
   ];
 
-  checkInputs = with python3.pkgs; [
+  nativeCheckInputs = with python3.pkgs; [
     pytestCheckHook
   ];
 

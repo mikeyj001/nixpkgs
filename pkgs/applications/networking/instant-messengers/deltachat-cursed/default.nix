@@ -5,13 +5,13 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "deltachat-cursed";
-  version = "0.6.0";
+  version = "0.7.2";
 
   src = fetchFromGitHub {
     owner = "adbenitez";
     repo = "deltachat-cursed";
     rev = "v${version}";
-    hash = "sha256-qFX5CjrF0HLR41BbrCPT+rI9vAP6VLzXXAaVq/Loabs=";
+    hash = "sha256-Cv2QT8GsPAcA5TTZGfNvFNwnUITSR0PmQE0QCO1nFNk=";
   };
 
   nativeBuildInputs = [

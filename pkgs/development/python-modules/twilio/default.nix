@@ -1,7 +1,14 @@
 { lib
+, aiohttp
+, aiohttp-retry
+, aiounittest
 , buildPythonPackage
+, cryptography
+, django
 , fetchFromGitHub
 , mock
+, multidict
+, pyngrok
 , pyjwt
 , pytestCheckHook
 , pythonOlder
@@ -11,26 +18,33 @@
 
 buildPythonPackage rec {
   pname = "twilio";
-  version = "7.9.1";
+  version = "8.9.0";
   format = "setuptools";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "twilio";
     repo = "twilio-python";
     rev = "refs/tags/${version}";
-    hash = "sha256-oi8LqyeqN8gn06B/m1wNI9iNu7hU3NrdkL7xTsImYPI=";
+    hash = "sha256-apdLWv4UV4MTAx+kyi/MaOibmBYjwMamaI9b6IGKIl0=";
   };
 
   propagatedBuildInputs = [
+    aiohttp
+    aiohttp-retry
     pyjwt
+    pyngrok
     pytz
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
+    aiounittest
+    cryptography
+    django
     mock
+    multidict
     pytestCheckHook
   ];
 
@@ -40,6 +54,12 @@ buildPythonPackage rec {
     "test_set_user_agent_extensions"
   ];
 
+  disabledTestPaths = [
+    # Tests require API token
+    "tests/cluster/test_webhook.py"
+    "tests/cluster/test_cluster.py"
+  ];
+
   pythonImportsCheck = [
     "twilio"
   ];
@@ -47,6 +67,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Twilio API client and TwiML generator";
     homepage = "https://github.com/twilio/twilio-python/";
+    changelog = "https://github.com/twilio/twilio-python/blob/${version}/CHANGES.md";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

@@ -6,6 +6,7 @@
 , setuptools-scm
 , importlib-metadata
 , dbus-python
+, jaraco-classes
 , jeepney
 , secretstorage
 , pytestCheckHook
@@ -13,14 +14,13 @@
 
 buildPythonPackage rec {
   pname = "keyring";
-  version = "23.5.1";
-  disabled = pythonOlder "3.7";
-
+  version = "24.2.0";
   format = "pyproject";
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-3uUCzfGKmCEb70KO6hFFajPABxiy8IUk/Vcnx/Qkv/0=";
+    hash = "sha256-ygdGoZ7EISGfTXE/hI+il6ZhqKjBUEhn5Vv7XgkJFQk=";
   };
 
   nativeBuildInputs = [
@@ -28,11 +28,12 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    # this should be optional, however, it has a different API
-    importlib-metadata # see https://github.com/jaraco/keyring/issues/503#issuecomment-798973205
+    jaraco-classes
   ] ++ lib.optionals stdenv.isLinux [
     jeepney
     secretstorage
+  ] ++ lib.optionals (pythonOlder "3.12") [
+    importlib-metadata
   ];
 
   pythonImportsCheck = [
@@ -40,22 +41,20 @@ buildPythonPackage rec {
     "keyring.backend"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
-  ];
-
-  disabledTests = [
-    # E       ValueError: too many values to unpack (expected 1)
-    "test_entry_point"
   ];
 
   disabledTestPaths = [
     "tests/backends/test_macOS.py"
-  ];
+  ]
+  # These tests fail when sandboxing is enabled because they are unable to get a password from keychain.
+  ++ lib.optional stdenv.isDarwin "tests/test_multiprocess.py";
 
   meta = with lib; {
     description = "Store and access your passwords safely";
     homepage    = "https://github.com/jaraco/keyring";
+    changelog   = "https://github.com/jaraco/keyring/blob/v${version}/NEWS.rst";
     license     = licenses.mit;
     maintainers = with maintainers; [ lovek323 dotlambda ];
     platforms   = platforms.unix;

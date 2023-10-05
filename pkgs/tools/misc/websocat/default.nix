@@ -3,16 +3,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "websocat";
-  version = "1.9.0";
+  version = "1.12.0";
 
   src = fetchFromGitHub {
     owner = "vi";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-aQWLsdYHmju7tCJfg3a1aOlFYui7qsQ8vJfhyMawXWo=";
+    sha256 = "sha256-wyVys+1g2klgwFHlKHI0ztd2qSlWyNXJoFvFCd1PGjo=";
   };
 
-  cargoSha256 = "sha256-b/B+K/LMP1XK1QEtFKY4nmy2fAqEmLTN+qL+XlrqA5w=";
+  cargoHash = "sha256-fakXOPQOEaKEt+AeOYlhumULJyjRHHXFKz4o9AD7WE0=";
 
   nativeBuildInputs = [ pkg-config makeWrapper ];
   buildInputs = [ openssl ]

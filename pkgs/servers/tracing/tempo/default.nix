@@ -1,17 +1,34 @@
 { lib, buildGoModule, fetchFromGitHub }:
 
 buildGoModule rec {
-  version = "1.1.0";
   pname = "tempo";
+  version = "2.2.3";
 
   src = fetchFromGitHub {
-    rev = "v${version}";
     owner = "grafana";
     repo = "tempo";
-    sha256 = "sha256-qKsgcc62HTwl7Usmp8zk4vKDo4XEJnwL+A3hoLhgBkk=";
+    rev = "v${version}";
+    fetchSubmodules = true;
+    hash = "sha256-23wjD8HTSEGonIMAWCoKORMLIISASxlN4FeY+Bmt/+I=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
+
+  subPackages = [
+    "cmd/tempo-cli"
+    "cmd/tempo-query"
+    "cmd/tempo-serverless"
+    "cmd/tempo-vulture"
+    "cmd/tempo"
+  ];
+
+  ldflags = [
+    "-s"
+    "-w"
+    "-X=main.Version=${version}"
+    "-X=main.Branch=<release>"
+    "-X=main.Revision=${version}"
+  ];
 
   # tests use docker
   doCheck = false;

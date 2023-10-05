@@ -1,19 +1,34 @@
-{ config, stdenv, lib, fetchurl, fetchpatch
-, perl, pkg-config
-, libcap, libtool, libxml2, openssl, libuv, nghttp2, jemalloc
-, enableGSSAPI ? true, libkrb5
-, enablePython ? false, python3
-, enableSeccomp ? false, libseccomp
-, buildPackages, nixosTests
+{ stdenv
+, lib
+, fetchurl
+, perl
+, pkg-config
+, libcap
+, libidn2
+, libtool
+, libxml2
+, openssl
+, libuv
+, nghttp2
+, jemalloc
+, enablePython ? false
+, python3
+, enableGSSAPI ? true
+, libkrb5
+, buildPackages
+, nixosTests
+, cmocka
+, tzdata
+, gitUpdater
 }:
 
 stdenv.mkDerivation rec {
   pname = "bind";
-  version = "9.18.3";
+  version = "9.18.19";
 
   src = fetchurl {
     url = "https://downloads.isc.org/isc/bind9/${version}/${pname}-${version}.tar.xz";
-    sha256 = "sha256-CtjadzvZPLoO9mzIGZlpjr35w+UfrtXlyMHrdcrSrm8=";
+    hash = "sha256-EV4JwFQ5vrreHScu2gj6iOs7YBKe3vaQWIyHpNJ2Esw=";
   };
 
   outputs = [ "out" "lib" "dev" "man" "dnsutils" "host" ];
@@ -23,9 +38,8 @@ stdenv.mkDerivation rec {
   ];
 
   nativeBuildInputs = [ perl pkg-config ];
-  buildInputs = [ libtool libxml2 openssl libuv nghttp2 jemalloc ]
+  buildInputs = [ libidn2 libtool libxml2 openssl libuv nghttp2 jemalloc ]
     ++ lib.optional stdenv.isLinux libcap
-    ++ lib.optional enableSeccomp libseccomp
     ++ lib.optional enableGSSAPI libkrb5
     ++ lib.optional enablePython (python3.withPackages (ps: with ps; [ ply ]));
 
@@ -33,26 +47,10 @@ stdenv.mkDerivation rec {
 
   configureFlags = [
     "--localstatedir=/var"
-    "--with-libtool"
-    (if enablePython then "--with-python" else "--without-python")
-    "--without-atf"
-    "--without-dlopen"
-    "--without-docbook-xsl"
-    "--without-idn"
-    "--without-idnlib"
     "--without-lmdb"
-    "--without-libjson"
-    "--without-pkcs11"
-    "--without-purify"
-    "--with-randomdev=/dev/random"
-    "--with-ecdsa"
-    "--with-gost"
-    "--without-eddsa"
-    "--with-aes"
-  ] ++ lib.optional stdenv.isLinux "--with-libcap=${libcap.dev}"
-    ++ lib.optional enableSeccomp "--enable-seccomp"
-    ++ lib.optional enableGSSAPI "--with-gssapi=${libkrb5.dev}/bin/krb5-config"
-    ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) "BUILD_CC=$(CC_FOR_BUILD)";
+    "--with-libidn2"
+  ] ++ lib.optional enableGSSAPI "--with-gssapi=${libkrb5.dev}/bin/krb5-config"
+  ++ lib.optional (stdenv.hostPlatform != stdenv.buildPlatform) "BUILD_CC=$(CC_FOR_BUILD)";
 
   postInstall = ''
     moveToOutput bin/bind9-config $dev
@@ -67,11 +65,50 @@ stdenv.mkDerivation rec {
     for f in "$lib/lib/"*.la "$dev/bin/"bind*-config; do
       sed -i "$f" -e 's|-L${openssl.dev}|-L${lib.getLib openssl}|g'
     done
+
+    cat <<EOF >$out/etc/rndc.conf
+    include "/etc/bind/rndc.key";
+    options {
+        default-key "rndc-key";
+        default-server 127.0.0.1;
+        default-port 953;
+    };
+    EOF
   '';
 
-  doCheck = false; # requires root and the net
+  enableParallelBuilding = true;
+  # TODO: investigate the aarch64-linux failures; see this and linked discussions:
+  # https://github.com/NixOS/nixpkgs/pull/192962
+  doCheck = with stdenv.hostPlatform; !isStatic && !(isAarch64 && isLinux)
+    # https://gitlab.isc.org/isc-projects/bind9/-/issues/4269
+    && !is32bit;
+  checkTarget = "unit";
+  checkInputs = [
+    cmocka
+  ] ++ lib.optionals (!stdenv.hostPlatform.isMusl) [
+    tzdata
+  ];
+  preCheck = lib.optionalString stdenv.hostPlatform.isMusl ''
+    # musl doesn't respect TZDIR, skip timezone-related tests
+    sed -i '/^ISC_TEST_ENTRY(isc_time_formatISO8601L/d' tests/isc/time_test.c
+  '';
 
-  passthru.tests = { inherit (nixosTests) bind; };
+  passthru = {
+    tests = {
+      inherit (nixosTests) bind;
+      prometheus-exporter = nixosTests.prometheus-exporters.bind;
+      kubernetes-dns-single-node = nixosTests.kubernetes.dns-single-node;
+      kubernetes-dns-multi-node = nixosTests.kubernetes.dns-multi-node;
+    };
+
+    updateScript = gitUpdater {
+      # No nicer place to find latest stable release.
+      url = "https://gitlab.isc.org/isc-projects/bind9.git";
+      rev-prefix = "v";
+      # Avoid unstable 9.19 releases.
+      odd-unstable = true;
+    };
+  };
 
   meta = with lib; {
     homepage = "https://www.isc.org/bind/";

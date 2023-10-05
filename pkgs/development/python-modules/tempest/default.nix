@@ -1,7 +1,7 @@
 { lib
-, buildPythonApplication
+, buildPythonPackage
+, defusedxml
 , fetchPypi
-, fetchpatch
 , pbr
 , cliff
 , jsonschema
@@ -15,6 +15,7 @@
 , oslo-serialization
 , oslo-utils
 , fixtures
+, pythonOlder
 , pyyaml
 , subunit
 , stevedore
@@ -27,26 +28,22 @@
 , python
 }:
 
-buildPythonApplication rec {
+buildPythonPackage rec {
   pname = "tempest";
-  version = "29.2.0";
+  version = "36.0.0";
+  format = "setuptools";
+
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "0521d3042360c0fb469b16f99174a9abddbae8a2d2a81268cfc664f1ccfdd0f9";
+    hash = "sha256-97Z5C7IluOXSkkUamFuljzzvD3QxdHZ/p8mXE9jW/2I=";
   };
-
-  patches = [
-    # remove need for unittest2
-    (fetchpatch {
-      url = "https://github.com/openstack/tempest/commit/cd3745c27b7d8fcdaffc72b965a3d803d9ee12c2.patch";
-      sha256 = "sha256-UwUmyFZokH66Xqfsj982MBHb0w7x6v4SAtXlqA5dpnk=";
-    })
-  ];
 
   propagatedBuildInputs = [
     pbr
     cliff
+    defusedxml
     jsonschema
     testtools
     paramiko
@@ -66,7 +63,7 @@ buildPythonApplication rec {
     debtcollector
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     stestr
     hacking
     oslotest

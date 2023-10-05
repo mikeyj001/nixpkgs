@@ -5,7 +5,7 @@
 
 buildGoModule rec {
   pname = "keybase";
-  version = "5.9.3";
+  version = "6.2.2";
 
   modRoot = "go";
   subPackages = [ "kbnm" "keybase" ];
@@ -16,9 +16,9 @@ buildGoModule rec {
     owner = "keybase";
     repo = "client";
     rev = "v${version}";
-    sha256 = "sha256-vPQ1hBd33DwsW0b79kNH1yd7mrwkoftIYFgmMVxC+78=";
+    hash = "sha256-1vJCuAkJmehFcVYLwp3UIlQiGji7mHVczCBtXq9Fl68=";
   };
-  vendorSha256 = "sha256-ckAnSSSEF00gbgxnPAi2Pi8TNu3nmAahK7TP6HnfmNo=";
+  vendorHash = "sha256-tXEEVEfjoKub2A4m7F3hDc5ABJ+R+axwX1+1j7e3BAM=";
 
   patches = [
     (substituteAll {

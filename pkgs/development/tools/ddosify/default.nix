@@ -2,20 +2,22 @@
 
 buildGoModule rec {
   pname = "ddosify";
-  version = "0.7.9";
+  version = "1.0.5";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-7dPDYBypLz0YWcgwP57LtZV+WNEGd705/0jyDXT4xTY=";
+    sha256 = "sha256-oCbEAEBZJsMnnVu2N6eiQiaywovWmGUSVpUyWyS7TpM=";
   };
 
-  vendorSha256 = "sha256-WvchcVd0tql5Kxt2EP/auSq66hjiVqew7Iyi/ytaI64=";
+  vendorHash = "sha256-cGhMhX+SEv9fejViLZrEwXg584o204OQ5iR6AkxKnXo=";
 
   ldflags = [
-    "-s -w"
+    "-s" "-w"
     "-X main.GitVersion=${version}"
+    "-X main.GitCommit=unknown"
+    "-X main.BuildDate=unknown"
   ];
 
   # TestCreateHammerMultipartPayload error occurred - Get "https://upload.wikimedia.org/wikipedia/commons/b/bd/Test.svg"

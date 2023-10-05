@@ -1,28 +1,40 @@
 { lib
 , fetchFromGitHub
 , wrapQtAppsHook
-, miniupnpc_2
+, miniupnpc
 , ffmpeg
 , enableSwftools ? false
 , swftools
 , python3Packages
+, qtbase
+, qtcharts
 }:
 
 python3Packages.buildPythonPackage rec {
   pname = "hydrus";
-  version = "484";
+  version = "544";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "hydrusnetwork";
     repo = "hydrus";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-W0oWETj0xnuS2XAORRb5sb39gbpvyE+cHqgIU+grolQ=";
+    hash = "sha256-e3VvkdJAQx5heKDJ1Ms6XpXrXWdzv48f8yu0DHfPy1A=";
   };
+
+  patches = [
+    # Nixpkgs specific, can be removed if upstream makes a more reasonable check
+    ./0001-inform-nixpkgs.patch
+  ];
 
   nativeBuildInputs = [
     wrapQtAppsHook
     python3Packages.mkdocs-material
+  ];
+
+  buildInputs = [
+    qtbase
+    qtcharts
   ];
 
   propagatedBuildInputs = with python3Packages; [
@@ -30,29 +42,36 @@ python3Packages.buildPythonPackage rec {
     cbor2
     chardet
     cloudscraper
+    dateparser
     html5lib
     lxml
     lz4
-    nose
     numpy
     opencv4
     pillow
+    pillow-heif
     psutil
-    pylzma
+    psd-tools
+    pympler
     pyopenssl
-    pyside2
+    pyqt6
+    pyqt6-charts
     pysocks
-    pythonPackages.mpv
+    python-dateutil
+    python3Packages.mpv
     pyyaml
     qtpy
     requests
     send2trash
     service-identity
-    six
     twisted
   ];
 
-  checkInputs = with python3Packages; [ nose mock httmock ];
+  nativeCheckInputs = with python3Packages; [
+    nose
+    mock
+    httmock
+  ];
 
   # most tests are failing, presumably because we are not using test.py
   checkPhase = ''
@@ -79,6 +98,8 @@ python3Packages.buildPythonPackage rec {
     -e TestHydrusServer \
     -e TestHydrusSessions \
     -e TestServer \
+    -e TestClientMetadataMigration \
+    -e TestClientFileStorage \
   '';
 
   outputs = [ "out" "doc" ];
@@ -87,13 +108,16 @@ python3Packages.buildPythonPackage rec {
     # Move the hydrus module and related directories
     mkdir -p $out/${python3Packages.python.sitePackages}
     mv {hydrus,static} $out/${python3Packages.python.sitePackages}
+    # Fix random files being marked with execute permissions
+    chmod -x $out/${python3Packages.python.sitePackages}/static/*.{png,svg,ico}
+    # Build docs
     mkdocs build -d help
     mv help $out/doc/
 
     # install the hydrus binaries
     mkdir -p $out/bin
-    install -m0755 server.py $out/bin/hydrus-server
-    install -m0755 client.py $out/bin/hydrus-client
+    install -m0755 hydrus_server.py $out/bin/hydrus-server
+    install -m0755 hydrus_client.py $out/bin/hydrus-client
   '' + lib.optionalString enableSwftools ''
     mkdir -p $out/${python3Packages.python.sitePackages}/bin
     # swfrender seems to have to be called sfwrender_linux
@@ -105,7 +129,7 @@ python3Packages.buildPythonPackage rec {
   dontWrapQtApps = true;
   preFixup = ''
     makeWrapperArgs+=("''${qtWrapperArgs[@]}")
-    makeWrapperArgs+=(--prefix PATH : ${lib.makeBinPath [ ffmpeg miniupnpc_2 ]})
+    makeWrapperArgs+=(--prefix PATH : ${lib.makeBinPath [ ffmpeg miniupnpc ]})
   '';
 
   meta = with lib; {

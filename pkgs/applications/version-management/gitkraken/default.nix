@@ -10,24 +10,24 @@ with lib;
 
 let
   pname = "gitkraken";
-  version = "8.5.0";
+  version = "9.5.1";
 
   throwSystem = throw "Unsupported system: ${stdenv.hostPlatform.system}";
 
   srcs = {
     x86_64-linux = fetchzip {
       url = "https://release.axocdn.com/linux/GitKraken-v${version}.tar.gz";
-      sha256 = "sha256-2ox7SI5tjoXR2qrhE+S/K2GQfq0wuTduKHAEpIOoulQ=";
+      sha256 = "sha256-irKs0yvz2TrKvF34DMOBdmJvH+Lox/ZVbPSaHAl6Vyo=";
     };
 
     x86_64-darwin = fetchzip {
       url = "https://release.axocdn.com/darwin/GitKraken-v${version}.zip";
-      sha256 = "sha256-+F++2L1WYVem96y7R93aPWiWySnUrg+b1q1gIJX69yw=";
+      sha256 = "sha256-3g49FBbolEhBgSPanLnrWhfxHR5jg4C1p+70rIrQ2GM=";
     };
 
     aarch64-darwin = fetchzip {
       url = "https://release.axocdn.com/darwin-arm64/GitKraken-v${version}.zip";
-      sha256 = "sha256-7WD9drsE93SR53Xqz+cmrnsVd4l4SIoud/Agq32QM4M=";
+      sha256 = "sha256-8ateh2LswWMOboPASWcYTy6OfK30h7wABIgoZXJ7GTM=";
     };
   };
 
@@ -36,6 +36,7 @@ let
   meta = {
     homepage = "https://www.gitkraken.com/";
     description = "The downright luxurious and most popular Git client for Windows, Mac & Linux";
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = licenses.unfree;
     platforms = builtins.attrNames srcs;
     maintainers = with maintainers; [ xnwdd evanjs arkivm ];
@@ -121,7 +122,9 @@ let
 
     postFixup = ''
       pushd $out/share/${pname}
-      patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ${pname}
+      for file in ${pname} chrome-sandbox chrome_crashpad_handler; do
+        patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $file
+      done
 
       for file in $(find . -type f \( -name \*.node -o -name ${pname} -o -name \*.so\* \) ); do
         patchelf --set-rpath ${libPath}:$out/share/${pname} $file || true

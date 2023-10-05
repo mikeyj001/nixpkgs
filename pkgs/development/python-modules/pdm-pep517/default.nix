@@ -4,17 +4,17 @@
 , fetchPypi
 , git
 , pytestCheckHook
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "pdm-pep517";
-  version = "0.12.5";
+  version = "1.1.4";
   format = "pyproject";
-  disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-z9FeVJhXkYa9wKGntu6p+YPnw6fdGip7CtItBdbcUJk=";
+    hash = "sha256-f0kSHnC0Lcopb6yWIhDdLaB6OVdfxWcxN61mFjOyzz8=";
   };
 
   preCheck = ''
@@ -24,9 +24,10 @@ buildPythonPackage rec {
     git config --global user.email nobody@example.com
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     git
+    setuptools
   ];
 
   meta = with lib; {

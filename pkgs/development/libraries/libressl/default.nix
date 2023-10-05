@@ -12,13 +12,19 @@ let
     then "DYLD_LIBRARY_PATH"
     else "LD_LIBRARY_PATH";
 
-  generic = { version, sha256, patches ? [] }: stdenv.mkDerivation rec {
+  generic =
+    { version
+    , hash
+    , patches ? []
+    , knownVulnerabilities ? []
+    }: stdenv.mkDerivation rec
+  {
     pname = "libressl";
     inherit version;
 
     src = fetchurl {
       url = "mirror://openbsd/LibreSSL/${pname}-${version}.tar.gz";
-      inherit sha256;
+      inherit hash;
     };
 
     nativeBuildInputs = [ cmake ];
@@ -56,7 +62,7 @@ let
       ''}
     '';
 
-    doCheck = true;
+    doCheck = !(stdenv.hostPlatform.isPower64 || stdenv.hostPlatform.isRiscV);
     preCheck = ''
       export PREVIOUS_${ldLibPathEnvName}=$${ldLibPathEnvName}
       export ${ldLibPathEnvName}="$${ldLibPathEnvName}:$(realpath tls/):$(realpath ssl/):$(realpath crypto/)"
@@ -80,17 +86,18 @@ let
       license = with licenses; [ publicDomain bsdOriginal bsd0 bsd3 gpl3 isc openssl ];
       platforms   = platforms.all;
       maintainers = with maintainers; [ thoughtpolice fpletz ];
+      inherit knownVulnerabilities;
     };
   };
 
 in {
-  libressl_3_4 = generic {
-    version = "3.4.3";
-    sha256 = "sha256-/4i//jVIGLPM9UXjyv5FTFAxx6dyFwdPUzJx1jw38I0=";
+  libressl_3_6 = generic {
+    version = "3.6.3";
+    hash = "sha256-h7G7426e7I0K5fBMg9NrLFsOWBeEx+sIFwJe0p6t6jc=";
   };
 
-  libressl_3_5 = generic {
-    version = "3.5.2";
-    sha256 = "sha256-Vv6rjiHD+mVJ+LfXURZYuOmFGBYoOKeVMUcyZUrfPl8=";
+  libressl_3_7 = generic {
+    version = "3.7.3";
+    hash = "sha256-eUjIVqkMglvXJotvhWdKjc0lS65C4iF4GyTj+NwzXbM=";
   };
 }

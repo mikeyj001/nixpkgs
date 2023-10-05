@@ -16,9 +16,9 @@ buildPythonApplication rec {
 
   propagatedBuildInputs = [ colorama decorator psutil pyte six ];
 
-  checkInputs = [ go mock pytestCheckHook pytest-mock ];
+  nativeCheckInputs = [ go mock pytestCheckHook pytest-mock ];
 
-  disabledTests = lib.optional stdenv.isDarwin [
+  disabledTests = lib.optionals stdenv.isDarwin [
     "test_settings_defaults"
     "test_from_file"
     "test_from_env"
@@ -39,6 +39,6 @@ buildPythonApplication rec {
     homepage = "https://github.com/nvbn/thefuck";
     description = "Magnificent app which corrects your previous console command";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

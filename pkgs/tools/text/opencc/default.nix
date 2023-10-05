@@ -2,23 +2,16 @@
 
 stdenv.mkDerivation rec {
   pname = "opencc";
-  version = "1.1.3";
+  version = "1.1.6";
 
   src = fetchFromGitHub {
     owner = "BYVoid";
     repo = "OpenCC";
     rev = "ver.${version}";
-    sha256 = "sha256-q/y4tRov/BYCAiE4i7fT6ysTerxxOHMZUWT2Jlo/0rI=";
+    sha256 = "sha256-0aIYnUuG5XATruxwY6+LZbEdKkHP3X1N1ueVE7R37Qk=";
   };
 
   nativeBuildInputs = [ cmake python3 ];
-
-  # let intermediate tools find intermediate library
-  preBuild = lib.optionalString stdenv.isLinux ''
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH''${LD_LIBRARY_PATH:+:}$(pwd)/src
-  '' + lib.optionalString stdenv.isDarwin ''
-    export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH''${DYLD_LIBRARY_PATH:+:}$(pwd)/src
-  '';
 
   meta = with lib; {
     homepage = "https://github.com/BYVoid/OpenCC";

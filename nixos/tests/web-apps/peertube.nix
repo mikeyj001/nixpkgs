@@ -11,7 +11,7 @@ import ../make-test-python.nix ({pkgs, ...}:
             { address = "192.168.2.10"; prefixLength = 24; }
           ];
         };
-        firewall.allowedTCPPorts = [ 5432 6379 ];
+        firewall.allowedTCPPorts = [ 5432 31638 ];
       };
 
       services.postgresql = {
@@ -34,13 +34,16 @@ import ../make-test-python.nix ({pkgs, ...}:
         enable = true;
         bind = "0.0.0.0";
         requirePass = "turrQfaQwnanGbcsdhxy";
-        port = 6379;
+        port = 31638;
       };
     };
 
     server = { pkgs, ... }: {
       environment = {
         etc = {
+          "peertube/secrets-peertube".text = ''
+            063d9c60d519597acef26003d5ecc32729083965d09181ef3949200cbe5f09ee
+          '';
           "peertube/password-posgressql-db".text = ''
             0gUN0C1mgST6czvjZ8T9
           '';
@@ -67,6 +70,10 @@ import ../make-test-python.nix ({pkgs, ...}:
         localDomain = "peertube.local";
         enableWebHttps = false;
 
+        secrets = {
+          secretsFile = "/etc/peertube/secrets-peertube";
+        };
+
         database = {
           host = "192.168.2.10";
           name = "peertube_local";
@@ -76,6 +83,7 @@ import ../make-test-python.nix ({pkgs, ...}:
 
         redis = {
           host = "192.168.2.10";
+          port = 31638;
           passwordFile = "/etc/peertube/password-redis-db";
         };
 
@@ -113,7 +121,7 @@ import ../make-test-python.nix ({pkgs, ...}:
     database.wait_for_unit("redis-peertube.service")
 
     database.wait_for_open_port(5432)
-    database.wait_for_open_port(6379)
+    database.wait_for_open_port(31638)
 
     server.wait_for_unit("peertube.service")
     server.wait_for_open_port(9000)

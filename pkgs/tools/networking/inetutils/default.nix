@@ -1,14 +1,21 @@
-{ stdenv, lib, fetchurl, ncurses, perl, help2man
+{ stdenv
+, lib
+, fetchurl
+, fetchpatch
+, ncurses
+, perl
+, help2man
 , apparmorRulesFromClosure
+, libxcrypt
 }:
 
 stdenv.mkDerivation rec {
   pname = "inetutils";
-  version = "2.2";
+  version = "2.4";
 
   src = fetchurl {
     url = "mirror://gnu/${pname}/${pname}-${version}.tar.xz";
-    sha256 = "sha256-1Uf2kXLfc6/vaRoPeIYoD9eBrOoo3vT/S0shIIaonYA";
+    sha256 = "sha256-F4nWsbGlff4qere1M+6fXf2cv1tZuxuzwmEu0I0PaLI=";
   };
 
   outputs = ["out" "apparmor"];
@@ -16,10 +23,16 @@ stdenv.mkDerivation rec {
   patches = [
     # https://git.congatec.com/yocto/meta-openembedded/commit/3402bfac6b595c622e4590a8ff5eaaa854e2a2a3
     ./inetutils-1_9-PATH_PROCNET_DEV.patch
+    (fetchpatch {
+      name = "CVE-2023-40303.patch";
+      url = "https://git.savannah.gnu.org/cgit/inetutils.git/patch/?id=e4e65c03f4c11292a3e40ef72ca3f194c8bffdd6";
+      hash = "sha256-I5skN537owfpFpAZr4vDKPHuERI6+oq5/hFW2RQeUxI=";
+    })
   ];
 
+  strictDeps = true;
   nativeBuildInputs = [ help2man perl /* for `whois' */ ];
-  buildInputs = [ ncurses /* for `talk' */ ];
+  buildInputs = [ ncurses /* for `talk' */ libxcrypt ];
 
   # Don't use help2man if cross-compiling
   # https://lists.gnu.org/archive/html/bug-sed/2017-01/msg00001.html
@@ -38,9 +51,7 @@ stdenv.mkDerivation rec {
     "--disable-rexec"
   ] ++ lib.optional stdenv.isDarwin  "--disable-servers";
 
-  # Test fails with "UNIX socket name too long", probably because our
-  # $TMPDIR is too long.
-  doCheck = false;
+  doCheck = true;
 
   installFlags = [ "SUIDMODE=" ];
 

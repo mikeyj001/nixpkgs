@@ -4,17 +4,21 @@
 
 stdenv.mkDerivation rec {
   pname = "fio";
-  version = "3.30";
+  version = "3.35";
 
   src = fetchFromGitHub {
     owner  = "axboe";
     repo   = "fio";
     rev    = "fio-${version}";
-    sha256 = "sha256-X2B8xlCLSHDgTaH55TUJq4WcaObZy/fvfkQ0j3J9Kzo=";
+    sha256 = "sha256-8LMpgayxBebHb0MXYmjlqqtndSiL42/yEQpgamxt9kI=";
   };
 
   buildInputs = [ python3 zlib ]
     ++ lib.optional (!stdenv.isDarwin) libaio;
+
+  # ./configure does not support autoconf-style --build=/--host=.
+  # We use $CC instead.
+  configurePlatforms = [ ];
 
   nativeBuildInputs = [ makeWrapper python3.pkgs.wrapPython ];
 
@@ -31,7 +35,7 @@ stdenv.mkDerivation rec {
 
   pythonPath = [ python3.pkgs.six ];
 
-  makeWrapperArgs = lib.optional withGnuplot [
+  makeWrapperArgs = lib.optionals withGnuplot [
     "--prefix PATH : ${lib.makeBinPath [ gnuplot ]}"
   ];
 

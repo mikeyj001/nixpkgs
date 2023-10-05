@@ -1,6 +1,7 @@
 { lib
-, buildPythonApplication
+, buildPythonPackage
 , fetchPypi
+, installShellFiles
 , mock
 , openstacksdk
 , pbr
@@ -9,31 +10,44 @@
 , stestr
 }:
 
-buildPythonApplication rec {
+buildPythonPackage rec {
   pname = "python-swiftclient";
-  version = "4.0.0";
+  version = "4.4.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-V7bx/yO0ZoQ4AqaBb0trvGiWtq0F1ld6/udiK+OilTg=";
+    hash = "sha256-p32Xqw5AEsZ4cy5XW9/u0oKzSJuRdegsRqR6yEke7oQ=";
   };
+
+  # remove duplicate script that will be created by setuptools from the
+  # entry_points section of setup.cfg
+  postPatch = ''
+    sed -i '/^scripts =/d' setup.cfg
+    sed -i '/bin\/swift/d' setup.cfg
+  '';
+
+  nativeBuildInputs = [
+    installShellFiles
+  ];
 
   propagatedBuildInputs = [
     pbr
     python-keystoneclient
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     openstacksdk
     stestr
   ];
 
   postInstall = ''
-    install -Dm644 tools/swift.bash_completion $out/share/bash_completion.d/swift
+    installShellCompletion --cmd swift \
+      --bash tools/swift.bash_completion
+    installManPage doc/manpages/*
   '';
 
   checkPhase = ''

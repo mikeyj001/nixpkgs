@@ -9,7 +9,7 @@
 
 buildPythonPackage rec {
   pname = "rns";
-  version = "0.3.7";
+  version = "0.6.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -18,7 +18,7 @@ buildPythonPackage rec {
     owner = "markqvist";
     repo = "Reticulum";
     rev = "refs/tags/${version}";
-    hash = "sha256-fihcDMQzFuQGOrADxjUcEcPqiolpQgPwyFNW0ZVXwhU=";
+    hash = "sha256-QD70/i/GBxVZ4w46AGqkUGuQDI1uFdwLU7UOBKnyJ2M=";
   };
 
   propagatedBuildInputs = [
@@ -37,6 +37,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Cryptography-based networking stack for wide-area networks";
     homepage = "https://github.com/markqvist/Reticulum";
+    changelog = "https://github.com/markqvist/Reticulum/releases/tag/${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

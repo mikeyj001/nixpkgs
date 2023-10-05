@@ -1,21 +1,22 @@
 { lib, stdenv, fetchFromGitHub, buildLinux, ... } @ args:
 
 let
-  stableVariant = {
-    version = "5.15.40";
-    suffix = "xanmod1";
-    hash = "sha256-P9pRPfzBVQNhWp6ulDiBgV/ki2C0CTbIRV6KRhUD+vQ=";
+  # These names are how they are designated in https://xanmod.org.
+  ltsVariant = {
+    version = "6.1.55";
+    hash = "sha256-kmiMbzH1hyteicjk1WfCQPYhLsVAbl1t5LJ83rUNZ1k=";
+    variant = "lts";
   };
 
-  edgeVariant = {
-    version = "5.17.8";
-    suffix = "xanmod1";
-    hash = "sha256-Q8YmBeocolr6Ds2inwV299Td6/zE8RTA1SWve5ZykAs=";
+  mainVariant = {
+    version = "6.5.5";
+    hash = "sha256-XjSuhZ5ooXOVllKc29Pd+PlOK6OtcgVMVFzxOx5nkIw=";
+    variant = "main";
   };
 
-  xanmodKernelFor = { version, suffix, hash }: buildLinux (args // rec {
+  xanmodKernelFor = { version, suffix ? "xanmod1", hash, variant }: buildLinux (args // rec {
     inherit version;
-    modDirVersion = "${version}-${suffix}";
+    modDirVersion = lib.versions.pad 3 "${version}-${suffix}";
 
     src = fetchFromGitHub {
       owner = "xanmod";
@@ -25,39 +26,16 @@ let
     };
 
     structuredExtraConfig = with lib.kernel; {
-      # removed options
-      CFS_BANDWIDTH = lib.mkForce (option no);
-      RT_GROUP_SCHED = lib.mkForce (option no);
-      SCHED_AUTOGROUP = lib.mkForce (option no);
-
       # AMD P-state driver
-      X86_AMD_PSTATE = yes;
+      X86_AMD_PSTATE = lib.mkOverride 60 yes;
 
-      # Linux RNG framework
-      LRNG = yes;
-
-      # Paragon's NTFS3 driver
-      NTFS3_FS = module;
-      NTFS3_LZX_XPRESS = yes;
-      NTFS3_FS_POSIX_ACL = yes;
-
-      # Preemptive Full Tickless Kernel at 500Hz
-      SCHED_CORE = lib.mkForce (option no);
-      PREEMPT_VOLUNTARY = lib.mkForce no;
-      PREEMPT = lib.mkForce yes;
-      NO_HZ_FULL = yes;
-      HZ_500 = yes;
-
-      # Google's BBRv2 TCP congestion Control
-      TCP_CONG_BBR2 = yes;
-      DEFAULT_BBR2 = yes;
+      # Google's BBRv3 TCP congestion Control
+      TCP_CONG_BBR = yes;
+      DEFAULT_BBR = yes;
 
       # FQ-PIE Packet Scheduling
       NET_SCH_DEFAULT = yes;
       DEFAULT_FQ_PIE = yes;
-
-      # Graysky's additional CPU optimizations
-      CC_OPTIMIZE_FOR_PERFORMANCE_O3 = yes;
 
       # Futex WAIT_MULTIPLE implementation for Wine / Proton Fsync.
       FUTEX = yes;
@@ -65,17 +43,22 @@ let
 
       # WineSync driver for fast kernel-backed Wine
       WINESYNC = module;
+
+      # Preemptive Full Tickless Kernel at 500Hz
+      HZ = freeform "500";
+      HZ_500 = yes;
+      HZ_1000 = no;
     };
 
     extraMeta = {
       branch = lib.versions.majorMinor version;
-      maintainers = with lib.maintainers; [ fortuneteller2k lovesegfault atemu ];
+      maintainers = with lib.maintainers; [ fortuneteller2k lovesegfault atemu shawn8901 zzzsy ];
       description = "Built with custom settings and new features built to provide a stable, responsive and smooth desktop experience";
       broken = stdenv.isAarch64;
     };
   } // (args.argsOverride or { }));
 in
 {
-  stable = xanmodKernelFor stableVariant;
-  edge = xanmodKernelFor edgeVariant;
+  lts = xanmodKernelFor ltsVariant;
+  main = xanmodKernelFor mainVariant;
 }

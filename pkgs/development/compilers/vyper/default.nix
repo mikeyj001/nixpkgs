@@ -6,10 +6,11 @@
 , writeText
 , asttokens
 , pycryptodome
+, importlib-metadata
 , recommonmark
 , semantic-version
 , sphinx
-, sphinx_rtd_theme
+, sphinx-rtd-theme
 , pytest-runner
 , setuptools-scm
 , git
@@ -27,14 +28,14 @@ let
 in
 buildPythonPackage rec {
   pname = "vyper";
-  version = "0.3.3";
+  version = "0.3.9";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-BAnNj27B1HAb9VVDA69bFGbQjeOpl0g5EB2juajqBAw=";
+    sha256 = "sha256-4UBSH4qRBgsy+VO9XzosWedM65R1lTo9ml2C95T9OAA=";
   };
 
   nativeBuildInputs = [
@@ -47,17 +48,18 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  pythonRelaxDeps = [ "semantic-version" ];
+  pythonRelaxDeps = [ "asttokens" "semantic-version" ];
 
   propagatedBuildInputs = [
     asttokens
     pycryptodome
     semantic-version
+    importlib-metadata
 
     # docs
     recommonmark
     sphinx
-    sphinx_rtd_theme
+    sphinx-rtd-theme
   ];
 
   checkPhase = ''

@@ -2,7 +2,6 @@
 , buildPythonPackage
 , fetchPypi
 , pythonOlder
-, kerberos
 , mock
 , pytestCheckHook
 , requests
@@ -27,11 +26,10 @@ buildPythonPackage rec {
     requests
     requests_ntlm
     six
-    kerberos
     xmltodict
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ];

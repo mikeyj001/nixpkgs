@@ -29,7 +29,7 @@ in
     services.xserver.desktopManager.enlightenment.enable = mkOption {
       type = types.bool;
       default = false;
-      description = "Enable the Enlightenment desktop environment.";
+      description = lib.mdDoc "Enable the Enlightenment desktop environment.";
     };
 
   };
@@ -92,7 +92,7 @@ in
 
     environment.etc."X11/xkb".source = xcfg.xkbDir;
 
-    fonts.fonts = [ pkgs.dejavu_fonts pkgs.ubuntu_font_family ];
+    fonts.packages = [ pkgs.dejavu_fonts pkgs.ubuntu_font_family ];
 
     services.udisks2.enable = true;
     services.upower.enable = config.powerManagement.enable;

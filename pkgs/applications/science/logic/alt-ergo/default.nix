@@ -1,44 +1,35 @@
-{ fetchFromGitHub, lib, which, ocamlPackages }:
+{ fetchurl, fetchpatch, lib, ocamlPackages }:
 
 let
   pname = "alt-ergo";
-  version = "2.4.1";
+  version = "2.5.1";
 
-  src = fetchFromGitHub {
-    owner = "OCamlPro";
-    repo = pname;
-    rev = version;
-    sha256 = "0hglj1p0753w2isds01h90knraxa42d2jghr35dpwf9g8a1sm9d3";
+  src = fetchurl {
+    url = "https://github.com/OCamlPro/alt-ergo/releases/download/v${version}/alt-ergo-${version}.tbz";
+    hash = "sha256-nPjWmg5FepObhquioYxhVPq6UdOHtCo2Hs5V0yndYB0=";
   };
-
-  useDune2 = true;
 in
 
 let alt-ergo-lib = ocamlPackages.buildDunePackage rec {
   pname = "alt-ergo-lib";
-  inherit version src useDune2;
-  configureFlags = [ pname ];
-  nativeBuildInputs = [ which ];
-  buildInputs = with ocamlPackages; [ dune-configurator ];
-  propagatedBuildInputs = with ocamlPackages; [ num ocplib-simplex stdlib-shims zarith ];
+  inherit version src;
+  buildInputs = with ocamlPackages; [ ppx_blob ];
+  propagatedBuildInputs = with ocamlPackages; [ camlzip dolmen_loop dune-build-info fmt ocplib-simplex seq stdlib-shims zarith ];
 }; in
 
 let alt-ergo-parsers = ocamlPackages.buildDunePackage rec {
   pname = "alt-ergo-parsers";
-  inherit version src useDune2;
-  configureFlags = [ pname ];
-  nativeBuildInputs = [ which ocamlPackages.menhir ];
-  propagatedBuildInputs = [ alt-ergo-lib ] ++ (with ocamlPackages; [ camlzip psmt2-frontend ]);
+  inherit version src;
+  nativeBuildInputs = [ ocamlPackages.menhir ];
+  propagatedBuildInputs = [ alt-ergo-lib ] ++ (with ocamlPackages; [ psmt2-frontend ]);
 }; in
 
 ocamlPackages.buildDunePackage {
 
-  inherit pname version src useDune2;
+  inherit pname version src;
 
-  configureFlags = [ pname ];
-
-  nativeBuildInputs = [ which ocamlPackages.menhir ];
-  buildInputs = [ alt-ergo-parsers ocamlPackages.cmdliner ];
+  nativeBuildInputs = [ ocamlPackages.menhir ];
+  buildInputs = [ alt-ergo-parsers ] ++ (with ocamlPackages; [ cmdliner dune-site ]);
 
   meta = {
     description = "High-performance theorem prover and SMT solver";

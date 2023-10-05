@@ -20,7 +20,7 @@ in appimageTools.wrapType2 rec {
     export LC_ALL=C.UTF-8
   '';
 
-  multiPkgs = null;
+  multiArch = false;
   extraPkgs = appimageTools.defaultFhsEnvArgs.multiPkgs;
   extraInstallCommands = ''
     mv $out/bin/{${name},${pname}}
@@ -36,6 +36,6 @@ in appimageTools.wrapType2 rec {
     homepage = "https://getstation.com";
     license = licenses.mit;
     platforms = [ "x86_64-linux" ];
-    maintainers = with maintainers; [ lattfein ];
+    maintainers = with maintainers; [ ];
   };
 }

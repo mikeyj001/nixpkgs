@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitLab, bc, librsvg, xcursorgen }:
+{ lib, stdenvNoCC, fetchFromGitLab, bc, librsvg, xcursorgen }:
 
 let
   dimensions = {
@@ -16,7 +16,7 @@ let
     # meta.longDescription.)
     map variantName product;
 in
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   pname = "comixcursors";
   version = "0.9.2";
 
@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    for outputName in $outputs ; do
+    for outputName in $(getAllOutputNames) ; do
       if [ $outputName != out ]; then
         local outputDir=''${!outputName};
         local iconsDir=$outputDir/share/icons

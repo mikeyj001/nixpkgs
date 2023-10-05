@@ -2,86 +2,83 @@
 , stdenvNoCC
 , fetchFromGitHub
 , gtk3
+, colloid-gtk-theme
 , gnome-themes-extra
 , gtk-engine-murrine
+, python3
 , sassc
-, which
-, tweaks ? [ ]         # can be "nord" "black" "rimless". cannot mix "nord" and "black"
-, size ? "standard"    # can be "standard" "compact"
+, accents ? [ "blue" ]
+, size ? "standard"
+, tweaks ? [ ]
+, variant ? "frappe"
 }:
 let
+  validAccents = [ "blue" "flamingo" "green" "lavender" "maroon" "mauve" "peach" "pink" "red" "rosewater" "sapphire" "sky" "teal" "yellow" ];
   validSizes = [ "standard" "compact" ];
-  validTweaks = [ "nord" "black" "rimless" ];
+  validTweaks = [ "black" "rimless" "normal" ];
+  validVariants = [ "latte" "frappe" "macchiato" "mocha" ];
 
-  unknownTweaks = lib.subtractLists validTweaks tweaks;
-  illegalMix = !(lib.elem "nord" tweaks) && !(lib.elem "black" tweaks);
-
-  assertIllegal = lib.assertMsg illegalMix ''
-    Tweaks "nord" and "black" cannot be mixed. Tweaks: ${toString tweaks}
-  '';
-
-  assertSize = lib.assertMsg (lib.elem size validSizes) ''
-    You entered wrong size: ${size}
-    Valid sizes are: ${toString validSizes}
-  '';
-
-  assertUnknown = lib.assertMsg (unknownTweaks == [ ]) ''
-    You entered wrong tweaks: ${toString unknownTweaks}
-    Valid tweaks are: ${toString validTweaks}
-  '';
+  pname = "catppuccin-gtk";
 in
 
-assert assertIllegal;
-assert assertSize;
-assert assertUnknown;
+lib.checkListOfEnum "${pname}: theme accent" validAccents accents
+lib.checkListOfEnum "${pname}: color variant" validVariants [variant]
+lib.checkListOfEnum "${pname}: size variant" validSizes [size]
+lib.checkListOfEnum "${pname}: tweaks" validTweaks tweaks
 
 stdenvNoCC.mkDerivation rec {
-  pname = "catppuccin-gtk";
-  version = "unstable-2022-02-24";
+  inherit pname;
+  version = "0.7.0";
 
   src = fetchFromGitHub {
-    repo = "gtk";
     owner = "catppuccin";
-    rev = "359c584f607c021fcc657ce77b81c181ebaff6de";
-    sha256 = "sha256-AVhFw1XTnkU0hoM+UyjT7ZevLkePybBATJUMLqRytpk=";
+    repo = "gtk";
+    rev = "v${version}";
+    hash = "sha256-J1iLN2FF3Ml/3zmntXYlfkv6dZcwl62A9X4ruAH1ll4=";
   };
 
-  nativeBuildInputs = [ gtk3 sassc which ];
+  nativeBuildInputs = [ gtk3 sassc ];
 
-  buildInputs = [ gnome-themes-extra ];
+  buildInputs = [
+    gnome-themes-extra
+    (python3.withPackages (ps: [ ps.catppuccin ]))
+  ];
 
   propagatedUserEnvPkgs = [ gtk-engine-murrine ];
 
-  patches = [
-    # Allows installing with `-t all`. Works around missing grey assets.
-    # https://github.com/catppuccin/gtk/issues/17
-    ./grey-fix.patch
-  ];
+  postUnpack = ''
+    rm -rf source/colloid
+    cp -r ${colloid-gtk-theme.src} source/colloid
+    chmod -R +w source/colloid
+  '';
 
   postPatch = ''
-    patchShebangs --build scripts/*
-    substituteInPlace Makefile \
-      --replace '$(shell git rev-parse --show-toplevel)' "$PWD"
-    substituteInPlace 'scripts/install.sh' \
-      --replace '$(git rev-parse --show-toplevel)' "$PWD"
+    patchShebangs --build colloid/install.sh
   '';
+
+  dontConfigure = true;
+  dontBuild = true;
 
   installPhase = ''
     runHook preInstall
 
     mkdir -p $out/share/themes
-    bash scripts/install.sh -d $out/share/themes -t all \
-      ${lib.optionalString (size != "") "-s ${size}"} \
-      ${lib.optionalString (tweaks != []) "--tweaks " + builtins.toString tweaks}
+    export HOME=$(mktemp -d)
+
+    python3 install.py ${variant} \
+      ${lib.optionalString (accents != []) "--accent " + builtins.toString accents} \
+      ${lib.optionalString (size != []) "--size " + size} \
+      ${lib.optionalString (tweaks != []) "--tweaks " + builtins.toString tweaks} \
+      --dest $out/share/themes
 
     runHook postInstall
   '';
 
   meta = with lib; {
-    description = "Soothing pastel theme for GTK3";
+    description = "Soothing pastel theme for GTK";
     homepage = "https://github.com/catppuccin/gtk";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
-    maintainers = [ maintainers.fufexan ];
+    maintainers = with maintainers; [ fufexan PlayerNameHere ];
   };
 }

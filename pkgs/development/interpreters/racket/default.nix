@@ -3,12 +3,12 @@
 , cairo, coreutils, fontconfig, freefont_ttf
 , glib, gmp
 , gtk3
+, glibcLocales
 , libedit, libffi
 , libiconv
 , libGL
 , libGLU
 , libjpeg
-, xorg
 , ncurses
 , libpng, libtool, mpfr, openssl, pango, poppler
 , readline, sqlite
@@ -24,7 +24,7 @@ let
     fontDirectories = [ freefont_ttf ];
   };
 
-  libPath = lib.makeLibraryPath [
+  libPath = lib.makeLibraryPath ([
     cairo
     fontconfig
     glib
@@ -32,8 +32,6 @@ let
     gtk3
     gsettings-desktop-schemas
     libedit
-    libGL
-    libGLU
     libjpeg
     libpng
     mpfr
@@ -43,13 +41,16 @@ let
     poppler
     readline
     sqlite
-  ];
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    libGL
+    libGLU
+  ]);
 
 in
 
 stdenv.mkDerivation rec {
   pname = "racket";
-  version = "8.5"; # always change at once with ./minimal.nix
+  version = "8.10"; # always change at once with ./minimal.nix
 
   src = (lib.makeOverridable ({ name, sha256 }:
     fetchurl {
@@ -58,14 +59,13 @@ stdenv.mkDerivation rec {
     }
   )) {
     name = "${pname}-${version}";
-    sha256 = "sha256-dWnOnpxh5zmou9eqVdcfhuCr8ts1CTqqEF1j/dk0jhs=";
+    sha256 = "sha256-Dklj2iwX5/bVdCi9odz2Ttp0N+Lya7bMSLR/QXo9k6M=";
   };
 
   FONTCONFIG_FILE = fontsConf;
   LD_LIBRARY_PATH = libPath;
   NIX_LDFLAGS = lib.concatStringsSep " " [
     (lib.optionalString (stdenv.cc.isGNU && ! stdenv.isDarwin) "-lgcc_s")
-    (lib.optionalString stdenv.isDarwin "-framework CoreFoundation")
   ];
 
   nativeBuildInputs = [ cacert wrapGAppsHook ];
@@ -89,7 +89,7 @@ stdenv.mkDerivation rec {
 
   preConfigure = ''
     unset AR
-    for f in src/lt/configure src/cs/c/configure src/bc/src/string.c src/ChezScheme/workarea; do
+    for f in src/lt/configure src/cs/c/configure src/bc/src/string.c; do
       substituteInPlace "$f" \
         --replace /usr/bin/uname ${coreutils}/bin/uname \
         --replace /bin/cp ${coreutils}/bin/cp \
@@ -108,6 +108,7 @@ stdenv.mkDerivation rec {
 
   '' + lib.optionalString stdenv.isLinux ''
     gappsWrapperArgs+=("--prefix"   "LD_LIBRARY_PATH" ":" ${libPath})
+    gappsWrapperArgs+=("--set"      "LOCALE_ARCHIVE" "${glibcLocales}/lib/locale/locale-archive")
   '' + lib.optionalString stdenv.isDarwin ''
     gappsWrapperArgs+=("--prefix" "DYLD_LIBRARY_PATH" ":" ${libPath})
   ''
@@ -129,15 +130,14 @@ stdenv.mkDerivation rec {
 
   shared = if stdenv.isDarwin then "dylib" else "shared";
   configureFlags = [ "--enable-${shared}"  "--enable-lt=${libtool}/bin/libtool" ]
-                   ++ lib.optional disableDocs [ "--disable-docs" ]
-                   ++ lib.optional stdenv.isDarwin [ "--enable-xonx" ];
+                   ++ lib.optionals disableDocs [ "--disable-docs" ]
+                   ++ lib.optionals stdenv.isDarwin [ "--enable-xonx" ];
 
   configureScript = "../configure";
 
   enableParallelBuilding = false;
 
   meta = with lib; {
-    broken = stdenv.isDarwin;
     description = "A programmable programming language";
     longDescription = ''
       Racket is a full-spectrum programming language. It goes beyond
@@ -149,8 +149,9 @@ stdenv.mkDerivation rec {
       GUIs and charts.
     '';
     homepage = "https://racket-lang.org/";
+    changelog = "https://github.com/racket/racket/releases/tag/v${version}";
     license = with licenses; [ asl20 /* or */ mit ];
-    maintainers = with maintainers; [ kkallio henrytill vrthra ];
+    maintainers = with maintainers; [ henrytill vrthra ];
     platforms = [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
   };
 }

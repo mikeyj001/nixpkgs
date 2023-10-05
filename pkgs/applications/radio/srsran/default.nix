@@ -10,19 +10,20 @@
 , libconfig
 , pcsclite
 , uhd
-, soapysdr
+, soapysdr-with-plugins
 , libbladeRF
+, zeromq
 }:
 
 stdenv.mkDerivation rec {
   pname = "srsran";
-  version = "21.10";
+  version = "23.04.1";
 
   src = fetchFromGitHub {
     owner = "srsran";
     repo = "srsran";
     rev = "release_${builtins.replaceStrings ["."] ["_"] version}";
-    sha256 = "sha256-uJv8khevp7g2p4zT6bkrut67kvMu+fuL1VHDDit0viw=";
+    sha256 = "sha256-4Mwdar1WUIgT23VjI9CtA5FT5gCm0Su+xK5dld3qfho=";
   };
 
   nativeBuildInputs = [ cmake pkg-config ];
@@ -35,8 +36,9 @@ stdenv.mkDerivation rec {
     lksctp-tools
     pcsclite
     uhd
-    soapysdr
+    soapysdr-with-plugins
     libbladeRF
+    zeromq
   ];
 
   meta = with lib; {

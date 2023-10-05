@@ -1,13 +1,13 @@
 { lib
 , buildPythonPackage
-, coloredlogs
+, deprecation
 , fetchFromGitHub
-, fetchpatch
 , ghostscript
+, hypothesis
 , img2pdf
-, importlib-metadata
 , importlib-resources
 , jbig2enc
+, packaging
 , pdfminer-six
 , pikepdf
 , pillow
@@ -16,19 +16,26 @@
 , pytest-xdist
 , pytestCheckHook
 , pythonOlder
+, rich
 , reportlab
+, setuptools
 , setuptools-scm
-, setuptools-scm-git-archive
 , substituteAll
-, tesseract4
+, tesseract
 , tqdm
+, typing-extensions
 , unpaper
+, wheel
 , installShellFiles
 }:
 
 buildPythonPackage rec {
   pname = "ocrmypdf";
-  version = "13.4.5";
+  version = "15.0.2";
+
+  disabled = pythonOlder "3.9";
+
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "ocrmypdf";
@@ -40,7 +47,7 @@ buildPythonPackage rec {
     postFetch = ''
       rm "$out/.git_archival.txt"
     '';
-    hash = "sha256-5IpJ55Vu9LjGgWJITkAH5fOr+MfovswWhwqbEs/RlzA=";
+    hash = "sha256-DpsNH3djB35WlqDPauCy7Re8pbZLnUE/pPAix4WHPKM=";
   };
 
   SETUPTOOLS_SCM_PRETEND_VERSION = version;
@@ -48,41 +55,37 @@ buildPythonPackage rec {
   patches = [
     (substituteAll {
       src = ./paths.patch;
-      gs = "${lib.getBin ghostscript}/bin/gs";
-      jbig2 = "${lib.getBin jbig2enc}/bin/jbig2";
-      pngquant = "${lib.getBin pngquant}/bin/pngquant";
-      tesseract = "${lib.getBin tesseract4}/bin/tesseract";
-      unpaper = "${lib.getBin unpaper}/bin/unpaper";
-    })
-    # https://github.com/ocrmypdf/OCRmyPDF/pull/973
-    (fetchpatch {
-      url = "https://github.com/ocrmypdf/OCRmyPDF/commit/808b24d59f5b541a335006aa6ea7cdc3c991adc0.patch";
-      hash = "sha256-khsH70fWk5fStf94wcRKKX7cCbgD69LtKkngJIqA3+w=";
+      gs = lib.getExe ghostscript;
+      jbig2 = lib.getExe jbig2enc;
+      pngquant = lib.getExe pngquant;
+      tesseract = lib.getExe tesseract;
+      unpaper = lib.getExe unpaper;
     })
   ];
 
   nativeBuildInputs = [
-    setuptools-scm-git-archive
+    setuptools
     setuptools-scm
+    wheel
     installShellFiles
   ];
 
   propagatedBuildInputs = [
-    coloredlogs
+    deprecation
     img2pdf
+    packaging
     pdfminer-six
     pikepdf
     pillow
     pluggy
     reportlab
-    tqdm
-  ] ++ (lib.optionals (pythonOlder "3.8") [
-    importlib-metadata
-  ]) ++ (lib.optionals (pythonOlder "3.9") [
-    importlib-resources
-  ]);
+    rich
+  ] ++ lib.optionals (pythonOlder "3.10") [
+    typing-extensions
+  ];
 
-  checkInputs = [
+  nativeCheckInputs = [
+    hypothesis
     pytest-xdist
     pytestCheckHook
   ];

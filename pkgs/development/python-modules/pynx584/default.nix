@@ -13,7 +13,7 @@
 
 buildPythonPackage rec {
   pname = "pynx584";
-  version = "0.7";
+  version = "0.8.1";
   disabled = pythonOlder "3.6";
 
 
@@ -21,7 +21,7 @@ buildPythonPackage rec {
     owner = "kk7ds";
     repo = pname;
     rev = version;
-    sha256 = "sha256-44JFq19fpJmpZzLeVcBILs8c9bOfWyMrb2jA4Yx8+Co=";
+    hash = "sha256-nF8+LbKqy/GrnPpykS5wEQMPoFYxi40pfM3Ys/UXCeo=";
   };
 
   propagatedBuildInputs = [
@@ -32,7 +32,7 @@ buildPythonPackage rec {
     stevedore
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ];

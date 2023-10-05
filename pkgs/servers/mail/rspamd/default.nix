@@ -1,6 +1,23 @@
-{ stdenv, lib, fetchFromGitHub, cmake, perl
-, glib, luajit, openssl, pcre2, pkg-config, sqlite, ragel, icu
-, hyperscan, jemalloc, blas, lapack, lua, libsodium
+{ stdenv
+, lib
+, fetchFromGitHub
+, fetchpatch2
+, cmake
+, perl
+, glib
+, luajit
+, openssl
+, pcre
+, pkg-config
+, sqlite
+, ragel
+, icu
+, hyperscan
+, jemalloc
+, blas
+, lapack
+, lua
+, libsodium
 , withBlas ? true
 , withHyperscan ? stdenv.isx86_64
 , withLuaJIT ? stdenv.isx86_64
@@ -11,24 +28,35 @@ assert withHyperscan -> stdenv.isx86_64;
 
 stdenv.mkDerivation rec {
   pname = "rspamd";
-  version = "3.2";
+  version = "3.6";
 
   src = fetchFromGitHub {
     owner = "rspamd";
     repo = "rspamd";
     rev = version;
-    sha256 = "122d5m1nfxxz93bhsk8lm4dazvdknzphb0a1188m7bsa4iynbfv2";
+    hash = "sha256-GuWuJK73RE+cS8451m+bcmpZNQEzmZtexm19xgdDQeU=";
   };
+
+  patches = [
+    # Fix leak in `gzip` function
+    # https://github.com/rspamd/rspamd/issues/4564
+    (fetchpatch2 {
+      url = "https://github.com/rspamd/rspamd/commit/ffbab4fbf218514845b8e5209aec044621b1f460.patch";
+      hash = "sha256-ltkC/mZcYmGoSFILaTTRB/UWSn36flEbuJP4Buys05Y=";
+    })
+  ];
 
   hardeningEnable = [ "pie" ];
 
   nativeBuildInputs = [ cmake pkg-config perl ];
-  buildInputs = [ glib openssl pcre2 sqlite ragel icu jemalloc libsodium ]
+  buildInputs = [ glib openssl pcre sqlite ragel icu jemalloc libsodium ]
     ++ lib.optional withHyperscan hyperscan
     ++ lib.optionals withBlas [ blas lapack ]
     ++ lib.optional withLuaJIT luajit ++ lib.optional (!withLuaJIT) lua;
 
   cmakeFlags = [
+    # pcre2 jit seems to cause crashes: https://github.com/NixOS/nixpkgs/pull/181908
+    "-DENABLE_PCRE2=OFF"
     "-DDEBIAN_BUILD=ON"
     "-DRUNDIR=/run/rspamd"
     "-DDBDIR=/var/lib/rspamd"

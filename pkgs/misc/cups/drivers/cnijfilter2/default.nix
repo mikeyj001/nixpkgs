@@ -4,16 +4,20 @@
 stdenv.mkDerivation {
   pname = "cnijfilter2";
 
-  version = "6.10";
+  version = "6.40";
 
   src = fetchzip {
-    url = "https://gdlp01.c-wss.com/gds/1/0100010921/01/cnijfilter2-source-6.10-1.tar.gz";
-    sha256 = "0w121issdjxdv5i9ksa5m23if6pz1r9ql8p894f1pqn16w0kw1ix";
+    url = "https://gdlp01.c-wss.com/gds/1/0100011381/01/cnijfilter2-source-6.40-1.tar.gz";
+    sha256 = "3RoG83jLOsdTEmvUkkxb7wa8oBrJA4v1mGtxTGwSowU=";
   };
 
   nativeBuildInputs = [ automake autoconf ];
   buildInputs = [
     cups glib libxml2 libusb1 libtool
+  ];
+
+  patches = [
+    ./patches/get_protocol.patch
   ];
 
   # lgmon3's --enable-libdir flag is used soley for specifying in which
@@ -25,7 +29,7 @@ stdenv.mkDerivation {
   # $out/lib/cups/filter/libcnbpcnclapicom2.so
   buildPhase = ''
     mkdir -p $out/lib
-    cp com/libs_bin64/* $out/lib
+    cp com/libs_bin_x86_64/* $out/lib
     mkdir -p $out/lib/cups/filter
     ln -s $out/lib/libcnbpcnclapicom2.so $out/lib/cups/filter
 
@@ -47,6 +51,12 @@ stdenv.mkDerivation {
 
     (
       cd cmdtocanonij2
+      ./autogen.sh --prefix=$out
+      make
+    )
+
+    (
+      cd cmdtocanonij3
       ./autogen.sh --prefix=$out
       make
     )
@@ -91,6 +101,11 @@ stdenv.mkDerivation {
     )
 
     (
+      cd cmdtocanonij3
+      make install
+    )
+
+    (
       cd cnijbe2
       make install
     )
@@ -130,6 +145,6 @@ stdenv.mkDerivation {
     homepage = "https://hk.canon/en/support/0101048401/1";
     license = licenses.unfree;
     platforms = [ "i686-linux" "x86_64-linux" ];
-    maintainers = with maintainers; [ cstrahan ];
+    maintainers = with maintainers; [ ];
   };
 }

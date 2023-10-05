@@ -4,13 +4,13 @@
 
 let
   pname = "qdirstat";
-  version = "1.8";
+  version = "1.8.1";
 
   src = fetchFromGitHub {
     owner = "shundhammer";
     repo = pname;
     rev = version;
-    sha256 = "sha256-R/eUqv5AxO5TcLkqOvlAXEkjAzeKGihf8YIQIIevOR0=";
+    sha256 = "sha256-yWv41iWtdTdlFuvLHKCbwmnSXq7Z5pIJq28GMDltdxM=";
   };
 in
 
@@ -53,5 +53,6 @@ mkDerivation {
     license = licenses.gpl2Plus;
     maintainers = with maintainers; [ ];
     platforms = platforms.linux;
+    mainProgram = "qdirstat";
   };
 }

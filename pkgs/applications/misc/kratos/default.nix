@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "kratos";
-  version = "0.9.0-alpha.3";
+  version = "1.0.0";
 
   src = fetchFromGitHub {
     owner = "ory";
     repo = "kratos";
     rev = "v${version}";
-    sha256 = "1x6g5mbbz1nkqi814dcyvdn8dyizpilzsb9cqijw0kpw4y3px757";
+    hash = "sha256-KDpc0zc65rvvpPojghFEujoS0aewyjv7B/bmpC2i1dA=";
   };
 
-  vendorSha256 = "1v29g302zqh7sc5s53dyz1mki0iijnr6nfj4fajayz2n7bfw3kh1";
+  vendorHash = "sha256-Y/Sd2hu1bPUb0TQRD1pANz+rtqKcHBXvjKpYwKgxHMQ=";
 
   subPackages = [ "." ];
 

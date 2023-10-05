@@ -1,30 +1,27 @@
-{ lib, rustPlatform, fetchFromGitHub, stdenv, CoreFoundation, CoreServices }:
+{ lib, rustPlatform, fetchFromGitHub, stdenv, darwin }:
 
 rustPlatform.buildRustPackage rec {
   pname = "cargo-modules";
-  version = "0.5.6";
+  version = "0.9.3";
 
   src = fetchFromGitHub {
     owner = "regexident";
     repo = pname;
     rev = version;
-    sha256 = "sha256-bLljwxNrCmg1ZWfSninIxJIFIn2oHY8dmbHYPdwtD+M=";
+    hash = "sha256-GbBPIJh2TnIpzpuSLZlrxEVN5hWFakeERKNeTcYbjSY=";
   };
 
-  cargoSha256 = "sha256-heyVeQwEIOA9qtyXnHY8lPo06YgIUJaWCtaht9dWLoo=";
+  cargoHash = "sha256-g8Edt2rmOSfoJ3UsZIUyTOIxXgf6iQD+TueK89d18CQ=";
 
   buildInputs = lib.optionals stdenv.isDarwin [
-    CoreFoundation
-    CoreServices
+    darwin.apple_sdk.frameworks.CoreServices
   ];
 
   meta = with lib; {
     description = "A cargo plugin for showing a tree-like overview of a crate's modules";
     homepage = "https://github.com/regexident/cargo-modules";
+    changelog = "https://github.com/regexident/cargo-modules/blob/${version}/CHANGELOG.md";
     license = with licenses; [ mpl20 ];
-    # all tests fail with:
-    # thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: "tests run with disabled concurrency, automatic snapshot name generation is not supported.  Consider using the \"backtrace\" feature of insta which tries to recover test names from the call stack."', /private/tmp/nix-build-cargo-modules-0.5.6.drv-0/cargo-modules-0.5.6-vendor.tar.gz/insta/src/runtime.rs:908:22
-    broken = (stdenv.isDarwin && stdenv.isx86_64);
-    maintainers = with maintainers; [ figsoda rvarago ];
+    maintainers = with maintainers; [ figsoda rvarago matthiasbeyer ];
   };
 }

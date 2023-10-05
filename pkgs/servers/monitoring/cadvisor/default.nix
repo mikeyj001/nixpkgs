@@ -2,28 +2,24 @@
 
 buildGoModule rec {
   pname = "cadvisor";
-  version = "0.40.0";
+  version = "unstable-2023-07-28";
 
   src = fetchFromGitHub {
     owner = "google";
     repo = "cadvisor";
-    rev = "v${version}";
-    sha256 = "sha256-8HOaKjdATVZpyx4yLf7xefz+jiOEqmkWiZnA3DOyT50=";
+    rev = "fdd3d9182bea6f7f11e4f934631c4abef3aa0584";
+    hash = "sha256-U6oZ80EYx56FJ7VsDKzCXH4TvFEH+oPmgK/Nd8T/Zp4=";
   };
 
   modRoot = "./cmd";
 
-  vendorSha256 = "sha256-+nrXD0hQ3zBwTTq9xoBqO3ho4s4tf8uZQz2wL1nYi/k=";
+  vendorHash = "sha256-hvgObwmNKk6yTJSyEHuHZ5abuXGPwPC42xUSAAF8UA0=";
 
   ldflags = [ "-s" "-w" "-X github.com/google/cadvisor/version.Version=${version}" ];
 
   postInstall = ''
     mv $out/bin/{cmd,cadvisor}
     rm $out/bin/example
-  '';
-
-  preCheck = ''
-    rm internal/container/mesos/handler_test.go
   '';
 
   meta = with lib; {

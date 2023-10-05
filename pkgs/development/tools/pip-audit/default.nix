@@ -1,55 +1,36 @@
 { lib
 , fetchFromGitHub
-, fetchpatch
 , python3
 }:
 
-let
-  py = python3.override {
-    packageOverrides = self: super: {
-
-      # ansible doesn't support resolvelib > 0.6.0 and can't have an override
-      resolvelib = super.resolvelib.overridePythonAttrs (oldAttrs: rec {
-        version = "0.8.1";
-        src = fetchFromGitHub {
-          owner = "sarugaku";
-          repo = "resolvelib";
-          rev = version;
-          sha256 = "1qpd0gg9yl0kbamlgjs9pkxd39kx511kbc92civ77v0ka5sw8ca0";
-        };
-      });
-    };
-  };
-in
-with py.pkgs;
-
-buildPythonApplication rec {
+python3.pkgs.buildPythonApplication rec {
   pname = "pip-audit";
-  version = "2.3.1";
+  version = "2.6.1";
   format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "trailofbits";
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-W7g2ZV1Xf1s5sGRJiZdQcreBD6zp1/VRQPGs+VIOJE0=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-bB3yaQweXyj4O2TMHBhyMz5tm2Th0cDqRZ1B9lv+ARk=";
   };
 
-  nativeBuildInputs = [
+  nativeBuildInputs = with python3.pkgs; [
     flit-core
   ];
 
-  propagatedBuildInputs = [
+  propagatedBuildInputs = with python3.pkgs; [
     cachecontrol
     cyclonedx-python-lib
     html5lib
     packaging
     pip-api
-    progress
-    resolvelib
-  ];
+    pip-requirements-parser
+    rich
+    toml
+  ] ++ cachecontrol.optional-dependencies.filecache;
 
-  checkInputs = [
+  nativeCheckInputs = with python3.pkgs; [
     pretend
     pytestCheckHook
   ];
@@ -65,7 +46,6 @@ buildPythonApplication rec {
   disabledTestPaths = [
     # Tests require network access
     "test/dependency_source/test_requirement.py"
-    "test/dependency_source/test_resolvelib.py"
     "test/service/test_pypi.py"
     "test/service/test_osv.py"
   ];
@@ -81,6 +61,7 @@ buildPythonApplication rec {
   meta = with lib; {
     description = "Tool for scanning Python environments for known vulnerabilities";
     homepage = "https://github.com/trailofbits/pip-audit";
+    changelog = "https://github.com/pypa/pip-audit/releases/tag/v${version}";
     license = with licenses; [ asl20 ];
     maintainers = with maintainers; [ fab ];
   };

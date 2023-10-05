@@ -7,9 +7,10 @@
 , pytest-asyncio
 , aiosqlite
 , databases
-, fetchpatch
 , flask
 , httpx
+, hatchling
+, orjson
 , passlib
 , peewee
 , python-jose
@@ -20,28 +21,39 @@
 
 buildPythonPackage rec {
   pname = "fastapi";
-  version = "0.75.2";
-  format = "flit";
+  version = "0.95.2";
+  format = "pyproject";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "tiangolo";
     repo = pname;
-    rev = version;
-    hash = "sha256-B4q3Q256Sj4jTQt1TDm3fiEaQKdVxddCF9+KsxkkTWo=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-wD39CqUZOgwpG/NEGz/pXgQsadzUoM/elxfEXthOlHo=";
   };
+
+  nativeBuildInputs = [
+    hatchling
+  ];
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace '"databases[sqlite] >=0.3.2,<0.7.0",' "" \
+      --replace "starlette==" "starlette>="
+  '';
 
   propagatedBuildInputs = [
     starlette
     pydantic
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aiosqlite
-    databases
+    # databases FIXME incompatible with SQLAlchemy 2.0
     flask
     httpx
+    orjson
     passlib
     peewee
     python-jose
@@ -49,22 +61,9 @@ buildPythonPackage rec {
     pytest-asyncio
     sqlalchemy
     trio
-  ] ++ passlib.optional-dependencies.bcrypt;
-
-  patches = [
-    # Bump starlette, https://github.com/tiangolo/fastapi/pull/4483
-    (fetchpatch {
-      name = "support-later-starlette.patch";
-      # PR contains multiple commits
-      url = "https://patch-diff.githubusercontent.com/raw/tiangolo/fastapi/pull/4483.patch";
-      sha256 = "sha256-ZWaqAd/QYEYRL1hSQdXdFPgWgdmOill2GtmEn33vz2U=";
-    })
-  ];
-
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace "starlette ==" "starlette >="
-  '';
+  ]
+  ++ passlib.optional-dependencies.bcrypt
+  ++ pydantic.optional-dependencies.email;
 
   pytestFlagsArray = [
     # ignoring deprecation warnings to avoid test failure from
@@ -77,6 +76,9 @@ buildPythonPackage rec {
     "tests/test_default_response_class.py"
     # Don't test docs and examples
     "docs_src"
+    # databases is incompatible with SQLAlchemy 2.0
+    "tests/test_tutorial/test_async_sql_databases"
+    "tests/test_tutorial/test_sql_databases"
   ];
 
   disabledTests = [
@@ -88,6 +90,8 @@ buildPythonPackage rec {
     "test_head"
     "test_options"
     "test_trace"
+    # Unexpected number of warnings caught
+    "test_warn_duplicate_operation_id"
   ];
 
   pythonImportsCheck = [

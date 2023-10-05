@@ -3,20 +3,25 @@
 , buildPythonPackage
 , cryptography
 , fetchPypi
+, poetry-core
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "pymazda";
-  version = "0.3.3";
-  format = "setuptools";
+  version = "0.3.11";
+  format = "pyproject";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-jvDjitS8r0oyANxUGbYksX7O7dbEqZeWEpYc9gABb78=";
+    hash = "sha256-DiXLY4mfgRbE0Y1tOJnkMSQQj1vcySLVDBthOWe7/dM=";
   };
+
+  nativeBuildInputs = [
+    poetry-core
+  ];
 
   propagatedBuildInputs = [
     aiohttp
@@ -33,6 +38,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python client for interacting with the MyMazda API";
     homepage = "https://github.com/bdr99/pymazda";
+    changelog = "https://github.com/bdr99/pymazda/releases/tag/${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

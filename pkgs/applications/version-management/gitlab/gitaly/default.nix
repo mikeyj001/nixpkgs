@@ -1,58 +1,59 @@
-{ lib, fetchFromGitLab, fetchFromGitHub, buildGoModule, ruby
-, bundlerEnv, pkg-config
-# libgit2 + dependencies
-, libgit2_1_3_0, openssl, zlib, pcre, http-parser }:
+{ lib
+, fetchFromGitLab
+, fetchFromGitHub
+, buildGoModule
+, pkg-config
+}:
 
 let
-  rubyEnv = bundlerEnv rec {
-    name = "gitaly-env";
-    inherit ruby;
-    copyGemFiles = true;
-    gemdir = ./.;
-  };
-
-  version = "15.0.0";
-  package_version = "v14";
+  version = "16.4.1";
+  package_version = "v${lib.versions.major version}";
   gitaly_package = "gitlab.com/gitlab-org/gitaly/${package_version}";
+
+  commonOpts = {
+    inherit version;
+
+    src = fetchFromGitLab {
+      owner = "gitlab-org";
+      repo = "gitaly";
+      rev = "v${version}";
+      hash = "sha256-t3d72l/Na0qv+jezT/YhAUbG9DSSe9pyixQjTALTxvk=";
+    };
+
+    vendorHash = "sha256-Nlq1l1f389DC854rFznEu2Viv0T7Y1cD1Ht0o2N304o=";
+
+    ldflags = [ "-X ${gitaly_package}/internal/version.version=${version}" "-X ${gitaly_package}/internal/version.moduleVersion=${version}" ];
+
+    tags = [ "static" ];
+
+    nativeBuildInputs = [ pkg-config ];
+
+    doCheck = false;
+  };
+
+  auxBins = buildGoModule ({
+    pname = "gitaly-aux";
+
+    subPackages = [ "cmd/gitaly-hooks" "cmd/gitaly-ssh" "cmd/gitaly-lfs-smudge" "cmd/gitaly-gpg" ];
+  } // commonOpts);
 in
-
-buildGoModule {
+buildGoModule ({
   pname = "gitaly";
-  inherit version;
 
-  src = fetchFromGitLab {
-    owner = "gitlab-org";
-    repo = "gitaly";
-    rev = "v${version}";
-    sha256 = "sha256-ib/gGkXo6W6LZ6j92oUMhJWdDYZRnA1p+tsOK6ewemk=";
-  };
+  subPackages = [ "cmd/gitaly" "cmd/gitaly-backup" ];
 
-  vendorSha256 = "sha256-/tHKWo09ZV31TSIqlOk36V3y7gNikziUJHf+nS1gHEw=";
-
-  passthru = {
-    inherit rubyEnv;
-  };
-
-  ldflags = "-X ${gitaly_package}/internal/version.version=${version} -X ${gitaly_package}/internal/version.moduleVersion=${version}";
-
-  tags = [ "static,system_libgit2" ];
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ rubyEnv.wrappedRuby libgit2_1_3_0 openssl zlib pcre http-parser ];
-  doCheck = false;
-
-  postInstall = ''
-    mkdir -p $ruby
-    cp -rv $src/ruby/{bin,lib,proto} $ruby
-    mv $out/bin/gitaly-git2go-${package_version} $out/bin/gitaly-git2go-${version}
+  preConfigure = ''
+    mkdir -p _build/bin
+    cp -r ${auxBins}/bin/* _build/bin
   '';
 
-  outputs = [ "out" "ruby" ];
+  outputs = [ "out" ];
 
   meta = with lib; {
     homepage = "https://gitlab.com/gitlab-org/gitaly";
     description = "A Git RPC service for handling all the git calls made by GitLab";
     platforms = platforms.linux ++ [ "x86_64-darwin" ];
-    maintainers = with maintainers; [ roblabla globin fpletz talyz yayayayaka ];
+    maintainers = teams.gitlab.members;
     license = licenses.mit;
   };
-}
+} // commonOpts)

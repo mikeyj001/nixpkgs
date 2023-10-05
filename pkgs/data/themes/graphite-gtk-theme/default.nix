@@ -22,18 +22,18 @@ in
 lib.checkListOfEnum "${pname}: theme variants" [ "default" "purple" "pink" "red" "orange" "yellow" "green" "teal" "blue" "all" ] themeVariants
 lib.checkListOfEnum "${pname}: color variants" [ "standard" "light" "dark" ] colorVariants
 lib.checkListOfEnum "${pname}: size variants" [ "standard" "compact" ] sizeVariants
-lib.checkListOfEnum "${pname}: tweaks" [ "nord" "black" "dark" "rimless" "normal" ] tweaks
+lib.checkListOfEnum "${pname}: tweaks" [ "nord" "black" "darker" "rimless" "normal" "float" "colorful" ] tweaks
 lib.checkListOfEnum "${pname}: grub screens" [ "1080p" "2k" "4k" ] grubScreens
 
 stdenvNoCC.mkDerivation rec {
   inherit pname;
-  version = "2022-03-22";
+  version = "2023-05-17";
 
   src = fetchFromGitHub {
     owner = "vinceliuice";
     repo = pname;
-    rev = "7ab6a1b7eda81e914405a9931408b1d5c73e6891";
-    sha256 = "maYHA+AICoPiZo62IJ52UFUhOZh+6m2e9z6Kz0zrsSc=";
+    rev = version;
+    sha256 = "hymOqtwMk6Yja5le6ADZl04yjbOJjhairiH7a4m7gMk=";
   };
 
   nativeBuildInputs = [
@@ -81,12 +81,12 @@ stdenvNoCC.mkDerivation rec {
       )
     ''}
 
-    jdupes -L -r $out/share
+    jdupes --quiet --link-soft --recurse $out/share
 
     runHook postInstall
   '';
 
-  passthru.updateScript = gitUpdater { inherit pname version; };
+  passthru.updateScript = gitUpdater { };
 
   meta = with lib; {
     description = "Flat Gtk+ theme based on Elegant Design";

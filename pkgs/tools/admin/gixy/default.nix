@@ -3,7 +3,7 @@
 let
   python = python3.override {
     packageOverrides = self: super: {
-      pyparsing = super.pyparsing.overridePythonAttrs (oldAttrs: rec {
+      pyparsing = super.pyparsing.overridePythonAttrs rec {
         version = "2.4.7";
         src = fetchFromGitHub {
           owner = "pyparsing";
@@ -11,13 +11,17 @@ let
           rev = "pyparsing_${version}";
           sha256 = "14pfy80q2flgzjcx8jkracvnxxnr59kjzp3kdm5nh232gk1v6g6h";
         };
-      });
+        nativeBuildInputs = [
+          super.setuptools
+        ];
+      };
     };
   };
 in
 python.pkgs.buildPythonApplication rec {
   pname = "gixy";
   version = "0.1.20";
+  format = "setuptools";
 
   # package is only compatible with python 2.7 and 3.5+
   disabled = with python.pkgs; !(pythonAtLeast "3.5" || isPy27);
@@ -39,7 +43,7 @@ python.pkgs.buildPythonApplication rec {
     configargparse
     pyparsing
     jinja2
-    nose
+    nose3
     setuptools
     six
   ];

@@ -1,26 +1,24 @@
 { lib, fetchFromGitHub, buildDunePackage, ocaml
 , dune-configurator
 , either, seq
-, gen, iter, ounit, qcheck, uutf
+, gen, iter, qcheck-core, uutf, yojson
 }:
 
 buildDunePackage rec {
-  version = "3.6.1";
+  version = "3.12";
   pname = "containers";
-
-  useDune2 = true;
 
   src = fetchFromGitHub {
     owner = "c-cube";
     repo = "ocaml-containers";
     rev = "v${version}";
-    sha256 = "sha256:1k8xrs3nki8g875sig9f5v6k4vwxrk5gn7ixrlkkys5ksbr4kis7";
+    hash = "sha256-15Wd6k/NvjAvTmxlPlZPClODBtFXM6FG3VxniC66u88=";
   };
 
   buildInputs = [ dune-configurator ];
   propagatedBuildInputs = [ either seq ];
 
-  checkInputs = [ gen iter ounit qcheck uutf ];
+  checkInputs = [ gen iter qcheck-core uutf yojson ];
 
   doCheck = lib.versionAtLeast ocaml.version "4.08";
 

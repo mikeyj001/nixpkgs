@@ -9,14 +9,14 @@
 , aiohttp
 , aiodns
 , brotli
-, cchardet
+, faust-cchardet
 , orjson
 , pynacl
 }:
 
 buildPythonPackage rec {
   pname = "nextcord";
-  version = "2.0.0a10";
+  version = "2.6.1";
 
   format = "setuptools";
 
@@ -25,8 +25,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "nextcord";
     repo = "nextcord";
-    rev = version;
-    hash = "sha256-p99WJ4y2iJQTI3wHbh+jwJyLnE3aBXnHxrehDYYek/4=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-bv4I+Ol/N4kbp/Ch7utaUpo0GmF+Mpx4zWmHL7uIveM=";
   };
 
   patches = [
@@ -41,7 +41,7 @@ buildPythonPackage rec {
     aiodns
     aiohttp
     brotli
-    cchardet
+    faust-cchardet
     orjson
     pynacl
   ];
@@ -56,6 +56,7 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
+    changelog = "https://github.com/nextcord/nextcord/blob/${src.rev}/docs/whats_new.rst";
     description = "Python wrapper for the Discord API forked from discord.py";
     homepage = "https://github.com/nextcord/nextcord";
     license = licenses.mit;

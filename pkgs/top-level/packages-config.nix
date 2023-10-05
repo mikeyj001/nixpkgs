@@ -9,7 +9,6 @@
   packageOverrides = super: with super; lib.mapAttrs (_: set: recurseIntoAttrs set) {
     inherit (super)
       apacheHttpdPackages
-      atomPackages
       fdbPackages
       fusePackages
       gns3Packages
@@ -27,6 +26,7 @@
       ut2004Packages
       zabbix40
       zabbix50
+      zabbix60
       zeroadPackages
     ;
 
@@ -45,8 +45,5 @@
     haskell = super.haskell // {
       compiler = recurseIntoAttrs super.haskell.compiler;
     };
-
-    # This is an alias which we disallow by default; explicitly allow it
-    emacs28Packages = emacs28.pkgs;
   };
 }

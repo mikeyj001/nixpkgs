@@ -9,12 +9,14 @@ in
 {
   options = {
     services.prowlarr = {
-      enable = mkEnableOption "Prowlarr";
+      enable = mkEnableOption (lib.mdDoc "Prowlarr");
+
+      package = mkPackageOptionMD pkgs "prowlarr" { };
 
       openFirewall = mkOption {
         type = types.bool;
         default = false;
-        description = "Open ports in the firewall for the Prowlarr web interface.";
+        description = lib.mdDoc "Open ports in the firewall for the Prowlarr web interface.";
       };
     };
   };
@@ -29,7 +31,7 @@ in
         Type = "simple";
         DynamicUser = true;
         StateDirectory = "prowlarr";
-        ExecStart = "${pkgs.prowlarr}/bin/Prowlarr -nobrowser -data=/var/lib/prowlarr";
+        ExecStart = "${lib.getExe cfg.package} -nobrowser -data=/var/lib/prowlarr";
         Restart = "on-failure";
       };
     };

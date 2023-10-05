@@ -1,14 +1,14 @@
-{ lib, fetchurl, appimageTools }:
+{ lib, fetchurl, appimageTools, makeWrapper }:
 
 let
   pname = "anytype";
-  version = "0.25.4";
+  version = "0.35.2";
   name = "Anytype-${version}";
   nameExecutable = pname;
   src = fetchurl {
-    url = "https://at9412003.fra1.digitaloceanspaces.com/Anytype-${version}.AppImage";
+    url = "https://anytype-release.fra1.cdn.digitaloceanspaces.com/Anytype-${version}.AppImage";
     name = "Anytype-${version}.AppImage";
-    sha256 = "sha256-v6Zecv/m1GvPJk/SmLlxHFyeYbNbIB+x17+AKCI45AM=";
+    sha256 = "RLkAC9rNGHdbX/EfDTfpbBBKaY+BqdFuCMm99mkjOjw=";
   };
   appimageContents = appimageTools.extractType2 { inherit name src; };
 in
@@ -20,11 +20,14 @@ appimageTools.wrapType2 {
 
   extraInstallCommands = ''
     mv $out/bin/${name} $out/bin/${pname}
-    install -m 444 -D ${appimageContents}/anytype2.desktop -t $out/share/applications
-    substituteInPlace $out/share/applications/anytype2.desktop \
+    source "${makeWrapper}/nix-support/setup-hook"
+    wrapProgram $out/bin/${pname} \
+      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
+    install -m 444 -D ${appimageContents}/anytype.desktop -t $out/share/applications
+    substituteInPlace $out/share/applications/anytype.desktop \
       --replace 'Exec=AppRun' 'Exec=${pname}'
-    install -m 444 -D ${appimageContents}/usr/share/icons/hicolor/0x0/apps/anytype2.png \
-      $out/share/icons/hicolor/512x512/apps/anytype2.png
+    install -m 444 -D ${appimageContents}/usr/share/icons/hicolor/0x0/apps/anytype.png \
+      $out/share/icons/hicolor/512x512/apps/anytype.png
   '';
 
   meta = with lib; {

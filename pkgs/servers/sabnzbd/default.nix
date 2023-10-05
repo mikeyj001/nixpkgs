@@ -1,51 +1,60 @@
 { lib, stdenv
+, coreutils
 , fetchFromGitHub
 , python3
 , par2cmdline
 , unzip
 , unrar
 , p7zip
+, util-linux
 , makeWrapper
 , nixosTests
 }:
 
 let
-
-  python = python3.override {
-    packageOverrides = final: prev: {
-      sabyenc3 = prev.sabyenc3.overridePythonAttrs (oldAttrs: rec {
-        version = "4.0.0";
-        src = oldAttrs.src.override {
-          inherit version;
-          hash = "sha256-PwwQ2jChKIqh7jJ6E2hkqPquTDSN4MklghfJ+MkM0n0=";
-        };
-      });
-    };
-    self = python;
-  };
-
-  pythonEnv = python.withPackages(ps: with ps; [
+  pythonEnv = python3.withPackages(ps: with ps; [
+    babelfish
+    cffi
     chardet
     cheetah3
+    cheroot
     cherrypy
-    cryptography
     configobj
+    cryptography
     feedparser
-    sabyenc3
-    puremagic
     guessit
+    jaraco-classes
+    jaraco-collections
+    jaraco-context
+    jaraco-functools
+    jaraco-text
+    more-itertools
+    notify2
+    orjson
+    portend
+    puremagic
+    pycparser
     pysocks
+    python-dateutil
+    pytz
+    rebulk
+    sabctools
+    sabyenc3
+    sgmllib3k
+    six
+    tempora
+    zc_lockfile
   ]);
-  path = lib.makeBinPath [ par2cmdline unrar unzip p7zip ];
+  path = lib.makeBinPath [ coreutils par2cmdline unrar unzip p7zip util-linux ];
 in stdenv.mkDerivation rec {
-  version = "3.5.3";
+  version = "4.1.0";
   pname = "sabnzbd";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = version;
-    sha256 = "sha256-pdYTTahdn9YVFreU5KhMGlUzQxHviN5G4TxWKKRBxOc=";
+    sha256 = "sha256-FN2BKvO9ToTvGdYqgv0wMSPgshMrVybDs9wsBo8MkII=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -73,6 +82,6 @@ in stdenv.mkDerivation rec {
     homepage = "https://sabnzbd.org";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = with lib.maintainers; [ fridh jojosch ];
+    maintainers = with lib.maintainers; [ fridh jojosch adamcstephens ];
   };
 }

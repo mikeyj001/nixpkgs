@@ -1,16 +1,16 @@
 { lib, buildGoModule, fetchFromGitHub, fetchurl, makeWrapper, runCommand }:
 
 let
-  version = "1.3.4";
+  version = "1.3.7";
 
   src = fetchFromGitHub {
     owner = "root-gg";
     repo = "plik";
     rev = version;
-    sha256 = "0kmcidnjw26vnxx9h3swcg72i507awg89s4nfxw6rwbyw36iiiqf";
+    hash = "sha256-Agkwo1oat1LDP6EJBVOoq+d+p80BGOLS4K7WTue5Nbg=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
   meta = with lib; {
     homepage = "https://plik.root.gg/";
@@ -18,12 +18,18 @@ let
     maintainers = with maintainers; [ freezeboy ];
     license = licenses.mit;
   };
+
+  postPatch = ''
+    substituteInPlace server/common/version.go \
+      --replace '"0.0.0"' '"${version}"'
+  '';
+
 in
 {
 
   plik = buildGoModule {
     pname = "plik";
-    inherit version meta src vendorSha256;
+    inherit version meta src vendorHash postPatch;
 
     subPackages = [ "client" ];
     postInstall = ''
@@ -33,7 +39,7 @@ in
 
   plikd-unwrapped = buildGoModule {
     pname = "plikd-unwrapped";
-    inherit version src vendorSha256;
+    inherit version src vendorHash postPatch;
 
     subPackages = [ "server" ];
     postFixup = ''

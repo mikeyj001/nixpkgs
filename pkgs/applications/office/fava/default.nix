@@ -1,25 +1,14 @@
-{ lib, python3, fetchpatch }:
+{ lib, python3, fetchPypi }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "fava";
-  version = "1.21";
+  version = "1.26.1";
   format = "pyproject";
 
-  src = python3.pkgs.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-0aFCKEjmXn6yddgNMi9t4rzqHcN7VBLoz3LEg9apmNY=";
+    hash = "sha256-pj4kaQDXahjhN7bu7xxT/ZuoCfPdGyo898482S5gnlE=";
   };
-
-  patches = [
-    (fetchpatch {
-      # Update werkzeug compatibility
-      url = "https://github.com/beancount/fava/commit/5a99417a42e1d739b1e57fae2d01ff1d146dcbc2.patch";
-      hash = "sha256-Y6IcxZAcFJEYgT8/xBIABdkP+pUdQX1EgSS5uNdSJUE=";
-      excludes = [
-        ".pre-commit-config.yaml"
-      ];
-    })
-  ];
 
   nativeBuildInputs = with python3.pkgs; [ setuptools-scm ];
 
@@ -29,8 +18,8 @@ python3.pkgs.buildPythonApplication rec {
     cheroot
     click
     flask
-    flaskbabel
-    jaraco_functools
+    flask-babel
+    jaraco-functools
     jinja2
     markdown2
     ply
@@ -38,7 +27,7 @@ python3.pkgs.buildPythonApplication rec {
     werkzeug
   ];
 
-  checkInputs = with python3.pkgs; [
+  nativeCheckInputs = with python3.pkgs; [
     pytestCheckHook
   ];
 

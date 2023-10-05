@@ -9,7 +9,7 @@
 
 buildPythonPackage rec {
   pname = "pycfmodel";
-  version = "0.20.0";
+  version = "0.20.3";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -18,14 +18,14 @@ buildPythonPackage rec {
     owner = "Skyscanner";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-c6RbglmG/A1fVOLmJLRsyMy9EgEIzpXnIe9Co/OLMSg=";
+    hash = "sha256-dHgd6vnmlg+VXMp7QUZoT2aic1X05lJGm8hDrowALvk=";
   };
 
   propagatedBuildInputs = [
     pydantic
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     httpx
     pytestCheckHook
   ];

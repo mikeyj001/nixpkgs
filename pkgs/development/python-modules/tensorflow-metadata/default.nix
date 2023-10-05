@@ -8,18 +8,23 @@
 
 buildPythonPackage rec {
   pname = "tensorflow-metadata";
-  version = "1.8.0";
+  version = "1.14.0";
 
   src = fetchFromGitHub {
     owner = "tensorflow";
     repo = "metadata";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-IaLr6XYEy1EcyWi5GWzDFa7TeVZ59v8Wj5qkNdVbOqw=";
+    hash = "sha256-ZfX25CaV+tZVdas+n7O6Gqv1GxOP1iwippIXxfhcOfg=";
   };
 
   patches = [
     ./build.patch
   ];
+
+  postPatch = ''
+    substituteInPlace setup.py \
+      --replace 'protobuf>=3.13,<4' 'protobuf>=3.13'
+  '';
 
   # Default build pulls in Bazel + extra deps, given the actual build
   # is literally three lines (see below) - replace it with custom build.

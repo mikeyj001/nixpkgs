@@ -1,4 +1,5 @@
 { stdenv
+, fetchpatch
 , bashInteractive
 , diffPlugins
 , glibcLocales
@@ -6,6 +7,7 @@
 , gst_all_1
 , lib
 , python3Packages
+, sphinxHook
 , runtimeShell
 , writeScript
 
@@ -21,36 +23,43 @@
 
 , src
 , version
+, extraPatches ? [ ]
 , pluginOverrides ? { }
 , disableAllPlugins ? false
+
+  # tests
+, runCommand
+, beets
 }@inputs:
 let
   inherit (lib) attrNames attrValues concatMap;
 
-  builtinPlugins = import ./builtin-plugins.nix inputs;
-
-  mkPlugin = { enable ? !disableAllPlugins, propagatedBuildInputs ? [ ], testPaths ? [ ], wrapperBins ? [ ] }: {
-    inherit enable propagatedBuildInputs testPaths wrapperBins;
+  mkPlugin = { enable ? !disableAllPlugins, builtin ? false, propagatedBuildInputs ? [ ], testPaths ? [ ], wrapperBins ? [ ] }: {
+    inherit enable builtin propagatedBuildInputs testPaths wrapperBins;
   };
 
-  allPlugins = lib.mapAttrs (_: mkPlugin) (lib.recursiveUpdate builtinPlugins pluginOverrides);
+  basePlugins = lib.mapAttrs (_: a: { builtin = true; } // a) (import ./builtin-plugins.nix inputs);
+  allPlugins = lib.mapAttrs (_: mkPlugin) (lib.recursiveUpdate basePlugins pluginOverrides);
+  builtinPlugins = lib.filterAttrs (_: p: p.builtin) allPlugins;
   enabledPlugins = lib.filterAttrs (_: p: p.enable) allPlugins;
   disabledPlugins = lib.filterAttrs (_: p: !p.enable) allPlugins;
 
   pluginWrapperBins = concatMap (p: p.wrapperBins) (attrValues enabledPlugins);
 in
-python3Packages.buildPythonApplication rec {
+python3Packages.buildPythonApplication {
   pname = "beets";
   inherit src version;
 
-  patches = [
-    # Bash completion fix for Nix
-    ./patches/bash-completion-always-print.patch
-  ];
+  patches = extraPatches;
+
+  postPatch = ''
+    # https://github.com/beetbox/beets/pull/4868
+    substituteInPlace beets/util/artresizer.py \
+      --replace "Image.ANTIALIAS" "Image.Resampling.LANCZOS"
+  '';
 
   propagatedBuildInputs = with python3Packages; [
     confuse
-    gobject-introspection
     gst-python
     jellyfish
     mediafile
@@ -61,7 +70,13 @@ python3Packages.buildPythonApplication rec {
     pyyaml
     reflink
     unidecode
+    typing-extensions
   ] ++ (concatMap (p: p.propagatedBuildInputs) (attrValues enabledPlugins));
+
+  nativeBuildInputs = [
+    gobject-introspection
+    sphinxHook
+  ];
 
   buildInputs = [
   ] ++ (with gst_all_1; [
@@ -69,6 +84,9 @@ python3Packages.buildPythonApplication rec {
     gst-plugins-good
     gst-plugins-ugly
   ]);
+
+  outputs = [ "out" "doc" "man" ];
+  sphinxBuilders = [ "html" "man" ];
 
   postInstall = ''
     mkdir -p $out/share/zsh/site-functions
@@ -99,7 +117,7 @@ python3Packages.buildPythonApplication rec {
     "--prefix PATH : ${lib.makeBinPath pluginWrapperBins}"
   ];
 
-  checkInputs = with python3Packages; [
+  nativeCheckInputs = with python3Packages; [
     pytest
     mock
     rarfile
@@ -117,7 +135,7 @@ python3Packages.buildPythonApplication rec {
       \( -name '*.py' -o -path 'beetsplug/*/__init__.py' \) -print \
       | sed -n -re 's|^beetsplug/([^/.]+).*|\1|p' \
       | sort -u > plugins_available
-    ${diffPlugins (attrNames allPlugins) "plugins_available"}
+    ${diffPlugins (attrNames builtinPlugins) "plugins_available"}
 
     export BEETS_TEST_SHELL="${bashInteractive}/bin/bash --norc"
     export HOME="$(mktemp -d)"
@@ -137,11 +155,32 @@ python3Packages.buildPythonApplication rec {
     runHook postCheck
   '';
 
+
+  passthru.plugins = allPlugins;
+
+  passthru.tests.gstreamer = runCommand "beets-gstreamer-test" {
+    meta.timeout = 60;
+  }
+  ''
+  set -euo pipefail
+  export HOME=$(mktemp -d)
+  mkdir $out
+
+  cat << EOF > $out/config.yaml
+replaygain:
+  backend: gstreamer
+EOF
+
+  echo $out/config.yaml
+  ${beets}/bin/beet -c $out/config.yaml > /dev/null
+  '';
+
   meta = with lib; {
     description = "Music tagger and library organizer";
     homepage = "https://beets.io";
     license = licenses.mit;
     maintainers = with maintainers; [ aszlig doronbehar lovesegfault pjones ];
     platforms = platforms.linux;
+    mainProgram = "beet";
   };
 }

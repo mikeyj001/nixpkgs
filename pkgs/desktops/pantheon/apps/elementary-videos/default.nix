@@ -6,42 +6,34 @@
 , meson
 , ninja
 , vala
-, python3
-, desktop-file-utils
 , gtk3
 , granite
 , libgee
 , libhandy
-, clutter-gst
-, clutter-gtk
 , gst_all_1
 , wrapGAppsHook
 }:
 
 stdenv.mkDerivation rec {
   pname = "elementary-videos";
-  version = "2.8.3";
+  version = "3.0.0";
 
   src = fetchFromGitHub {
     owner = "elementary";
     repo = "videos";
     rev = version;
-    sha256 = "sha256-3V8iDy68ngdFTJxAGimuGi4vPru32pHYevThA0RwNpE=";
+    sha256 = "sha256-O98478E3NlY2NYqjyy8mcXZ3lG+wIV+VrPzdzOp44yA=";
   };
 
   nativeBuildInputs = [
-    desktop-file-utils
     meson
     ninja
     pkg-config
-    python3
     vala
     wrapGAppsHook
   ];
 
   buildInputs = [
-    clutter-gst
-    clutter-gtk
     granite
     gtk3
     libgee
@@ -50,20 +42,14 @@ stdenv.mkDerivation rec {
     gst-libav
     gst-plugins-bad
     gst-plugins-base
-    gst-plugins-good
+    # https://github.com/elementary/videos/issues/356
+    (gst-plugins-good.override { gtkSupport = true; })
     gst-plugins-ugly
     gstreamer
   ]);
 
-  postPatch = ''
-    chmod +x meson/post_install.py
-    patchShebangs meson/post_install.py
-  '';
-
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = "pantheon.${pname}";
-    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {

@@ -3,82 +3,79 @@
 , groff
 , less
 , fetchFromGitHub
+, nix-update-script
+, testers
+, awscli2
 }:
+
 let
-  py = python3.override {
-    packageOverrides = self: super: {
-      awscrt = super.awscrt.overridePythonAttrs (oldAttrs: rec {
-        version = "0.13.5";
-        src = self.fetchPypi {
-          inherit (oldAttrs) pname;
-          inherit version;
-          sha256 = "sha256-dUNljMKsbl6eByhEYivWgRJczTBw3N1RVl8r3e898mg=";
+  py = python3 // {
+    pkgs = python3.pkgs.overrideScope (final: prev: {
+      ruamel-yaml = prev.ruamel-yaml.overridePythonAttrs (prev: {
+        src = prev.src.override {
+          version = "0.17.21";
+          hash = "sha256-i3zml6LyEnUqNcGsQURx3BbEJMlXO+SSa1b/P10jt68=";
         };
       });
-      jmespath = super.jmespath.overridePythonAttrs (oldAttrs: rec {
-        version = "0.10.0";
-        src = self.fetchPypi {
-          inherit (oldAttrs) pname;
-          inherit version;
-          sha256 = "sha256-uF0FZ7hmYUmpMXJxLmiSBzQzPAzn6Jt4s+mH9x5e1Pk=";
-        };
-      });
-    };
+    });
   };
 
 in
 with py.pkgs; buildPythonApplication rec {
   pname = "awscli2";
-  version = "2.7.3"; # N.B: if you change this, check if overrides are still up-to-date
+  version = "2.13.23"; # N.B: if you change this, check if overrides are still up-to-date
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = "aws-cli";
-    rev = version;
-    sha256 = "sha256-CM20zBuby1X+XOiphDDtWHUB08Mw7IYf0aZUWIvEAqI=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-KFj+Z4Di14umlgzSg7Ip4jg7I6jP5fHTGG7c6+kXbRo=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace 'cryptography>=3.3.2,<40.0.2' 'cryptography>=3.3.2' \
+      --replace 'flit_core>=3.7.1,<3.8.1' 'flit_core>=3.7.1' \
+      --replace 'awscrt>=0.16.4,<=0.16.16' 'awscrt>=0.16.4'
+
+    substituteInPlace requirements-base.txt \
+      --replace "wheel==0.38.4" "wheel>=0.38.4" \
+      --replace "flit_core==3.8.0" "flit_core>=3.8.0"
+
+    # Upstream needs pip to build and install dependencies and validates this
+    # with a configure script, but we don't as we provide all of the packages
+    # through PYTHONPATH
+    sed -i '/pip>=/d' requirements/bootstrap.txt
+  '';
+
+  nativeBuildInputs = [
+    flit-core
+  ];
 
   propagatedBuildInputs = [
     awscrt
     bcdoc
+    botocore
     colorama
     cryptography
     distro
     docutils
     groff
+    jmespath
     less
     prompt-toolkit
-    pyyaml
-    rsa
-    ruamel-yaml
-    wcwidth
     python-dateutil
-    jmespath
+    pyyaml
+    ruamel-yaml
     urllib3
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     jsonschema
     mock
     pytestCheckHook
-    pytest-xdist
   ];
-
-  postPatch = ''
-    substituteInPlace setup.cfg \
-      --replace "colorama>=0.2.5,<0.4.4" "colorama" \
-      --replace "docutils>=0.10,<0.16" "docutils" \
-      --replace "ruamel.yaml>=0.15.0,<0.16.0" "ruamel.yaml" \
-      --replace "wcwidth<0.2.0" "wcwidth" \
-      --replace "distro>=1.5.0,<1.6.0" "distro"
-  '';
-
-  checkPhase = ''
-    export PATH=$PATH:$out/bin
-
-    # https://github.com/NixOS/nixpkgs/issues/16144#issuecomment-225422439
-    export HOME=$TMP
-  '';
 
   postInstall = ''
     mkdir -p $out/${python3.sitePackages}/awscli/data
@@ -93,13 +90,47 @@ with py.pkgs; buildPythonApplication rec {
     rm $out/bin/aws.cmd
   '';
 
-  passthru.python = py; # for aws_shell
+  preCheck = ''
+    export PATH=$PATH:$out/bin
+    export HOME=$(mktemp -d)
+  '';
+
+  pytestFlagsArray = [
+    "-Wignore::DeprecationWarning"
+  ];
+
+  disabledTestPaths = [
+    # Integration tests require networking
+    "tests/integration"
+
+    # Disable slow tests (only run unit tests)
+    "tests/backends"
+    "tests/functional"
+  ];
+
+  pythonImportsCheck = [
+    "awscli"
+  ];
+
+  passthru = {
+    python = py; # for aws_shell
+    updateScript = nix-update-script {
+      # Excludes 1.x versions from the Github tags list
+      extraArgs = [ "--version-regex" "^(2\.(.*))" ];
+    };
+    tests.version = testers.testVersion {
+      package = awscli2;
+      command = "aws --version";
+      inherit version;
+    };
+  };
 
   meta = with lib; {
+    description = "Unified tool to manage your AWS services";
     homepage = "https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html";
     changelog = "https://github.com/aws/aws-cli/blob/${version}/CHANGELOG.rst";
-    description = "Unified tool to manage your AWS services";
     license = licenses.asl20;
-    maintainers = with maintainers; [ bhipple davegallant bryanasdev000 ];
+    maintainers = with maintainers; [ bhipple davegallant bryanasdev000 devusb anthonyroussel ];
+    mainProgram = "aws";
   };
 }

@@ -1,24 +1,34 @@
-{ lib, stdenv
-, python3Packages
+{ lib
+, python3
 , fetchFromGitHub
 , systemd
 , xrandr
-, installShellFiles }:
+, installShellFiles
+, desktop-file-utils
+}:
 
-stdenv.mkDerivation rec {
+python3.pkgs.buildPythonApplication rec {
   pname = "autorandr";
-  version = "1.12.1";
+  version = "1.14";
+  format = "other";
 
-  buildInputs = [ python3Packages.python ];
+  src = fetchFromGitHub {
+    owner = "phillipberndt";
+    repo = "autorandr";
+    rev = "refs/tags/${version}";
+    hash = "sha256-Ru3nQF0DB98rKSew6QtxAZQEB/9nVlIelNX3M7bNYHk=";
+  };
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [ installShellFiles desktop-file-utils ];
+  propagatedBuildInputs = with python3.pkgs; [ packaging ];
 
-  # no wrapper, as autorandr --batch does os.environ.clear()
   buildPhase = ''
     substituteInPlace autorandr.py \
       --replace 'os.popen("xrandr' 'os.popen("${xrandr}/bin/xrandr' \
       --replace '["xrandr"]' '["${xrandr}/bin/xrandr"]'
   '';
+
+  patches = [ ./0001-don-t-use-sys.executable.patch ];
 
   outputs = [ "out" "man" ];
 
@@ -31,7 +41,10 @@ stdenv.mkDerivation rec {
     # see https://github.com/phillipberndt/autorandr/issues/197
     installShellCompletion --cmd autorandr \
         --bash contrib/bash_completion/autorandr \
-        --zsh contrib/zsh_completion/_autorandr
+        --zsh contrib/zsh_completion/_autorandr \
+        --fish contrib/fish_copletion/autorandr.fish
+    # In the line above there's a typo that needs to be fixed in the next
+    # release
 
     make install TARGETS='autostart_config' PREFIX=$out DESTDIR=$out
 
@@ -52,13 +65,6 @@ stdenv.mkDerivation rec {
 
     runHook postInstall
   '';
-
-  src = fetchFromGitHub {
-    owner = "phillipberndt";
-    repo = "autorandr";
-    rev = version;
-    sha256 = "sha256-7SNnbgV6PeseBD6wdilEIOfOL2KVDpnlkSn9SBgRhhM=";
-  };
 
   meta = with lib; {
     homepage = "https://github.com/phillipberndt/autorandr/";

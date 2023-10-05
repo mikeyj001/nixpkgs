@@ -3,16 +3,11 @@
 , buildPythonPackage
 , fetchFromGitHub
 , openmp
-, pytest-runner
 , ply
-, networkx
-, decorator
 , gast
-, six
 , numpy
 , beniget
-, pytestCheckHook
-, scipy
+, xsimd
 , isPy3k
 , substituteAll
 }:
@@ -22,13 +17,13 @@ let
 
 in buildPythonPackage rec {
   pname = "pythran";
-  version = "0.9.12";
+  version = "0.13.1";
 
   src = fetchFromGitHub {
     owner = "serge-sans-paille";
     repo = "pythran";
     rev = version;
-    sha256 = "sha256-lQbVq4K/Q8RzlFhE+l3HPCmUGmauXawcKe31kfbUHsI=";
+    hash = "sha256-baDrReJgQXbaKA8KNhHiFjr0X34yb8WK/nUJmiM9EZs=";
   };
 
   patches = [
@@ -39,16 +34,15 @@ in buildPythonPackage rec {
     })
   ];
 
-  nativeBuildInputs = [
-    pytest-runner
-  ];
+  # xsimd: unvendor this header-only C++ lib
+  postPatch = ''
+    rm -r third_party/xsimd
+    ln -s '${lib.getDev xsimd}'/include/xsimd third_party/
+  '';
 
   propagatedBuildInputs = [
     ply
-    networkx
-    decorator
     gast
-    six
     numpy
     beniget
   ];
@@ -62,14 +56,7 @@ in buildPythonPackage rec {
     "pythran.spec"
   ];
 
-  checkInputs = [
-    pytestCheckHook
-    numpy
-    scipy
-  ];
-
-  # Test suite is huge.
-  # Also, in the future scipy will rely on it resulting in a circular test dependency
+  # Test suite is huge and has a circular dependency on scipy.
   doCheck = false;
 
   disabled = !isPy3k;
@@ -79,5 +66,4 @@ in buildPythonPackage rec {
     homepage = "https://github.com/serge-sans-paille/pythran";
     license = lib.licenses.bsd3;
   };
-
 }

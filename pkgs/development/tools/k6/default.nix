@@ -1,24 +1,32 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{ lib, stdenv, buildGoModule, fetchFromGitHub, installShellFiles }:
 
 buildGoModule rec {
   pname = "k6";
-  version = "0.37.0";
+  version = "0.46.0";
 
   src = fetchFromGitHub {
     owner = "grafana";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-5pxOg+pwa2VrEWinDadx2ZFYXiQgochbU4bCkJEezQw=";
+    sha256 = "sha256-4ucnq/FTvdDpzf1RWRY+U5A+BCaaQWMTEaZtmU0JD90=";
   };
 
   subPackages = [ "./" ];
 
-  vendorSha256 = null;
+  vendorHash = null;
 
-  doCheck = true;
+  nativeBuildInputs = [ installShellFiles ];
+
   doInstallCheck = true;
   installCheckPhase = ''
     $out/bin/k6 version | grep ${version} > /dev/null
+  '';
+
+  postInstall = lib.optionalString (stdenv.hostPlatform == stdenv.buildPlatform) ''
+    installShellCompletion --cmd k6 \
+      --bash <($out/bin/k6 completion bash) \
+      --fish <($out/bin/k6 completion fish) \
+      --zsh <($out/bin/k6 completion zsh)
   '';
 
   meta = with lib; {
@@ -26,6 +34,6 @@ buildGoModule rec {
     homepage = "https://k6.io/";
     changelog = "https://github.com/grafana/k6/releases/tag/v${version}";
     license = licenses.agpl3Plus;
-    maintainers = with maintainers; [ offline bryanasdev000 ];
+    maintainers = with maintainers; [ offline bryanasdev000 kashw2 ];
   };
 }

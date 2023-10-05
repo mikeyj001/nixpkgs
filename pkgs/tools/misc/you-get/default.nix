@@ -1,8 +1,15 @@
-{ lib, buildPythonApplication, fetchPypi, installShellFiles }:
+{ lib
+, python3
+, fetchPypi
+, substituteAll
+, ffmpeg
+, installShellFiles
+}:
 
-buildPythonApplication rec {
+python3.pkgs.buildPythonApplication rec {
   pname = "you-get";
-  version = "0.4.1602";
+  version = "0.4.1650";
+  format = "setuptools";
 
   # Tests aren't packaged, but they all hit the real network so
   # probably aren't suitable for a build environment anyway.
@@ -10,8 +17,17 @@ buildPythonApplication rec {
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-RwbAbMS5CA6pO08TuaTb67YM/hLRkceOF7D6iV0XcI8=";
+    sha256 = "sha256-s8lEz3pjzEaMzMiBbc5/wAjC5rW6Uq7+XOIIGBijrUc=";
   };
+
+  patches = [
+    (substituteAll {
+      src = ./ffmpeg-path.patch;
+      ffmpeg = "${lib.getBin ffmpeg}/bin/ffmpeg";
+      ffprobe = "${lib.getBin ffmpeg}/bin/ffmpeg";
+      version = lib.getVersion ffmpeg;
+    })
+  ];
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -21,6 +37,10 @@ buildPythonApplication rec {
       --fish contrib/completion/you-get.fish \
       --bash contrib/completion/you-get-completion.bash
   '';
+
+  pythonImportsCheck = [
+    "you_get"
+  ];
 
   meta = with lib; {
     description = "A tiny command line utility to download media contents from the web";

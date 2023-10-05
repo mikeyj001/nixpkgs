@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "argo-rollouts";
-  version = "1.2.1";
+  version = "1.6.0";
 
   src = fetchFromGitHub {
     owner = "argoproj";
     repo = "argo-rollouts";
     rev = "v${version}";
-    sha256 = "sha256-1oF93+pN9wyCq5R5bTeMN/uzg9DHpc/AkX/d1lB5r1g=";
+    sha256 = "sha256-WJ5vIfQQguwjInS5p+bUYorM90MUAbH8endV/nkgQ00=";
   };
 
-  vendorSha256 = "sha256-URuIeF1ejKdMGxziJbujLctYheiIr/Jfo+gTzppZG9E=";
+  vendorHash = "sha256-vBSS1KMfloK5pvVc8nHE5B8PsVZTS/iA9GyrLaeR6ps=";
 
   # Disable tests since some test fail because of missing test data
   doCheck = false;

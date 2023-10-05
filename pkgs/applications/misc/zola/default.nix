@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch
 , rustPlatform
 , cmake
 , pkg-config
@@ -15,16 +16,24 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "zola";
-  version = "0.15.3";
+  version = "0.17.2";
 
   src = fetchFromGitHub {
     owner = "getzola";
     repo = "zola";
     rev = "v${version}";
-    sha256 = "sha256-LK8twqWaS+SQ3oqvMGE7oP/IJNLvQ45Pu92pkbSKzDs=";
+    hash = "sha256-br7VpxkVMZ/TgwMaFbnVMOw9RemNjur/UYnloMoDzHs=";
   };
 
-  cargoSha256 = "sha256-7W0vjbAWZl/eKBZvUWWWolEOh8aQeKegt823EebcKMQ=";
+  cargoHash = "sha256-AAub8UwAvX3zNX+SM/T9biyNxFTgfqUQG/MUGfwWuno=";
+
+  patches = [
+    (fetchpatch {
+      name = "CVE-2023-40274.patch";
+      url = "https://github.com/getzola/zola/commit/fe1967fb0fe063b1cee1ad48820870ab2ecc0e5b.patch";
+      hash = "sha256-B/SVGhVX5hAbvMhBYO+mU5+xdZXU2JyS4uKmOj+aZuI=";
+    })
+  ];
 
   nativeBuildInputs = [
     cmake
@@ -43,9 +52,9 @@ rustPlatform.buildRustPackage rec {
 
   postInstall = ''
     installShellCompletion --cmd zola \
-      --fish completions/zola.fish \
-      --zsh completions/_zola \
-      --bash completions/zola.bash
+      --bash <($out/bin/zola completion bash) \
+      --fish <($out/bin/zola completion fish) \
+      --zsh <($out/bin/zola completion zsh)
   '';
 
   passthru.tests.version = testers.testVersion { package = zola; };

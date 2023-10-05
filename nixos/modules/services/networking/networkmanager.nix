@@ -5,7 +5,7 @@ with lib;
 let
   cfg = config.networking.networkmanager;
 
-  delegateWireless = config.networking.wireless.enable == true && cfg.unmanaged != [];
+  delegateWireless = config.networking.wireless.enable == true && cfg.unmanaged != [ ];
 
   enableIwd = cfg.wifi.backend == "iwd";
 
@@ -30,17 +30,15 @@ let
   configFile = pkgs.writeText "NetworkManager.conf" (lib.concatStringsSep "\n" [
     (mkSection "main" {
       plugins = "keyfile";
-      dhcp = cfg.dhcp;
-      dns = cfg.dns;
+      inherit (cfg) dhcp dns;
       # If resolvconf is disabled that means that resolv.conf is managed by some other module.
       rc-manager =
         if config.networking.resolvconf.enable then "resolvconf"
         else "unmanaged";
-      firewall-backend = cfg.firewallBackend;
     })
     (mkSection "keyfile" {
       unmanaged-devices =
-        if cfg.unmanaged == [] then null
+        if cfg.unmanaged == [ ] then null
         else lib.concatStringsSep ";" cfg.unmanaged;
     })
     (mkSection "logging" {
@@ -103,33 +101,17 @@ let
   };
 
   macAddressOpt = mkOption {
-    type = types.either types.str (types.enum ["permanent" "preserve" "random" "stable"]);
+    type = types.either types.str (types.enum [ "permanent" "preserve" "random" "stable" ]);
     default = "preserve";
     example = "00:11:22:33:44:55";
-    description = ''
+    description = lib.mdDoc ''
       Set the MAC address of the interface.
-      <variablelist>
-        <varlistentry>
-          <term>"XX:XX:XX:XX:XX:XX"</term>
-          <listitem><para>MAC address of the interface</para></listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>"permanent"</literal></term>
-          <listitem><para>Use the permanent MAC address of the device</para></listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>"preserve"</literal></term>
-          <listitem><para>Don’t change the MAC address of the device upon activation</para></listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>"random"</literal></term>
-          <listitem><para>Generate a randomized value upon each connect</para></listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><literal>"stable"</literal></term>
-          <listitem><para>Generate a stable, hashed MAC address</para></listitem>
-        </varlistentry>
-      </variablelist>
+
+      - `"XX:XX:XX:XX:XX:XX"`: MAC address of the interface
+      - `"permanent"`: Use the permanent MAC address of the device
+      - `"preserve"`: Don’t change the MAC address of the device upon activation
+      - `"random"`: Generate a randomized value upon each connect
+      - `"stable"`: Generate a stable, hashed MAC address
     '';
   };
 
@@ -142,7 +124,8 @@ let
     pkgs.wpa_supplicant
   ];
 
-in {
+in
+{
 
   meta = {
     maintainers = teams.freedesktop.members;
@@ -157,10 +140,10 @@ in {
       enable = mkOption {
         type = types.bool;
         default = false;
-        description = ''
+        description = lib.mdDoc ''
           Whether to use NetworkManager to obtain an IP address and other
           configuration for all network interfaces that are not manually
-          configured. If enabled, a group <literal>networkmanager</literal>
+          configured. If enabled, a group `networkmanager`
           will be created. Add all users that should have permission
           to change network settings to this group.
         '';
@@ -172,18 +155,15 @@ in {
           int
           str
         ]));
-        default = {};
-        description = ''
+        default = { };
+        description = lib.mdDoc ''
           Configuration for the [connection] section of NetworkManager.conf.
           Refer to
-          <link xlink:href="https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html">
+          [
             https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html#id-1.2.3.11
-          </link>
+          ](https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html)
           or
-          <citerefentry>
-            <refentrytitle>NetworkManager.conf</refentrytitle>
-            <manvolnum>5</manvolnum>
-          </citerefentry>
+          {manpage}`NetworkManager.conf(5)`
           for more information.
         '';
       };
@@ -191,36 +171,30 @@ in {
       extraConfig = mkOption {
         type = types.lines;
         default = "";
-        description = ''
+        description = lib.mdDoc ''
           Configuration appended to the generated NetworkManager.conf.
           Refer to
-          <link xlink:href="https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html">
+          [
             https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html
-          </link>
+          ](https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html)
           or
-          <citerefentry>
-            <refentrytitle>NetworkManager.conf</refentrytitle>
-            <manvolnum>5</manvolnum>
-          </citerefentry>
+          {manpage}`NetworkManager.conf(5)`
           for more information.
         '';
       };
 
       unmanaged = mkOption {
         type = types.listOf types.str;
-        default = [];
-        description = ''
+        default = [ ];
+        description = lib.mdDoc ''
           List of interfaces that will not be managed by NetworkManager.
           Interface name can be specified here, but if you need more fidelity,
           refer to
-          <link xlink:href="https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html#device-spec">
+          [
             https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html#device-spec
-          </link>
+          ](https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html#device-spec)
           or the "Device List Format" Appendix of
-          <citerefentry>
-            <refentrytitle>NetworkManager.conf</refentrytitle>
-            <manvolnum>5</manvolnum>
-          </citerefentry>.
+          {manpage}`NetworkManager.conf(5)`.
         '';
       };
 
@@ -243,7 +217,7 @@ in {
           in
           types.listOf networkManagerPluginPackage;
         default = [ ];
-        description = ''
+        description = lib.mdDoc ''
           List of NetworkManager plug-ins to enable.
           Some plug-ins are enabled by the NetworkManager module by default.
         '';
@@ -252,32 +226,23 @@ in {
       dhcp = mkOption {
         type = types.enum [ "dhcpcd" "internal" ];
         default = "internal";
-        description = ''
+        description = lib.mdDoc ''
           Which program (or internal library) should be used for DHCP.
-        '';
-      };
-
-      firewallBackend = mkOption {
-        type = types.enum [ "iptables" "nftables" "none" ];
-        default = "iptables";
-        description = ''
-          Which firewall backend should be used for configuring masquerading with shared mode.
-          If set to none, NetworkManager doesn't manage the configuration at all.
         '';
       };
 
       logLevel = mkOption {
         type = types.enum [ "OFF" "ERR" "WARN" "INFO" "DEBUG" "TRACE" ];
         default = "WARN";
-        description = ''
+        description = lib.mdDoc ''
           Set the default logging verbosity level.
         '';
       };
 
       appendNameservers = mkOption {
         type = types.listOf types.str;
-        default = [];
-        description = ''
+        default = [ ];
+        description = lib.mdDoc ''
           A list of name servers that should be appended
           to the ones configured in NetworkManager or received by DHCP.
         '';
@@ -285,8 +250,8 @@ in {
 
       insertNameservers = mkOption {
         type = types.listOf types.str;
-        default = [];
-        description = ''
+        default = [ ];
+        description = lib.mdDoc ''
           A list of name servers that should be inserted before
           the ones configured in NetworkManager or received by DHCP.
         '';
@@ -300,16 +265,16 @@ in {
         backend = mkOption {
           type = types.enum [ "wpa_supplicant" "iwd" ];
           default = "wpa_supplicant";
-          description = ''
+          description = lib.mdDoc ''
             Specify the Wi-Fi backend used for the device.
-            Currently supported are <option>wpa_supplicant</option> or <option>iwd</option> (experimental).
+            Currently supported are {option}`wpa_supplicant` or {option}`iwd` (experimental).
           '';
         };
 
         powersave = mkOption {
           type = types.nullOr types.bool;
           default = null;
-          description = ''
+          description = lib.mdDoc ''
             Whether to enable Wi-Fi power saving.
           '';
         };
@@ -317,7 +282,7 @@ in {
         scanRandMacAddress = mkOption {
           type = types.bool;
           default = true;
-          description = ''
+          description = lib.mdDoc ''
             Whether to enable MAC address randomization of a Wi-Fi device
             during scanning.
           '';
@@ -327,19 +292,15 @@ in {
       dns = mkOption {
         type = types.enum [ "default" "dnsmasq" "unbound" "systemd-resolved" "none" ];
         default = "default";
-        description = ''
-          Set the DNS (<literal>resolv.conf</literal>) processing mode.
-          </para>
-          <para>
+        description = lib.mdDoc ''
+          Set the DNS (`resolv.conf`) processing mode.
+
           A description of these modes can be found in the main section of
-          <link xlink:href="https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html">
+          [
             https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html
-          </link>
+          ](https://developer.gnome.org/NetworkManager/stable/NetworkManager.conf.html)
           or in
-          <citerefentry>
-            <refentrytitle>NetworkManager.conf</refentrytitle>
-            <manvolnum>5</manvolnum>
-          </citerefentry>.
+          {manpage}`NetworkManager.conf(5)`.
         '';
       };
 
@@ -348,7 +309,7 @@ in {
           options = {
             source = mkOption {
               type = types.path;
-              description = ''
+              description = lib.mdDoc ''
                 Path to the hook script.
               '';
             };
@@ -356,56 +317,66 @@ in {
             type = mkOption {
               type = types.enum (attrNames dispatcherTypesSubdirMap);
               default = "basic";
-              description = ''
+              description = lib.mdDoc ''
                 Dispatcher hook type. Look up the hooks described at
-                <link xlink:href="https://developer.gnome.org/NetworkManager/stable/NetworkManager.html">https://developer.gnome.org/NetworkManager/stable/NetworkManager.html</link>
+                [https://developer.gnome.org/NetworkManager/stable/NetworkManager.html](https://developer.gnome.org/NetworkManager/stable/NetworkManager.html)
                 and choose the type depending on the output folder.
                 You should then filter the event type (e.g., "up"/"down") from within your script.
               '';
             };
           };
         });
-        default = [];
+        default = [ ];
         example = literalExpression ''
-        [ {
-              source = pkgs.writeText "upHook" '''
+          [ {
+            source = pkgs.writeText "upHook" '''
+              if [ "$2" != "up" ]; then
+                logger "exit: event $2 != up"
+                exit
+              fi
 
-                if [ "$2" != "up" ]; then
-                    logger "exit: event $2 != up"
-                    exit
-                fi
-
-                # coreutils and iproute are in PATH too
-                logger "Device $DEVICE_IFACE coming up"
+              # coreutils and iproute are in PATH too
+              logger "Device $DEVICE_IFACE coming up"
             ''';
             type = "basic";
-        } ]'';
-        description = ''
-          A list of scripts which will be executed in response to  network  events.
+          } ]
+        '';
+        description = lib.mdDoc ''
+          A list of scripts which will be executed in response to network events.
         '';
       };
 
       enableStrongSwan = mkOption {
         type = types.bool;
         default = false;
-        description = ''
+        description = lib.mdDoc ''
           Enable the StrongSwan plugin.
-          </para><para>
+
           If you enable this option the
-          <literal>networkmanager_strongswan</literal> plugin will be added to
-          the <option>networking.networkmanager.plugins</option> option
-          so you don't need to to that yourself.
+          `networkmanager_strongswan` plugin will be added to
+          the {option}`networking.networkmanager.plugins` option
+          so you don't need to do that yourself.
         '';
       };
 
-      enableFccUnlock = mkOption {
-        type = types.bool;
-        default = false;
-        description = ''
-          Enable FCC unlock procedures. Since release 1.18.4, the ModemManager daemon no longer
-          automatically performs the FCC unlock procedure by default. See
-          <link xlink:href="https://modemmanager.org/docs/modemmanager/fcc-unlock/">the docs</link>
-          for more details.
+      fccUnlockScripts = mkOption {
+        type = types.listOf (types.submodule {
+          options = {
+            id = mkOption {
+              type = types.str;
+              description = lib.mdDoc "vid:pid of either the PCI or USB vendor and product ID";
+            };
+            path = mkOption {
+              type = types.path;
+              description = lib.mdDoc "Path to the unlock script";
+            };
+          };
+        });
+        default = [ ];
+        example = literalExpression ''[{ name = "03f0:4e1d"; script = "''${pkgs.modemmanager}/share/ModemManager/fcc-unlock.available.d/03f0:4e1d"; }]'';
+        description = lib.mdDoc ''
+          List of FCC unlock scripts to enable on the system, behaving as described in
+          https://modemmanager.org/docs/modemmanager/fcc-unlock/#integration-with-third-party-fcc-unlock-tools.
         '';
       };
     };
@@ -416,13 +387,23 @@ in {
       [ "networking" "networkmanager" "packages" ]
       [ "networking" "networkmanager" "plugins" ])
     (mkRenamedOptionModule [ "networking" "networkmanager" "useDnsmasq" ] [ "networking" "networkmanager" "dns" ])
-    (mkRemovedOptionModule ["networking" "networkmanager" "dynamicHosts"] ''
+    (mkRemovedOptionModule [ "networking" "networkmanager" "enableFccUnlock" ] ''
+      This option was removed, because using bundled FCC unlock scripts is risky,
+      might conflict with vendor-provided unlock scripts, and should
+      be a conscious decision on a per-device basis.
+      Instead it's recommended to use the
+      `networking.networkmanager.fccUnlockScripts` option.
+    '')
+    (mkRemovedOptionModule [ "networking" "networkmanager" "dynamicHosts" ] ''
       This option was removed because allowing (multiple) regular users to
       override host entries affecting the whole system opens up a huge attack
       vector. There seem to be very rare cases where this might be useful.
       Consider setting system-wide host entries using networking.hosts, provide
       them via the DNS server in your network, or use environment.etc
       to add a file into /etc/NetworkManager/dnsmasq.d reconfiguring hostsdir.
+    '')
+    (mkRemovedOptionModule [ "networking" "networkmanager" "firewallBackend" ] ''
+      This option was removed as NixOS is now using iptables-nftables-compat even when using iptables, therefore Networkmanager now uses the nftables backend unconditionally.
     '')
   ];
 
@@ -432,7 +413,8 @@ in {
   config = mkIf cfg.enable {
 
     assertions = [
-      { assertion = config.networking.wireless.enable == true -> cfg.unmanaged != [];
+      {
+        assertion = config.networking.wireless.enable == true -> cfg.unmanaged != [ ];
         message = ''
           You can not use networking.networkmanager with networking.wireless.
           Except if you mark some interfaces as <literal>unmanaged</literal> by NetworkManager.
@@ -443,25 +425,29 @@ in {
     hardware.wirelessRegulatoryDatabase = true;
 
     environment.etc = {
-        "NetworkManager/NetworkManager.conf".source = configFile;
-      }
-      // builtins.listToAttrs (map (pkg: nameValuePair "NetworkManager/${pkg.networkManagerPlugin}" {
+      "NetworkManager/NetworkManager.conf".source = configFile;
+    }
+    // builtins.listToAttrs (map
+      (pkg: nameValuePair "NetworkManager/${pkg.networkManagerPlugin}" {
         source = "${pkg}/lib/NetworkManager/${pkg.networkManagerPlugin}";
-      }) cfg.plugins)
-      // optionalAttrs cfg.enableFccUnlock
-         {
-           "ModemManager/fcc-unlock.d".source =
-             "${pkgs.modemmanager}/share/ModemManager/fcc-unlock.available.d/*";
-         }
-      // optionalAttrs (cfg.appendNameservers != [] || cfg.insertNameservers != [])
-         {
-           "NetworkManager/dispatcher.d/02overridedns".source = overrideNameserversScript;
-         }
-      // listToAttrs (lib.imap1 (i: s:
-         {
-            name = "NetworkManager/dispatcher.d/${dispatcherTypesSubdirMap.${s.type}}03userscript${lib.fixedWidthNumber 4 i}";
-            value = { mode = "0544"; inherit (s) source; };
-         }) cfg.dispatcherScripts);
+      })
+      cfg.plugins)
+    // builtins.listToAttrs (map
+      (e: nameValuePair "ModemManager/fcc-unlock.d/${e.id}" {
+        source = e.path;
+      })
+      cfg.fccUnlockScripts)
+    // optionalAttrs (cfg.appendNameservers != [ ] || cfg.insertNameservers != [ ])
+      {
+        "NetworkManager/dispatcher.d/02overridedns".source = overrideNameserversScript;
+      }
+    // listToAttrs (lib.imap1
+      (i: s:
+        {
+          name = "NetworkManager/dispatcher.d/${dispatcherTypesSubdirMap.${s.type}}03userscript${lib.fixedWidthNumber 4 i}";
+          value = { mode = "0544"; inherit (s) source; };
+        })
+      cfg.dispatcherScripts);
 
     environment.systemPackages = packages;
 
@@ -490,6 +476,8 @@ in {
       "d /var/lib/NetworkManager-fortisslvpn 0700 root root -"
 
       "d /var/lib/misc 0755 root root -" # for dnsmasq.leases
+      # ppp isn't able to mkdir that directory at runtime
+      "d /run/pppd/lock 0700 root root -"
     ];
 
     systemd.services.NetworkManager = {

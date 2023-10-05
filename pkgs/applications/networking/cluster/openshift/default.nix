@@ -1,55 +1,53 @@
 { lib
 , buildGoModule
 , fetchFromGitHub
-, libkrb5
-, git
+, gpgme
 , installShellFiles
+, pkg-config
 , testers
 , openshift
 }:
-
 buildGoModule rec {
   pname = "openshift";
-  version = "4.10.0";
-  gitCommit = "346b183";
+  version = "4.13.0";
+  gitCommit = "e561d37";
 
   src = fetchFromGitHub {
     owner = "openshift";
     repo = "oc";
-    rev = "release-4.10";
-    sha256 = "Pdq3OwT5P7vvB70X+GVglT9CdJbhkm35nvEGurO1HPc=";
+    rev = "e561d37285c8bde273ce00d086bea599a9cdd3be";
+    hash = "sha256-/ar96N+MSy0DPdza3UWiyolg1EZPBR6LCku4GV+HppM=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
-  buildInputs = [ libkrb5 ];
+  buildInputs = [ gpgme ];
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [ installShellFiles pkg-config ];
 
-  patchPhase = ''
-    patchShebangs ./hack
-  '';
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/openshift/oc/pkg/version.commitFromGit=${gitCommit}"
+    "-X github.com/openshift/oc/pkg/version.versionFromGit=v${version}"
+  ];
 
-  buildPhase = ''
-    # Openshift build require this variables to be set
-    # unless there is a .git folder which is not the case with fetchFromGitHub
-    export SOURCE_GIT_COMMIT=${gitCommit}
-    export SOURCE_GIT_TAG=v${version}
-    export SOURCE_GIT_TREE_STATE=clean
+  doCheck = false;
 
-    make all
-  '';
-
-  installPhase = ''
-    mkdir -p $out/bin
-    cp oc $out/bin
-
+  postInstall = ''
+    # Install man pages.
     mkdir -p man
-    ./genman man oc
+    $out/bin/genman man oc
     installManPage man/*.1
 
-    installShellCompletion --bash contrib/completions/bash/*
-    installShellCompletion --zsh contrib/completions/zsh/*
+    # Remove unwanted tooling.
+    rm $out/bin/clicheck $out/bin/gendocs $out/bin/genman
+
+    # Install shell completions.
+    installShellCompletion --cmd oc \
+      --bash <($out/bin/oc completion bash) \
+      --fish <($out/bin/oc completion fish) \
+      --zsh <($out/bin/oc completion zsh)
   '';
 
   passthru.tests.version = testers.testVersion {

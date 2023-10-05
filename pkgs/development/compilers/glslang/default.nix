@@ -9,13 +9,13 @@
 }:
 stdenv.mkDerivation rec {
   pname = "glslang";
-  version = "1.3.211.0";
+  version = "12.3.1";
 
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "glslang";
-    rev = "sdk-${version}";
-    sha256 = "sha256-YLn/Mxuk6mXPGtBBgfwky5Nl1TCAW6i2g+AZLzqVz+A=";
+    rev = version;
+    hash = "sha256-NP5ph598YSPbpzJJUR2r+EkqFmuItxgvOSDgDaN+Swg=";
   };
 
   # These get set at all-packages, keep onto them for child drvs
@@ -34,6 +34,15 @@ stdenv.mkDerivation rec {
   # This is a dirty fix for lib/cmake/SPIRVTargets.cmake:51 which includes this directory
   postInstall = ''
     mkdir $out/include/External
+  '';
+
+  # Fix the paths in .pc, even though it's unclear if these .pc are really useful.
+  postFixup = ''
+    substituteInPlace $out/lib/pkgconfig/*.pc \
+      --replace '=''${prefix}//' '=/'
+
+    # add a symlink for backwards compatibility
+    ln -s $out/bin/glslang $out/bin/glslangValidator
   '';
 
   meta = with lib; {

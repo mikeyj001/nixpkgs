@@ -1,24 +1,61 @@
-{ stdenv, pkgs, makeWrapper, runCommand, lib, writeShellScript
-, fetchFromGitHub, bundlerEnv, callPackage
+{ stdenv
+, pkgs
+, makeWrapper
+, runCommand
+, lib
+, writeShellScript
+, fetchFromGitHub
+, bundlerEnv
+, callPackage
 
-, ruby, replace, gzip, gnutar, git, cacert, util-linux, gawk, nettools
-, imagemagick, optipng, pngquant, libjpeg, jpegoptim, gifsicle, jhead
-, oxipng, libpsl, redis, postgresql, which, brotli, procps, rsync, icu
-, fetchYarnDeps, yarn, fixup_yarn_lock, nodePackages, nodejs-14_x
-, nodejs-16_x
+, ruby_3_2
+, replace
+, gzip
+, gnutar
+, git
+, cacert
+, util-linux
+, gawk
+, nettools
+, imagemagick
+, optipng
+, pngquant
+, libjpeg
+, jpegoptim
+, gifsicle
+, jhead
+, oxipng
+, libpsl
+, redis
+, postgresql
+, which
+, brotli
+, procps
+, rsync
+, icu
+, fetchYarnDeps
+, yarn
+, fixup_yarn_lock
+, nodePackages
+, nodejs_18
+, jq
+, moreutils
+, terser
 
 , plugins ? []
 }@args:
 
 let
-  version = "2.9.0.beta4";
+  version = "3.1.0";
 
   src = fetchFromGitHub {
     owner = "discourse";
     repo = "discourse";
     rev = "v${version}";
-    sha256 = "sha256-DpUEBGLgjcroVzdDG8/nGvC+ym19ZkGa7qvHKZZ1mH4=";
+    sha256 = "sha256-Iv7VSnK8nZDpmIwIRPedSWlftABKuMOQ4MXDGpjuWrY=";
   };
+
+  ruby = ruby_3_2;
 
   runtimeDeps = [
     # For backups, themes and assets
@@ -125,9 +162,9 @@ let
                 cd ../..
 
                 mkdir -p vendor/v8/${stdenv.hostPlatform.system}/libv8/obj/
-                ln -s "${nodejs-16_x.libv8}/lib/libv8.a" vendor/v8/${stdenv.hostPlatform.system}/libv8/obj/libv8_monolith.a
+                ln -s "${nodejs_18.libv8}/lib/libv8.a" vendor/v8/${stdenv.hostPlatform.system}/libv8/obj/libv8_monolith.a
 
-                ln -s ${nodejs-16_x.libv8}/include vendor/v8/include
+                ln -s ${nodejs_18.libv8}/include vendor/v8/include
 
                 mkdir -p ext/libv8-node
                 echo '--- !ruby/object:Libv8::Node::Location::Vendor {}' >ext/libv8-node/.location.yml
@@ -159,23 +196,28 @@ let
     ];
   };
 
-  yarnOfflineCache = fetchYarnDeps {
-    yarnLock = src + "/app/assets/javascripts/yarn.lock";
-    sha256 = "1l4nfc14cm42lkilsawfhdcnv1ln7m7bpan9a804abv4hwrs3f52";
-  };
-
   assets = stdenv.mkDerivation {
     pname = "discourse-assets";
     inherit version src;
+
+    yarnOfflineCache = fetchYarnDeps {
+      yarnLock = src + "/app/assets/javascripts/yarn.lock";
+      sha256 = "0sclrv3303dgg3r08dwhd1yvi3pvlnvnikn300vjsh6c71fnzhnj";
+    };
 
     nativeBuildInputs = runtimeDeps ++ [
       postgresql
       redis
       nodePackages.uglify-js
-      nodePackages.terser
+      terser
+      nodePackages.patch-package
       yarn
-      nodejs-14_x
+      nodejs_18
+      jq
+      moreutils
     ];
+
+    outputs = [ "out" "javascripts" ];
 
     patches = [
       # Use the Ruby API version in the plugin gem path, to match the
@@ -190,6 +232,12 @@ let
       # Fix the rake command used to recursively execute itself in the
       # assets precompilation task.
       ./assets_rake_command.patch
+
+      # `app/assets/javascripts/discourse/package.json`'s postinstall
+      # hook tries to call `../node_modules/.bin/patch-package`, which
+      # hasn't been `patchShebangs`-ed yet. So instead we just use
+      # `patch-package` from `nativeBuildInputs`.
+      ./asserts_patch-package_from_path.patch
     ];
 
     # We have to set up an environment that is close enough to
@@ -201,16 +249,25 @@ let
       export HOME=$NIX_BUILD_TOP/fake_home
 
       # Make yarn install packages from our offline cache, not the registry
-      yarn config --offline set yarn-offline-mirror ${yarnOfflineCache}
+      yarn config --offline set yarn-offline-mirror $yarnOfflineCache
 
       # Fixup "resolved"-entries in yarn.lock to match our offline cache
       ${fixup_yarn_lock}/bin/fixup_yarn_lock app/assets/javascripts/yarn.lock
 
       export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
 
+      find app/assets/javascripts -name package.json -print0 \
+        | xargs -0 -I {} bash -c "jq 'del(.scripts.postinstall)' -r <{} | sponge {}"
       yarn install --offline --cwd app/assets/javascripts/discourse
 
       patchShebangs app/assets/javascripts/node_modules/
+
+      # Run `patch-package` AFTER the corresponding shebang inside `.bin/patch-package`
+      # got patched. Otherwise this will fail with
+      #     /bin/sh: line 1: /build/source/app/assets/javascripts/node_modules/.bin/patch-package: cannot execute: required file not found
+      pushd app/assets/javascripts &>/dev/null
+        yarn run patch-package
+      popd &>/dev/null
 
       redis-server >/dev/null &
 
@@ -253,12 +310,12 @@ let
 
       mv public/assets $out
 
+      rm -r app/assets/javascripts/plugins
+      mv app/assets/javascripts $javascripts
+      ln -sf /run/discourse/assets/javascripts/plugins $javascripts/plugins
+
       runHook postInstall
     '';
-
-    passthru = {
-      inherit yarnOfflineCache;
-    };
   };
 
   discourse = stdenv.mkDerivation {
@@ -301,7 +358,10 @@ let
       # path, not their relative state directory path. This gets rid of
       # warnings and means we don't have to link back to lib from the
       # state directory.
-      find config -type f -execdir sed -Ei "s,(\.\./)+(lib|app)/,$out/share/discourse/\2/," {} \;
+      find config -type f -name "*.rb" -execdir \
+        sed -Ei "s,(\.\./)+(lib|app)/,$out/share/discourse/\2/," {} \;
+      find config -maxdepth 1 -type f -name "*.rb" -execdir \
+        sed -Ei "s,require_relative (\"|')([[:alnum:]].*)(\"|'),require_relative '$out/share/discourse/config/\2'," {} \;
     '';
 
     buildPhase = ''
@@ -322,9 +382,10 @@ let
       ln -sf /var/log/discourse $out/share/discourse/log
       ln -sf /var/lib/discourse/tmp $out/share/discourse/tmp
       ln -sf /run/discourse/config $out/share/discourse/config
-      ln -sf /run/discourse/assets/javascripts/plugins $out/share/discourse/app/assets/javascripts/plugins
       ln -sf /run/discourse/public $out/share/discourse/public
       ln -sf ${assets} $out/share/discourse/public.dist/assets
+      rm -r $out/share/discourse/app/assets/javascripts
+      ln -sf ${assets.javascripts} $out/share/discourse/app/assets/javascripts
       ${lib.concatMapStringsSep "\n" (p: "ln -sf ${p} $out/share/discourse/plugins/${p.pluginName or ""}") plugins}
 
       runHook postInstall

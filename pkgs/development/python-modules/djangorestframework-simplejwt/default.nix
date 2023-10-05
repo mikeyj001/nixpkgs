@@ -1,21 +1,26 @@
 { lib
 , buildPythonPackage
+, cryptography
 , django
 , djangorestframework
 , fetchPypi
 , pyjwt
 , python-jose
+, pythonOlder
 , setuptools-scm
 }:
 
 buildPythonPackage rec {
   pname = "djangorestframework-simplejwt";
-  version = "5.1.0";
+  version = "5.3.0";
+  format = "setuptools";
+
+  disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     pname = "djangorestframework_simplejwt";
     inherit version;
-    sha256 = "sha256-dTI1KKe5EIQ7h5GUdG8OvDSBxK2fNU3i3RYhYGYvuVo=";
+    hash = "sha256-jkxd/KjRHAuKZt/YpOP8HGqn6hiNEJB/+RyUL0tS7WY=";
   };
 
   nativeBuildInputs = [
@@ -26,8 +31,16 @@ buildPythonPackage rec {
     django
     djangorestframework
     pyjwt
-    python-jose
   ];
+
+  passthru.optional-dependencies = {
+    python-jose = [
+      python-jose
+    ];
+    crypto = [
+      cryptography
+    ];
+  };
 
   # Test raises django.core.exceptions.ImproperlyConfigured
   doCheck = false;
@@ -39,6 +52,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "JSON Web Token authentication plugin for Django REST Framework";
     homepage = "https://github.com/davesque/django-rest-framework-simplejwt";
+    changelog = "https://github.com/jazzband/djangorestframework-simplejwt/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ arnoldfarkas ];
   };

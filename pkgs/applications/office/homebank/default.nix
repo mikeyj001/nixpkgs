@@ -3,20 +3,20 @@
 
 stdenv.mkDerivation rec {
   pname = "homebank";
-  version = "5.5.4";
+  version = "5.6.6";
   src = fetchurl {
-    url = "http://homebank.free.fr/public/homebank-${version}.tar.gz";
-    sha256 = "sha256-DQZpvKCZNArlwhPqE8srkyg7/IoOTPelkCwYKTZuV2U=";
+    url = "http://homebank.free.fr/public/sources/homebank-${version}.tar.gz";
+    hash = "sha256-ZW/N8YUU8r7SYY/+hqVYrqYW/KQqtuChfQJxXftl3A4=";
   };
 
-  nativeBuildInputs = [ pkg-config wrapGAppsHook ];
-  buildInputs = [ gtk libofx intltool libsoup gnome.adwaita-icon-theme ];
+  nativeBuildInputs = [ pkg-config wrapGAppsHook intltool ];
+  buildInputs = [ gtk libofx libsoup gnome.adwaita-icon-theme];
 
   meta = with lib; {
     description = "Free, easy, personal accounting for everyone";
     homepage = "http://homebank.free.fr/";
     license = licenses.gpl2Plus;
     maintainers = with maintainers; [ pSub ];
-    platforms = platforms.linux;
+    platforms = platforms.linux ++ platforms.darwin;
   };
 }

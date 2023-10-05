@@ -1,7 +1,9 @@
 { lib
 , fetchFromGitHub
+, fetchpatch
 , python3
 , makeWrapper
+, nixosTests
 }:
 let
   # Seahub 8.x.x does not support django-webpack-loader >=1.x.x
@@ -11,7 +13,7 @@ let
         version = "0.7.0";
         src = old.src.override {
           inherit version;
-          sha256 = "0izl6bibhz3v538ad5hl13lfr6kvprf62rcl77wq2i5538h8hg3s";
+          hash = "sha256-ejyIIBqlRIH5OZRlYVy+e5rs6AgUlqbQKHt8uOIy9Ec=";
         };
       });
     };
@@ -19,14 +21,23 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "seahub";
-  version = "8.0.8";
+  version = "9.0.10";
+  pyproject = false;
 
   src = fetchFromGitHub {
     owner = "haiwen";
     repo = "seahub";
-    rev = "c51346155b2f31e038c3a2a12e69dcc6665502e2"; # using a fixed revision because upstream may re-tag releases :/
-    sha256 = "0dagiifxllfk73xdzfw2g378jccpzplhdrmkwbaakbhgbvvkg92k";
+    rev = "5971bf25fe67d94ec4d9f53b785c15a098113620"; # using a fixed revision because upstream may re-tag releases :/
+    sha256 = "sha256-7Exvm3EShb/1EqwA4wzWB9zCdv0P/ISmjKSoqtOMnqk=";
   };
+
+  patches = [
+    (fetchpatch {
+      # PIL update fix
+      url = "https://patch-diff.githubusercontent.com/raw/haiwen/seahub/pull/5570.patch";
+      sha256 = "sha256-7V2aRlacJ7Qhdi9k4Bs+t/Emx+EAM/NNCI+K40bMwLA=";
+    })
+  ];
 
   dontBuild = true;
 
@@ -39,6 +50,7 @@ python.pkgs.buildPythonApplication rec {
   propagatedBuildInputs = with python.pkgs; [
     django
     future
+    django-compressor
     django-statici18n
     django-webpack-loader
     django-simple-captcha
@@ -47,17 +59,19 @@ python.pkgs.buildPythonApplication rec {
     mysqlclient
     pillow
     python-dateutil
-    django_compressor
     djangorestframework
     openpyxl
     requests
     requests-oauthlib
+    chardet
     pyjwt
     pycryptodome
     qrcode
     pysearpc
     seaserv
     gunicorn
+    markdown
+    bleach
   ];
 
   installPhase = ''
@@ -68,7 +82,10 @@ python.pkgs.buildPythonApplication rec {
 
   passthru = {
     inherit python;
-    pythonPath = python3.pkgs.makePythonPath propagatedBuildInputs;
+    pythonPath = python.pkgs.makePythonPath propagatedBuildInputs;
+    tests = {
+      inherit (nixosTests) seafile;
+    };
   };
 
   meta = with lib; {

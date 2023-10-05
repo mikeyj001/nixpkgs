@@ -7,10 +7,7 @@ let
   dynamic-linker = stdenv.cc.bintools.dynamicLinker;
 
   patchelf = libPath :
-    if stdenv.isDarwin
-      then ""
-      else
-        ''
+    lib.optionalString (!stdenv.isDarwin) ''
           chmod u+w $PURS
           patchelf --interpreter ${dynamic-linker} --set-rpath ${libPath} $PURS
           chmod u-w $PURS
@@ -18,20 +15,27 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "purescript";
-  version = "0.15.2";
+  version = "0.15.11";
 
   # These hashes can be updated automatically by running the ./update.sh script.
   src =
     if stdenv.isDarwin
     then
-    fetchurl {
-      url = "https://github.com/${pname}/${pname}/releases/download/v${version}/macos.tar.gz";
-      sha256 = "06fsq9ynfvfqn3ac5jxdj81lmzd6bh84p7jz5qib31h27iy5aq4h";
-    }
+      (if stdenv.isAarch64
+      then
+      fetchurl {
+        url = "https://github.com/${pname}/${pname}/releases/download/v${version}/macos-arm64.tar.gz";
+        sha256 = "1ffhcwzb4cazxviqdl9zwg0jnbhsisg2pbxkqbk63zj2grjcpg86";
+      }
+      else
+      fetchurl {
+        url = "https://github.com/${pname}/${pname}/releases/download/v${version}/macos.tar.gz";
+        sha256 = "0h923269zb9hwlifcv8skz17zlggh8hsxhrgf33h2inl1midvgq5";
+      })
     else
     fetchurl {
       url = "https://github.com/${pname}/${pname}/releases/download/v${version}/linux64.tar.gz";
-      sha256 = "1p37k6briczw6gvw04idkx734ms1swgrx9sl4hi6xwvxkfp1nm0m";
+      sha256 = "0vrbgmgmmwbyxl969k59zkfrq5dxshspnzskx8zmhcy4flamz8av";
     };
 
 
@@ -61,8 +65,9 @@ in stdenv.mkDerivation rec {
     description = "A strongly-typed functional programming language that compiles to JavaScript";
     homepage = "https://www.purescript.org/";
     license = licenses.bsd3;
+    sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ justinwoo mbbx6spp cdepillabout ];
-    platforms = [ "x86_64-linux" "x86_64-darwin" ];
+    platforms = [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ];
     mainProgram = "purs";
     changelog = "https://github.com/purescript/purescript/releases/tag/v${version}";
   };

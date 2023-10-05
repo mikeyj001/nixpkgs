@@ -1,66 +1,65 @@
 { buildPythonPackage
-, chex
-, cloudpickle
-, dill
-, dm-tree
 , fetchFromGitHub
-, jaxlib
-, jmp
+, fetchpatch
+, callPackage
 , lib
-, pytest-xdist
-, pytestCheckHook
+, jmp
 , tabulate
-, tensorflow
+, jaxlib
 }:
 
 buildPythonPackage rec {
   pname = "dm-haiku";
-  version = "0.0.6";
+  version = "0.0.10";
 
   src = fetchFromGitHub {
     owner = "deepmind";
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-qvKMeGPiWXvvyV+GZdTWdsC6Wp08AmP8nDtWk7sZtqM=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-EZx3o6PgTeFjTwI9Ko9H39EqPSE0yLWWpsdqX6ALlo4=";
   };
 
-  propagatedBuildInputs = [
-    jmp
-    tabulate
+  patches = [
+    # https://github.com/deepmind/dm-haiku/issues/717
+    (fetchpatch {
+      name = "remove-typing-extensions.patch";
+      url = "https://github.com/deepmind/dm-haiku/commit/c22867db1a3314a382bd2ce36511e2b756dc32a8.patch";
+      hash = "sha256-SxJc8FrImwMqTJ5OuJ1f4T+HfHgW/sGqXeIqlxEatlE=";
+    })
+    # https://github.com/deepmind/dm-haiku/pull/672
+    (fetchpatch {
+      name = "fix-find-namespace-packages.patch";
+      url = "https://github.com/deepmind/dm-haiku/commit/728031721f77d9aaa260bba0eddd9200d107ba5d.patch";
+      hash = "sha256-qV94TdJnphlnpbq+B0G3KTx5CFGPno+8FvHyu/aZeQE=";
+    })
   ];
 
-  checkInputs = [
-    chex
-    cloudpickle
-    dill
-    dm-tree
+  outputs = [
+    "out"
+    "testsout"
+  ];
+
+  propagatedBuildInputs = [
     jaxlib
-    pytest-xdist
-    pytestCheckHook
-    tensorflow
+    jmp
+    tabulate
   ];
 
   pythonImportsCheck = [
     "haiku"
   ];
 
-  disabledTestPaths = [
-    # These tests require `bsuite` which isn't packaged in `nixpkgs`.
-    "examples/impala_lite_test.py"
-    "examples/impala/actor_test.py"
-    "examples/impala/learner_test.py"
-    # This test breaks on multiple cases with TF-related errors,
-    # likely that's the reason the upstream uses TF-nightly for tests?
-    # `nixpkgs` doesn't have the corresponding TF version packaged.
-    "haiku/_src/integration/jax2tf_test.py"
-    # `TypeError: lax.conv_general_dilated requires arguments to have the same dtypes, got float32, float16`.
-    "haiku/_src/integration/numpy_inputs_test.py"
-  ];
+  postInstall = ''
+    mkdir $testsout
+    cp -R examples $testsout/examples
+  '';
 
-  disabledTests = [
-    # See https://github.com/deepmind/dm-haiku/issues/366.
-    "test_jit_Recurrent"
-  ];
+  # check in passthru.tests.pytest to escape infinite recursion with bsuite
+  doCheck = false;
+
+  passthru.tests = {
+    pytest = callPackage ./tests.nix { };
+  };
 
   meta = with lib; {
     description = "Haiku is a simple neural network library for JAX developed by some of the authors of Sonnet.";

@@ -9,16 +9,16 @@
 
 buildGoModule rec {
   pname = "mob";
-  version = "3.1.3";
+  version = "4.4.6";
 
   src = fetchFromGitHub {
     owner = "remotemobprogramming";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-FOZrwOf3IFnwtqAk0RNwvlTUidqWbo1aopSu6SmmV4k=";
+    sha256 = "sha256-UunFfP0Rn4t8lSJiubbqZ0bImK9OhIdC0gSGbkg6Ohw=";
   };
 
-  vendorSha256 = "sha256-pQpattmS9VmO3ZIQUFn66az8GSmB4IvYhTTCFn6SUmo=";
+  vendorHash = null;
 
   nativeBuildInputs = [
     makeWrapper

@@ -8,24 +8,24 @@
 , geventhttpclient
 , git
 , glibcLocales
+, gnupg
 , gpgme
-, mock
-, pkgs
-, urllib3
 , paramiko
+, pytestCheckHook
 , pythonOlder
+, urllib3
 }:
 
 buildPythonPackage rec {
-  version = "0.20.42";
+  version = "0.21.6";
   pname = "dulwich";
   format = "setuptools";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-cro7YK5qVU0TMrO0CjRf6+FuxGnPYBS7RDtxmQLjPvA=";
+    hash = "sha256-MPvofotR84E8Ex4oQchtAHQ00WC9FttYa0DUfzHdBbA=";
   };
 
   LC_ALL = "en_US.UTF-8";
@@ -35,26 +35,51 @@ buildPythonPackage rec {
     urllib3
   ];
 
-  checkInputs = [
-    fastimport
+  passthru.optional-dependencies = {
+    fastimport = [
+      fastimport
+    ];
+    pgp = [
+      gpgme
+      gnupg
+    ];
+    paramiko = [
+      paramiko
+    ];
+  };
+
+  nativeCheckInputs = [
     gevent
     geventhttpclient
     git
     glibcLocales
-    gpgme
-    pkgs.gnupg
-    mock
-    paramiko
-  ];
+    pytestCheckHook
+  ] ++ passthru.optional-dependencies.fastimport
+  ++ passthru.optional-dependencies.pgp
+  ++ passthru.optional-dependencies.paramiko;
 
   doCheck = !stdenv.isDarwin;
+
+  disabledTests = [
+    # OSError: [Errno 84] Invalid or incomplete multibyte or wide character: b'/build/tmpsqwlbpd1/\xc0'
+    "test_no_decode_encode"
+    # OSError: [Errno 84] Invalid or incomplete multibyte or wide character: b'/build/tmpwmtfyvo2/refs.git/refs/heads/\xcd\xee\xe2\xe0\xff\xe2\xe5\xf2\xea\xe01'
+    "test_cyrillic"
+    # OSError: [Errno 84] Invalid or incomplete multibyte or wide character: b'/build/tmpfseetobk/test/\xc0'
+    "test_commit_no_encode_decode"
+  ];
+
+  disabledTestPaths = [
+    # missing test inputs
+    "dulwich/contrib/test_swift_smoke.py"
+  ];
 
   pythonImportsCheck = [
     "dulwich"
   ];
 
   meta = with lib; {
-    description = "Simple Python implementation of the Git file formats and protocols";
+    description = "Implementation of the Git file formats and protocols";
     longDescription = ''
       Dulwich is a Python implementation of the Git file formats and protocols, which
       does not depend on Git itself. All functionality is available in pure Python.

@@ -1,38 +1,55 @@
-{ pkgs, stdenv, lib, fetchFromGitHub, dataDir ? "/var/lib/snipe-it" }:
+{ lib
+, pkgs
+, stdenv
+, fetchFromGitHub
+, dataDir ? "/var/lib/snipe-it"
+, mariadb
+, nixosTests
+, php
+, phpPackages
+}:
 
 let
   package = (import ./composition.nix {
-    inherit pkgs;
+    inherit pkgs php phpPackages;
     inherit (stdenv.hostPlatform) system;
     noDev = true; # Disable development dependencies
-    # Requires PHP >= 7.4 and PHP < 8.0 as of v5.4.3
-    # https://snipe-it.readme.io/docs/requirements
-    php = pkgs.php74;
-    phpPackages = pkgs.php74Packages;
   }).overrideAttrs (attrs : {
     installPhase = attrs.installPhase + ''
+      # Before symlinking the following directories, copy the invalid_barcode.gif
+      # to a different location. The `snipe-it-setup` oneshot service will then
+      # copy the file back during bootstrap.
+      mkdir -p $out/share/snipe-it
+      cp $out/public/uploads/barcodes/invalid_barcode.gif $out/share/snipe-it/
+
       rm -R $out/storage $out/public/uploads $out/bootstrap/cache
       ln -s ${dataDir}/.env $out/.env
       ln -s ${dataDir}/storage $out/
       ln -s ${dataDir}/public/uploads $out/public/uploads
       ln -s ${dataDir}/bootstrap/cache $out/bootstrap/cache
+
       chmod +x $out/artisan
+
+      substituteInPlace config/database.php --replace "env('DB_DUMP_PATH', '/usr/local/bin')" "env('DB_DUMP_PATH', '${mariadb}/bin')"
     '';
   });
 
 in package.override rec {
   pname = "snipe-it";
-  version = "5.4.3";
+  version = "6.2.0";
 
   src = fetchFromGitHub {
     owner = "snipe";
     repo = pname;
     rev = "v${version}";
-    sha256 = "053cm5vb0806sj61g0zf0xqqzlchgkdj8zwkry07mhjdbp1k8k7n";
+    sha256 = "0s8w98jd81cg3rr2h6i63qm72idxdbhgliz2bdka91cqq0zh6d88";
   };
 
+  passthru.tests = nixosTests.snipe-it;
+  passthru.phpPackage = php;
+
   meta = with lib; {
-    description = "A free open source IT asset/license management system ";
+    description = "A free open source IT asset/license management system";
     longDescription = ''
       Snipe-IT was made for IT asset management, to enable IT departments to track
       who has which laptop, when it was purchased, which software licenses and accessories
@@ -40,6 +57,7 @@ in package.override rec {
       Details for snipe-it can be found on the official website at https://snipeitapp.com/.
     '';
     homepage = "https://snipeitapp.com/";
+    changelog = "https://github.com/snipe/snipe-it/releases/tag/v${version}";
     license = licenses.agpl3Only;
     maintainers = with maintainers; [ yayayayaka ];
     platforms = platforms.linux;

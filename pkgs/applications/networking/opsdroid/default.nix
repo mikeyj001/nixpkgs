@@ -22,14 +22,14 @@ python3Packages.buildPythonPackage rec {
     aiohttp matrix-api-async aioredis aiosqlite arrow pyyaml motor regex
     mattermostdriver setuptools voluptuous ibm-watson tailer multidict
     watchgod get-video-properties appdirs bitstring matrix-nio
-  ];
+  ] ++ matrix-nio.optional-dependencies.e2e;
 
   passthru.python = python3Packages.python;
 
   meta = with lib; {
     description = "An open source chat-ops bot framework";
     homepage = "https://opsdroid.dev";
-    maintainers = with maintainers; [ fpletz globin willibutz lheckemann ];
+    maintainers = with maintainers; [ globin willibutz ];
     license = licenses.asl20;
     platforms = platforms.unix;
   };

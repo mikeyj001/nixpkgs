@@ -1,5 +1,4 @@
 { lib, stdenv, fetchurl, wrapGAppsHook, makeWrapper
-, dpkg
 , alsa-lib
 , at-spi2-atk
 , at-spi2-core
@@ -7,6 +6,7 @@
 , cairo
 , cups
 , dbus
+, dpkg
 , expat
 , fontconfig
 , freetype
@@ -15,32 +15,34 @@
 , gnome
 , gsettings-desktop-schemas
 , gtk3
-, libuuid
-, libdrm
 , libX11
+, libXScrnSaver
 , libXcomposite
 , libXcursor
 , libXdamage
 , libXext
 , libXfixes
 , libXi
-, libxkbcommon
 , libXrandr
 , libXrender
-, libXScrnSaver
-, libxshmfence
 , libXtst
+, libdrm
+, libkrb5
+, libuuid
+, libxkbcommon
+, libxshmfence
 , mesa
 , nspr
 , nss
 , pango
 , pipewire
+, snappy
 , udev
 , wayland
+, xdg-utils
+, coreutils
 , xorg
 , zlib
-, xdg-utils
-, snappy
 
 # command line arguments which are always set e.g "--disable-gpu"
 , commandLineArgs ? ""
@@ -73,7 +75,7 @@ let
     libxkbcommon libXScrnSaver libXcomposite libXcursor libXdamage
     libXext libXfixes libXi libXrandr libXrender libxshmfence
     libXtst libuuid mesa nspr nss pango pipewire udev wayland
-    xdg-utils xorg.libxcb zlib snappy
+    xorg.libxcb zlib snappy libkrb5
   ]
     ++ optional pulseSupport libpulseaudio
     ++ optional libvaSupport libva;
@@ -90,11 +92,11 @@ in
 
 stdenv.mkDerivation rec {
   pname = "brave";
-  version = "1.38.115";
+  version = "1.58.135";
 
   src = fetchurl {
     url = "https://github.com/brave/brave-browser/releases/download/v${version}/brave-browser_${version}_amd64.deb";
-    sha256 = "sha256-YQpFsB3VVzsOa7PoZ+TLv10Dzm9z819cmyw7atnG/Cs=";
+    sha256 = "sha256-tJfpBIZvBr0diympUmImXYELPERJIzCSuOB0aovhodI=";
   };
 
   dontConfigure = true;
@@ -150,7 +152,7 @@ stdenv.mkDerivation rec {
           --replace /opt/brave.com $out/opt/brave.com
 
       # Correct icons location
-      icon_sizes=("16" "22" "24" "32" "48" "64" "128" "256")
+      icon_sizes=("16" "24" "32" "48" "64" "128" "256")
 
       for icon in ''${icon_sizes[*]}
       do
@@ -170,17 +172,18 @@ stdenv.mkDerivation rec {
     gappsWrapperArgs+=(
       --prefix LD_LIBRARY_PATH : ${rpath}
       --prefix PATH : ${binpath}
+      --suffix PATH : ${lib.makeBinPath [ xdg-utils coreutils ]}
       ${optionalString (enableFeatures != []) ''
       --add-flags "--enable-features=${strings.concatStringsSep "," enableFeatures}"
       ''}
       ${optionalString (disableFeatures != []) ''
       --add-flags "--disable-features=${strings.concatStringsSep "," disableFeatures}"
       ''}
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland}}"
+      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
       ${optionalString vulkanSupport ''
       --prefix XDG_DATA_DIRS  : "${addOpenGLRunpath.driverLink}/share"
-      --add-flags ${escapeShellArg commandLineArgs}
       ''}
+      --add-flags ${escapeShellArg commandLineArgs}
     )
   '';
 
@@ -200,6 +203,7 @@ stdenv.mkDerivation rec {
       chew up your bandwidth, and invade your privacy. Brave lets you
       contribute to your favorite creators automatically.
     '';
+    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.mpl20;
     maintainers = with maintainers; [ uskudnik rht jefflabonte nasirhm ];
     platforms = [ "x86_64-linux" ];

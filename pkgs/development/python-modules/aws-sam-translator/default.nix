@@ -3,60 +3,64 @@
 , buildPythonPackage
 , fetchFromGitHub
 , jsonschema
-, mock
 , parameterized
+, pydantic
+, pytest-env
+, pytest-rerunfailures
+, pytest-xdist
 , pytestCheckHook
 , pythonOlder
 , pyyaml
-, six
+, typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "aws-sam-translator";
-  version = "1.42.0";
+  version = "1.74.0";
   format = "setuptools";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = "serverless-application-model";
-    rev = "v${version}";
-    sha256 = "sha256-pjcRsmxPL4lbgDopW+wKQRkRcqebLPTd95JTL8PiWtc=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-uOfBR0bvLVyBcfSAkSqOx4KjmSYbfktpJlxKjipfj50=";
   };
 
-  propagatedBuildInputs = [
-    boto3
-    jsonschema
-    six
-  ];
-
   postPatch = ''
-    substituteInPlace requirements/base.txt \
-      --replace "jsonschema~=3.2" "jsonschema>=3.2"
     substituteInPlace pytest.ini \
       --replace " --cov samtranslator --cov-report term-missing --cov-fail-under 95" ""
   '';
 
-  checkInputs = [
-    mock
-    parameterized
-    pytestCheckHook
-    pyyaml
+  propagatedBuildInputs = [
+    boto3
+    jsonschema
+    pydantic
+    typing-extensions
   ];
 
-  disabledTests = [
-    # AssertionError: Expected 7 errors, found 9:
-    "test_errors_13_error_definitionuri"
+  nativeCheckInputs = [
+    parameterized
+    pytest-env
+    pytest-rerunfailures
+    pytest-xdist
+    pytestCheckHook
+    pyyaml
   ];
 
   pythonImportsCheck = [
     "samtranslator"
   ];
 
+  preCheck = ''
+    sed -i '2ienv =\n\tAWS_DEFAULT_REGION=us-east-1' pytest.ini
+  '';
+
   meta = with lib; {
     description = "Python library to transform SAM templates into AWS CloudFormation templates";
     homepage = "https://github.com/awslabs/serverless-application-model";
+    changelog = "https://github.com/aws/serverless-application-model/releases/tag/v${version}";
     license = licenses.asl20;
     maintainers = with maintainers; [ ];
   };

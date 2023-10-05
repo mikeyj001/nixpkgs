@@ -4,27 +4,31 @@
 , pytestCheckHook
 , pythonOlder
 , aspy-refactor-imports
+, classify-imports
 }:
 
 buildPythonPackage rec {
   pname = "reorder-python-imports";
-  version = "3.1.0";
-  disabled = pythonOlder "3.7";
+  version = "3.11.0";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "asottile";
     repo = "reorder_python_imports";
     rev = "v${version}";
-    hash = "sha256-Ge+VQjK24TqWLMQS19DBX+FFHF3irogK21orlENJx50=";
+    hash = "sha256-5fv2DSMeCleDxsW+nua2dOOeWZIZfuP+Qo++w2YEf4Q=";
   };
 
-  propagatedBuildInputs = [ aspy-refactor-imports ];
+  propagatedBuildInputs = [
+    aspy-refactor-imports
+    classify-imports
+  ];
 
   pythonImportsCheck = [
     "reorder_python_imports"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

@@ -22,13 +22,13 @@
 
 buildPythonPackage rec {
   pname = "binwalk${lib.optionalString visualizationSupport "-full"}";
-  version = "2.3.3";
+  version = "2.3.4";
 
   src = fetchFromGitHub {
     owner = "ReFirmLabs";
     repo = "binwalk";
     rev = "v${version}";
-    sha256 = "0phqyqv34vhh80dgipiggs4n3iq2vfjk9ywx2c5d8g61vzgbd2g8";
+    hash = "sha256-hlPbzqGRSXcIqlI+SNKq37CnnHd1IoMBNSjhyeAM1TE=";
   };
 
   patches = [
@@ -58,7 +58,7 @@ buildPythonPackage rec {
     HOME=$(mktemp -d)
   '';
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
 
   pythonImportsCheck = [ "binwalk" ];
 
@@ -67,7 +67,5 @@ buildPythonPackage rec {
     description = "A tool for searching a given binary image for embedded files";
     maintainers = [ maintainers.koral ];
     license = licenses.mit;
-    # Signature Exception: [Errno 1] Operation not permitted: '/testing/tests/input-vectors/_dirtraversal.tar.extracted'
-    broken = (stdenv.isDarwin && stdenv.isx86_64); # broken on hydra since 2021-11-02
   };
 }

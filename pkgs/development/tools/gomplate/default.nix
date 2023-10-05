@@ -1,18 +1,20 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{ lib
+, buildGoModule
+, fetchFromGitHub
+}:
 
 buildGoModule rec {
   pname = "gomplate";
-  version = "3.10.0";
-  owner = "hairyhenderson";
-  rev = "v${version}";
+  version = "3.11.5";
 
   src = fetchFromGitHub {
-    inherit owner rev;
+    owner = "hairyhenderson";
     repo = pname;
-    sha256 = "0dbi9saxbwcvypxc0s656ln9zq2vysx8dhrcz488nmy6rcpqiiah";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-cBSOfjU7A6B7+5zQLGtGLx9kORsjH/IzGgkjwjjTcYY=";
   };
 
-  vendorSha256 = "0rvki8ghlbbaqgnjfsbs1jswj08jfzmnz9ilynv2c6kfkx9zs108";
+  vendorHash = "sha256-thsa15CDD7+gCSPSU4xDbovETREeuL4gV6TjdcImj9w=";
 
   postPatch = ''
     # some tests require network access
@@ -24,16 +26,22 @@ buildGoModule rec {
       internal/tests/integration/datasources_vault*_test.go
   '';
 
+  # TestInputDir_RespectsUlimit
+  preCheck = ''
+    ulimit -n 1024
+  '';
+
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/${owner}/${pname}/v3/version.Version=${rev}"
+    "-X github.com/${src.owner}/${pname}/v3/version.Version=${version}"
   ];
 
   meta = with lib; {
     description = "A flexible commandline tool for template rendering";
     homepage = "https://gomplate.ca/";
-    maintainers = with maintainers; [ ris jlesquembre ];
+    changelog = "https://github.com/hairyhenderson/gomplate/releases/tag/v${version}";
     license = licenses.mit;
+    maintainers = with maintainers; [ ris jlesquembre ];
   };
 }

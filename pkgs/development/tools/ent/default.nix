@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "ent-go";
-  version = "0.10.1";
+  version = "0.12.3";
 
   src = fetchFromGitHub {
     owner = "ent";
     repo = "ent";
     rev = "v${version}";
-    sha256 = "sha256-MvfbQKGVYWbZkqc3X3BqsB+z2KMkr0gMOquL02qHwUY=";
+    sha256 = "sha256-ryOpaRQi30NPDNe9rUmW+fEqWSKWEsvHl/Bd1+i88y4=";
   };
 
-  vendorSha256 = "sha256-BF2eD/jOtY1XhZ0hB7f3/frKQYwS9PbuGxum5SSnjzA=";
+  vendorHash = "sha256-67+4r4ByVS0LgfL7eUOdEoQ+CMRzqNjPgkq3dNfNwBY=";
 
   subPackages = [ "cmd/ent" ];
 
@@ -34,7 +34,7 @@ buildGoModule rec {
     homepage = "https://entgo.io/";
     downloadPage = "https://github.com/ent/ent";
     license = licenses.asl20;
-    maintainers = with maintainers; [ superherointj ];
+    maintainers = with maintainers; [ ];
     mainProgram = "ent";
   };
 }
