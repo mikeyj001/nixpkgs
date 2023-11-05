@@ -32753,7 +32753,6 @@ with pkgs;
     ;
 
   sfwbar = callPackage ../applications/misc/sfwbar { };
- refs/remotes/origin/master
 
   skate = callPackage ../applications/misc/skate { };
 

@@ -8,8 +8,9 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
 	url = "https://archive.mozilla.org/pub/seamonkey/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
-	sha256 = "sha256-JGI6objGvH7gwBAqBm1XRtVLfW7MynhpecxKm61yCbQ=";
-#	sha256 = "";
+	# 2.53.17.1
+#	sha256 = "sha256-JGI6objGvH7gwBAqBm1XRtVLfW7MynhpecxKm61yCbQ=";
+	sha256 = "";
 	#2.53.17
 #	sha256 = "sha256-SZFcMbuWb6O7lggc1ZRPcdbM1Ca2MIE2PbZjtaijvH8=";
   };
