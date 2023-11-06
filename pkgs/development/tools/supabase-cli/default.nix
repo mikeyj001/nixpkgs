@@ -9,16 +9,16 @@
 
 buildGoModule rec {
   pname = "supabase-cli";
-  version = "1.97.1";
+  version = "1.107.0";
 
   src = fetchFromGitHub {
     owner = "supabase";
     repo = "cli";
     rev = "v${version}";
-    hash = "sha256-k1/6QAxQ3h5xG+2VBc/PillddYhrvsQrtJK5tXrb0sQ=";
+    hash = "sha256-uR7Iu1PdnzWp9+IJ5szUR6r+qKckyD6LFgsY5YQxT5c=";
   };
 
-  vendorHash = "sha256-oEIRmkOCHIvIQJX7GQVJD/aURoEJ7V/LJFEg+oltWEY=";
+  vendorHash = "sha256-gWGoRKlSo0C1gFU/kC4DcgOl0Mp5LCTpSZ1Yav0ZL9c=";
 
   ldflags = [
     "-s"

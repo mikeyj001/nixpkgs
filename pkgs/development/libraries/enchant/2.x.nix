@@ -13,13 +13,13 @@
 
 stdenv.mkDerivation rec {
   pname = "enchant";
-  version = "2.6.0";
+  version = "2.6.2";
 
   outputs = [ "out" "dev" ];
 
   src = fetchurl {
     url = "https://github.com/AbiWord/${pname}/releases/download/v${version}/${pname}-${version}.tar.gz";
-    hash = "sha256-M1fqk6F0T/vNcwIjzINmE11A/1mIGuBZHVHT7o/5rm8=";
+    hash = "sha256-ZoanKOVudg+N7gmiLw+1O0bunb59ZM+eW7NaZYv/fh0=";
   };
 
   nativeBuildInputs = [

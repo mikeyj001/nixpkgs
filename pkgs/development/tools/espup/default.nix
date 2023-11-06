@@ -15,16 +15,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "espup";
-  version = "0.5.0";
+  version = "0.7.0";
 
   src = fetchFromGitHub {
     owner = "esp-rs";
     repo = "espup";
     rev = "v${version}";
-    hash = "sha256-Eb0Q+Ju5nTXL0XvNhAo4Mc+ZP/vOfld313H9/oI3I2U=";
+    hash = "sha256-D5ck96nR8agiYf1t6ViOaEWws9AQ0EBZ48YKp68jfRA=";
   };
 
-  cargoHash = "sha256-ZKku6ElEtYXxwqeWTDKcCuZ4Wgqonc0B9nMyNd0VcdU=";
+  cargoHash = "sha256-mKpAGS6Rxoq2v/VW0AncVx/9BjvG7wM8ePTR+661e5U=";
 
   nativeBuildInputs = [
     pkg-config
@@ -39,6 +39,7 @@ rustPlatform.buildRustPackage rec {
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.CoreFoundation
     darwin.apple_sdk.frameworks.Security
+    darwin.apple_sdk.frameworks.SystemConfiguration
   ];
 
   env = {
