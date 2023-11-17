@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchNpmDeps, buildPackages, nodejs }:
+{ lib, stdenv, fetchNpmDeps, buildPackages, nodejs } @ topLevelArgs:
 
 { name ? "${args.pname}-${args.version}"
 , src ? null
@@ -34,16 +34,16 @@
 , npmPruneFlags ? npmInstallFlags
   # Value for npm `--workspace` flag and directory in which the files to be installed are found.
 , npmWorkspace ? null
+, nodejs ? topLevelArgs.nodejs
+, npmDeps ?  fetchNpmDeps {
+  inherit forceGitDeps src srcs sourceRoot prePatch patches postPatch;
+  name = "${name}-npm-deps";
+  hash = npmDepsHash;
+}
 , ...
 } @ args:
 
 let
-  npmDeps = fetchNpmDeps {
-    inherit forceGitDeps src srcs sourceRoot prePatch patches postPatch;
-    name = "${name}-npm-deps";
-    hash = npmDepsHash;
-  };
-
   # .override {} negates splicing, so we need to use buildPackages explicitly
   npmHooks = buildPackages.npmHooks.override {
     inherit nodejs;
