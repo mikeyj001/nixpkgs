@@ -9304,7 +9304,10 @@ with pkgs;
     stdenv = gcc8Stdenv;
   };
 
-  hylafaxplus = callPackage ../servers/hylafaxplus { };
+  hylafaxplus = callPackage ../servers/hylafaxplus {
+    # libtiff >= 4.6 dropped many executables needed by hylafaxplus
+    libtiff = libtiff_4_5;
+  };
 
   hyphen = callPackage ../development/libraries/hyphen { };
 
@@ -12493,6 +12496,8 @@ with pkgs;
 
   qlcplus = libsForQt5.callPackage ../applications/misc/qlcplus { };
 
+  qlog = qt6Packages.callPackage ../applications/radio/qlog { };
+
   qnial = callPackage ../development/interpreters/qnial { };
 
   quickbms = pkgsi686Linux.callPackage ../tools/archivers/quickbms { };
@@ -14234,8 +14239,6 @@ with pkgs;
   typstfmt = callPackage ../tools/typesetting/typstfmt { };
 
   typst-live = callPackage ../tools/typesetting/typst-live { };
-
-  typst-preview = callPackage ../tools/typesetting/typst-preview { };
 
   tz = callPackage ../tools/misc/tz { };
 
@@ -17273,7 +17276,9 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) SystemConfiguration CoreFoundation Security;
   };
 
-  squeak = callPackage ../development/compilers/squeak { };
+  squeak = callPackage ../development/compilers/squeak {
+    stdenv = clangStdenv;
+  };
 
   squirrel-sql = callPackage ../development/tools/database/squirrel-sql {
     drivers = [ jtds_jdbc mssql_jdbc mysql_jdbc postgresql_jdbc ];
@@ -19837,8 +19842,7 @@ with pkgs;
 
   qtcreator = qt6Packages.callPackage ../development/tools/qtcreator {
     inherit (linuxPackages) perf;
-    stdenv = llvmPackages_14.stdenv;
-    llvmPackages = llvmPackages_14;
+    stdenv = llvmPackages.stdenv;
   };
 
   qxmledit = libsForQt5.callPackage ../applications/editors/qxmledit {} ;
@@ -22733,6 +22737,8 @@ with pkgs;
 
   libfprint-2-tod1-vfs0090 = callPackage ../development/libraries/libfprint-2-tod1-vfs0090 { };
 
+  libfprint-2-tod1-elan = callPackage ../development/libraries/libfprint-2-tod1-elan { };
+
   libfpx = callPackage ../development/libraries/libfpx { };
 
   libgadu = callPackage ../development/libraries/libgadu { };
@@ -23500,6 +23506,7 @@ with pkgs;
   libtifiles2 = callPackage ../development/libraries/libtifiles2 { };
 
   libtiff = callPackage ../development/libraries/libtiff { };
+  libtiff_4_5 = callPackage ../development/libraries/libtiff/4.5.nix { };
 
   libtiger = callPackage ../development/libraries/libtiger { };
 
@@ -26911,7 +26918,6 @@ with pkgs;
   inherit (import ../servers/sql/mariadb pkgs)
     mariadb_105
     mariadb_106
-    mariadb_1010
     mariadb_1011
     mariadb_110
   ;
@@ -28107,6 +28113,7 @@ with pkgs;
   linuxPackages_testing = linuxKernel.packages.linux_testing;
   linux_testing = linuxKernel.kernels.linux_testing;
 
+  # FIXME: Remove and alias to `linux(Packages)_testing`` after 23.11 is released
   linuxPackages_testing_bcachefs = linuxKernel.packages.linux_testing_bcachefs;
   linux_testing_bcachefs = linuxKernel.kernels.linux_testing_bcachefs;
 
@@ -33930,7 +33937,11 @@ with pkgs;
 
   normalize = callPackage ../applications/audio/normalize { };
 
-  norouter = callPackage ../tools/networking/norouter { };
+  norouter = callPackage ../tools/networking/norouter {
+    # doesn't build with go 1.21
+    # https://github.com/norouter/norouter/issues/165
+    buildGoModule = buildGo120Module;
+  };
 
   nqptp = callPackage ../tools/networking/nqptp { };
 
@@ -34070,8 +34081,6 @@ with pkgs;
 
   nwg-dock-hyprland = callPackage ../applications/misc/nwg-dock-hyprland { };
 
-  nwg-drawer = callPackage ../applications/misc/nwg-drawer { };
-
   nwg-launchers = callPackage ../applications/misc/nwg-launchers { };
 
   nwg-look = callPackage ../applications/misc/nwg-look { };
@@ -34093,9 +34102,9 @@ with pkgs;
   okteto = callPackage ../development/tools/okteto { };
 
   onlyoffice-bin_7_2 = callPackage ../applications/office/onlyoffice-bin/7_2.nix { };
-  onlyoffice-bin_7_4 = callPackage ../applications/office/onlyoffice-bin/7_4.nix { };
+  onlyoffice-bin_7_5 = callPackage ../applications/office/onlyoffice-bin/7_5.nix { };
   onlyoffice-bin = onlyoffice-bin_7_2;
-  onlyoffice-bin_latest = onlyoffice-bin_7_4;
+  onlyoffice-bin_latest = onlyoffice-bin_7_5;
 
   onmetal-image = callPackage ../tools/virtualization/onmetal-image { };
 
@@ -40216,6 +40225,10 @@ with pkgs;
 
   cups-bjnp = callPackage ../misc/cups/drivers/cups-bjnp { };
 
+  dcp375cwlpr = (pkgsi686Linux.callPackage ../misc/cups/drivers/brother/dcp375cw { }).driver;
+
+  dcp375cw-cupswrapper = (callPackage ../misc/cups/drivers/brother/dcp375cw { }).cupswrapper;
+
   dcp9020cdwlpr = (pkgsi686Linux.callPackage ../misc/cups/drivers/brother/dcp9020cdw { }).driver;
 
   dcp9020cdw-cupswrapper = (callPackage ../misc/cups/drivers/brother/dcp9020cdw { }).cupswrapper;
@@ -41029,6 +41042,9 @@ with pkgs;
   canon-cups-ufr2 = callPackage ../misc/cups/drivers/canon { };
 
   hll2390dw-cups = callPackage ../misc/cups/drivers/hll2390dw-cups { };
+
+  mfc465cncupswrapper = callPackage ../misc/cups/drivers/brother/mfc465cncupswrapper { };
+  mfc465cnlpr = callPackage ../misc/cups/drivers/brother/mfc465cnlpr { };
 
   mfcj470dw-cupswrapper = callPackage ../misc/cups/drivers/mfcj470dwcupswrapper { };
   mfcj470dwlpr = pkgsi686Linux.callPackage ../misc/cups/drivers/mfcj470dwlpr { };
