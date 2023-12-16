@@ -290,6 +290,7 @@ with lib.maintainers; {
     members = [
       theuni
       dpausp
+      frlan
       leona
     ];
     scope = "Team for Flying Circus employees who collectively maintain packages.";
@@ -317,6 +318,7 @@ with lib.maintainers; {
       das-g
       imincik
       nh2
+      nialov
       sikmir
       willcohen
     ];
@@ -428,6 +430,7 @@ with lib.maintainers; {
       cleeyv
       ryantm
       lassulus
+      yayayayaka
     ];
     scope = "Maintain Jitsi.";
     shortName = "Jitsi";
@@ -559,6 +562,18 @@ with lib.maintainers; {
     scope = "Maintain lumina desktop environment and related packages.";
     shortName = "Lumina";
     enableFeatureFreezePing = true;
+  };
+
+  lxc = {
+    members = [
+      aanderse
+      adamcstephens
+      jnsgruk
+      megheaiulian
+      mkg20001
+    ];
+    scope = "All things linuxcontainers. LXC, Incus, LXD and related packages.";
+    shortName = "lxc";
   };
 
   lxqt = {

@@ -295,7 +295,7 @@ in
         ++ lib.optional config.powerManagement.enable powerdevil
         ++ lib.optional config.services.colord.enable pkgs.colord-kde
         ++ lib.optional config.services.hardware.bolt.enable pkgs.plasma5Packages.plasma-thunderbolt
-        ++ lib.optionals config.services.samba.enable [ kdenetwork-filesharing pkgs.samba ]
+        ++ lib.optional config.services.samba.enable kdenetwork-filesharing
         ++ lib.optional config.services.xserver.wacom.enable pkgs.wacomtablet
         ++ lib.optional config.services.flatpak.enable flatpak-kcm;
 
@@ -338,6 +338,7 @@ in
 
       # Enable helpful DBus services.
       services.accounts-daemon.enable = true;
+      programs.dconf.enable = true;
       # when changing an account picture the accounts-daemon reads a temporary file containing the image which systemsettings5 may place under /tmp
       systemd.services.accounts-daemon.serviceConfig.PrivateTmp = false;
       services.power-profiles-daemon.enable = mkDefault true;

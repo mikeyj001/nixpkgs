@@ -12,6 +12,7 @@
   ./config/iproute2.nix
   ./config/krb5/default.nix
   ./config/ldap.nix
+  ./config/ldso.nix
   ./config/locale.nix
   ./config/malloc.nix
   ./config/mysql.nix
@@ -28,6 +29,7 @@
   ./config/resolvconf.nix
   ./config/shells-environment.nix
   ./config/stevenblack.nix
+  ./config/stub-ld.nix
   ./config/swap.nix
   ./config/sysctl.nix
   ./config/system-environment.nix
@@ -276,6 +278,7 @@
   ./programs/wayland/waybar.nix
   ./programs/wayland/wayfire.nix
   ./programs/weylus.nix
+  ./programs/winbox.nix
   ./programs/wireshark.nix
   ./programs/xastir.nix
   ./programs/wshowkeys.nix
@@ -364,6 +367,7 @@
   ./services/backup/mysql-backup.nix
   ./services/backup/postgresql-backup.nix
   ./services/backup/postgresql-wal-receiver.nix
+  ./services/backup/snapraid.nix
   ./services/backup/restic-rest-server.nix
   ./services/backup/restic.nix
   ./services/backup/rsnapshot.nix
@@ -971,6 +975,7 @@
   ./services/networking/iwd.nix
   ./services/networking/jibri/default.nix
   ./services/networking/jicofo.nix
+  ./services/networking/jigasi.nix
   ./services/networking/jitsi-videobridge.nix
   ./services/networking/jool.nix
   ./services/networking/kea.nix
@@ -1334,6 +1339,7 @@
   ./services/web-apps/vikunja.nix
   ./services/web-apps/whitebophir.nix
   ./services/web-apps/wiki-js.nix
+  ./services/web-apps/windmill.nix
   ./services/web-apps/wordpress.nix
   ./services/web-apps/writefreely.nix
   ./services/web-apps/youtrack.nix
@@ -1359,6 +1365,7 @@
   ./services/web-servers/molly-brown.nix
   ./services/web-servers/nginx/default.nix
   ./services/web-servers/nginx/gitweb.nix
+  ./services/web-servers/nginx/tailscale-auth.nix
   ./services/web-servers/phpfpm/default.nix
   ./services/web-servers/pomerium.nix
   ./services/web-servers/rustus.nix
@@ -1504,7 +1511,6 @@
   ./tasks/network-interfaces.nix
   ./tasks/powertop.nix
   ./tasks/scsi-link-power-management.nix
-  ./tasks/snapraid.nix
   ./tasks/stratis.nix
   ./tasks/swraid.nix
   ./tasks/trackpoint.nix

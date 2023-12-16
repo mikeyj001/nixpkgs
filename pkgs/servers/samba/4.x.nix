@@ -61,11 +61,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "samba";
-  version = "4.19.2";
+  version = "4.19.3";
 
   src = fetchurl {
     url = "mirror://samba/pub/samba/stable/${pname}-${version}.tar.gz";
-    hash = "sha256-nmPwUF4cYx8dsLepNJpR6SXAJsoDrz/V2BIii7WX05M=";
+    hash = "sha256-KAVTuQ8TGxlAWA3yk2U8npvYkGIB9d725ejBYPC/rJY=";
   };
 
   outputs = [ "out" "dev" "man" ];
@@ -79,7 +79,7 @@ stdenv.mkDerivation rec {
   ];
 
   nativeBuildInputs = [
-    python
+    python3Packages.python
     wafHook
     pkg-config
     bison
@@ -223,7 +223,7 @@ stdenv.mkDerivation rec {
   '';
 
   disallowedReferences =
-    lib.optionals (buildPackages.python3Packages.python != python)
+    lib.optionals (buildPackages.python3Packages.python != python3Packages.python)
       [ buildPackages.python3Packages.python ];
 
   passthru = {

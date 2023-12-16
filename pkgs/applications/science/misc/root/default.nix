@@ -58,7 +58,7 @@
 
 stdenv.mkDerivation rec {
   pname = "root";
-  version = "6.28.08";
+  version = "6.28.10";
 
   passthru = {
     tests = import ./tests { inherit callPackage; };
@@ -66,7 +66,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://root.cern.ch/download/root_v${version}.source.tar.gz";
-    hash = "sha256-o+ZLTAH4fNm75X5h75a0FibkmwRGCVBw1B2b+6NSaGI=";
+    hash = "sha256-adb962B+ayC9AsdX+mIXAkwLYTLB6bHf9Nhdmiu35R4=";
   };
 
   nativeBuildInputs = [ makeWrapper cmake pkg-config git ];
@@ -113,7 +113,11 @@ stdenv.mkDerivation rec {
   ];
 
   preConfigure = ''
-    rm -rf builtins/*
+    for path in builtins/*; do
+      if [[ "$path" != "builtins/openui5" ]] && [[ "$path" != "builtins/rendercore" ]]; then
+        rm -rf "$path"
+      fi
+    done
     substituteInPlace cmake/modules/SearchInstalledSoftware.cmake \
       --replace 'set(lcgpackages ' '#set(lcgpackages '
 
@@ -147,7 +151,7 @@ stdenv.mkDerivation rec {
     "-Dbuiltin_freetype=OFF"
     "-Dbuiltin_gtest=OFF"
     "-Dbuiltin_nlohmannjson=OFF"
-    "-Dbuiltin_openui5=OFF"
+    "-Dbuiltin_openui5=ON"
     "-Dalien=OFF"
     "-Dbonjour=OFF"
     "-Dcastor=OFF"
@@ -176,12 +180,12 @@ stdenv.mkDerivation rec {
     "-Dpythia6=OFF"
     "-Dpythia8=OFF"
     "-Drfio=OFF"
-    "-Droot7=OFF"
+    "-Droot7=ON"
     "-Dsqlite=OFF"
     "-Dssl=ON"
     "-Dtmva=ON"
     "-Dvdt=OFF"
-    "-Dwebgui=OFF"
+    "-Dwebgui=ON"
     "-Dxml=ON"
     "-Dxrootd=ON"
   ]
