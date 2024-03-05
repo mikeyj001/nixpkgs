@@ -7,18 +7,18 @@
 
 buildGoModule rec {
   pname = "extism-cli";
-  version = "0.3.8";
+  version = "1.1.0";
 
   src = fetchFromGitHub {
     owner = "extism";
     repo = "cli";
     rev = "refs/tags/v${version}";
-    hash = "sha256-StMipPMLSQzrhWv0yoKkNiuHMRW7QIhmVZ/M27WDWrM=";
+    hash = "sha256-QC21BrT7uAbKPyLGjx0lBnQHN1nHek+BdCJ7EpJGV6s=";
   };
 
   modRoot = "./extism";
 
-  vendorHash = "sha256-sSKiwYT5EP0FQJbhgv9ZFDwwwvIJ66yMULbj529AZwY=";
+  vendorHash = "sha256-UaMPtWmBKCcBR2KiubhW6F7knP6dM8sXQzUEaT59cRQ=";
 
   nativeBuildInputs = [ installShellFiles ];
 

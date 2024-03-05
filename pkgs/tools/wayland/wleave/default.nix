@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "wleave";
-  version = "0.3.1";
+  version = "0.3.2";
 
   src = fetchFromGitHub {
     owner = "AMNatty";
     repo = "wleave";
     rev = version;
-    hash = "sha256-CVngGK2gSqar4rnUzgTH/aDE34La5PjSocN/h1oxoVA=";
+    hash = "sha256-RMUwsrDvSErNbulpyJyRSB1NIsG706SCvF50t3VKuWA=";
   };
 
-  cargoHash = "sha256-wVDNJSxNzx9gMp2tMx9bMwWGKcEybEixVom4SUJZPgU=";
+  cargoHash = "sha256-E7Lw7HIZC8j/1H+M9lfglfMkWDeaAL505qCkj+CV7Ik=";
 
   nativeBuildInputs = [
     pkg-config
@@ -36,7 +36,18 @@ rustPlatform.buildRustPackage rec {
     glib
   ];
 
+  postPatch = ''
+    substituteInPlace style.css \
+      --replace-fail "/usr/share/wleave" "$out/share/${pname}"
+
+    substituteInPlace src/main.rs \
+      --replace-fail "/etc/wleave" "$out/etc/${pname}"
+  '';
+
   postInstall = ''
+    install -Dm644 -t "$out/etc/wleave" {"style.css","layout"}
+    install -Dm644 -t "$out/share/wleave/icons" icons/*
+
     for f in man/*.scd; do
       local page="man/$(basename "$f" .scd)"
       scdoc < "$f" > "$page"

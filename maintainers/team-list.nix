@@ -96,6 +96,16 @@ with lib.maintainers; {
     shortName = "Blockchains";
   };
 
+  buildbot = {
+    members = [
+      lopsided98
+      mic92
+      zowoq
+    ];
+    scope = "Maintain Buildbot CI framework";
+    shortName = "Buildbot";
+  };
+
   c = {
     members = [
       matthewbauer
@@ -166,7 +176,7 @@ with lib.maintainers; {
 
   cosmopolitan = {
     members = [
-      lourkeur
+      bbjubjub
       tomberek
     ];
     scope = "Maintain the Cosmopolitan LibC and related programs.";
@@ -297,6 +307,20 @@ with lib.maintainers; {
     shortName = "Flying Circus employees";
   };
 
+  formatter = {
+    members = [
+      piegames
+      infinisil
+      das_j
+      tomberek
+      _0x4A6F
+      # Not in the maintainer list
+      # Sereja313
+    ];
+    scope = "Tentative Nix formatter team to be established in https://github.com/NixOS/rfcs/pull/166";
+    shortName = "Nix formatter team";
+  };
+
   freedesktop = {
     members = [ jtojnar ];
     scope = "Maintain Freedesktop.org packages for graphical desktop.";
@@ -315,11 +339,9 @@ with lib.maintainers; {
 
   geospatial = {
     members = [
-      das-g
       imincik
       nh2
       nialov
-      r-burns
       sikmir
       willcohen
     ];
@@ -407,7 +429,6 @@ with lib.maintainers; {
   helsinki-systems = {
     # Verify additions to this team with at least one already existing member of the team.
     members = [
-      ajs124
       das_j
     ];
     scope = "Group registration for packages maintained by Helsinki Systems";
@@ -752,7 +773,6 @@ with lib.maintainers; {
     members = [
       aanderse
       drupol
-      etu
       ma27
       talyz
     ];
@@ -798,12 +818,18 @@ with lib.maintainers; {
 
   qt-kde = {
     members = [
+      ilya-fedin
+      k900
+      LunNova
+      mjm
+      nickcao
+      SuperSandro2000
       ttuegel
     ];
     githubTeams = [
       "qt-kde"
     ];
-    scope = "Maintain the KDE desktop environment and Qt.";
+    scope = "Maintain the Qt framework, KDE application suite, Plasma desktop environment and related projects.";
     shortName = "Qt / KDE";
     enableFeatureFreezePing = true;
   };
