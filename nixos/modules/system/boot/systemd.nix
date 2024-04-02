@@ -47,6 +47,9 @@ let
       "rescue.target"
       "rescue.service"
 
+      # systemd-debug-generator
+      "debug-shell.service"
+
       # Udev.
       "systemd-tmpfiles-setup-dev-early.service"
       "systemd-udevd-control.socket"
@@ -97,7 +100,7 @@ let
 
       # Maintaining state across reboots.
       "systemd-random-seed.service"
-      "systemd-boot-random-seed.service"
+      ] ++ (optional cfg.package.withBootloader "systemd-boot-random-seed.service") ++ [
       "systemd-backlight@.service"
       "systemd-rfkill.service"
       "systemd-rfkill.socket"
