@@ -67,7 +67,9 @@ let
     chapterskip = callPackage ./chapterskip.nix { };
     convert = callPackage ./convert.nix { };
     cutter = callPackage ./cutter.nix { };
+    dynamic-crop = callPackage ./dynamic-crop.nix { };
     inhibit-gnome = callPackage ./inhibit-gnome.nix { };
+    memo = callPackage ./memo.nix { };
     modernx = callPackage ./modernx.nix { };
     modernx-zydezu = callPackage ./modernx-zydezu.nix { };
     mpris = callPackage ./mpris.nix { };
