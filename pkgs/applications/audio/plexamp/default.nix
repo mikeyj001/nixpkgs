@@ -1,4 +1,4 @@
-{ lib, fetchurl, appimageTools, pkgs }:
+{ lib, fetchurl, appimageTools }:
 
 let
   pname = "plexamp";
@@ -16,9 +16,6 @@ let
 in appimageTools.wrapType2 {
   inherit pname version src;
 
-  multiArch = false; # no 32bit needed
-  extraPkgs = pkgs: appimageTools.defaultFhsEnvArgs.multiPkgs pkgs ++ [ pkgs.bash ];
-
   extraInstallCommands = ''
     install -m 444 -D ${appimageContents}/plexamp.desktop $out/share/applications/plexamp.desktop
     install -m 444 -D ${appimageContents}/plexamp.png \
@@ -30,7 +27,7 @@ in appimageTools.wrapType2 {
   passthru.updateScript = ./update-plexamp.sh;
 
   meta = with lib; {
-    description = "A beautiful Plex music player for audiophiles, curators, and hipsters";
+    description = "Beautiful Plex music player for audiophiles, curators, and hipsters";
     homepage = "https://plexamp.com/";
     changelog = "https://forums.plex.tv/t/plexamp-release-notes/221280/53";
     license = licenses.unfree;

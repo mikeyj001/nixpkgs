@@ -11,20 +11,19 @@
 
 buildGoModule rec {
   pname = "sing-box";
-  version = "1.8.12";
+  version = "1.9.2";
 
   src = fetchFromGitHub {
     owner = "SagerNet";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-hgp4SzPJMeIaCxsuK7Y93h6E3KxK0KdNp+DCfv8UtiI=";
+    hash = "sha256-pcmY/AU/P0ebGbcJVhp8Moj4y3B2AbyZD56Fw2ZSpt4=";
   };
 
-  vendorHash = "sha256-4P36eTT7Q5+fZuPUGKEYal3NQ9WyEJxfNVoKJRIk6bo=";
+  vendorHash = "sha256-gmh+0NYOXcBsD+aamCTuOlgvYqmtfDnar2iGWRcepPE=";
 
   tags = [
     "with_quic"
-    "with_grpc"
     "with_dhcp"
     "with_wireguard"
     "with_ech"
@@ -32,7 +31,6 @@ buildGoModule rec {
     "with_reality_server"
     "with_acme"
     "with_clash_api"
-    "with_v2ray_api"
     "with_gvisor"
   ];
 
@@ -65,7 +63,7 @@ buildGoModule rec {
 
   meta = with lib;{
     homepage = "https://sing-box.sagernet.org";
-    description = "The universal proxy platform";
+    description = "Universal proxy platform";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ nickcao ];
     mainProgram = "sing-box";

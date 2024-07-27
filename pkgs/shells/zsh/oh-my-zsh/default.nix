@@ -5,14 +5,14 @@
 , git, nix, nixfmt-classic, jq, coreutils, gnused, curl, cacert, bash }:
 
 stdenv.mkDerivation rec {
-  version = "2024-04-23";
+  version = "2024-06-04";
   pname = "oh-my-zsh";
 
   src = fetchFromGitHub {
     owner = "ohmyzsh";
     repo = "ohmyzsh";
-    rev = "5d2d35cd1741af19553007fe0cc5324744fc58fa";
-    sha256 = "sha256-qEF36Ne1b63XYqfiTOtjbkF/cqDDAPM4EyckhOjYFEE=";
+    rev = "efdfe2f29ac57a9de76391b4e5548edab6a43241";
+    sha256 = "sha256-IyBZMAcSFhZ2zdDZ9FcKpSEK3N2qjkTbkh3ToigFtTw=";
   };
 
   strictDeps = true;
@@ -108,7 +108,7 @@ stdenv.mkDerivation rec {
   };
 
   meta = with lib; {
-    description = "A framework for managing your zsh configuration";
+    description = "Framework for managing your zsh configuration";
     longDescription = ''
       Oh My Zsh is a framework for managing your zsh configuration.
 

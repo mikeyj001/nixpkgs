@@ -8,16 +8,16 @@
 
 buildGoModule rec {
   pname = "updatecli";
-  version = "0.76.0";
+  version = "0.78.0";
 
   src = fetchFromGitHub {
     owner = "updatecli";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-UfiwagyE3w+kcPJnDDNTCGrxghnag/RPz6SSdAglyYA=";
+    hash = "sha256-VpMi+r7QUSD99PRzbTeIxXn1O9GdfHNJM1F0OBzvNmc=";
   };
 
-  vendorHash = "sha256-STiVtzA78zeo5wywwzvA0dqmBW3REUvcpOXuWjpxReY=";
+  vendorHash = "sha256-Ji8r5c8LP7StGp/ve9RkQDeL21HBoK3Fln8LGBeqBpw=";
 
   # tests require network access
   doCheck = false;
@@ -47,7 +47,7 @@ buildGoModule rec {
   '';
 
   meta = with lib; {
-    description = "A Declarative Dependency Management tool";
+    description = "Declarative Dependency Management tool";
     longDescription = ''
       Updatecli is a command-line tool used to define and apply update strategies.
     '';

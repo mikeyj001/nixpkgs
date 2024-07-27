@@ -13,7 +13,7 @@
 , openjfx21
 , autoPatchelfHook
 , makeBinaryWrapper
-, wrapGAppsHook
+, wrapGAppsHook3
 }:
 
 let
@@ -66,7 +66,7 @@ stdenv.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     autoPatchelfHook
     makeBinaryWrapper
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [
@@ -98,7 +98,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   meta = with lib; {
-    description = "The secure french messenger";
+    description = "Secure french messenger";
     homepage = "https://www.olvid.io";
     license = licenses.agpl3Only;
     mainProgram = "olvid";

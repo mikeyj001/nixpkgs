@@ -24,6 +24,11 @@ buildGoModule rec {
 
   vendorHash = "sha256-XlfdIg8YHCeCvc7kZczUxlxUonyZSQATgsxLTMvNDk4=";
 
+  ldflags = [
+    "-w"
+    "-X main.Version=${version}"
+  ];
+
   nativeBuildInputs = lib.optionals hsmSupport [ pkg-config ];
 
   buildInputs =
@@ -57,7 +62,7 @@ buildGoModule rec {
   passthru.tests.step-ca = nixosTests.step-ca;
 
   meta = with lib; {
-    description = "A private certificate authority (X.509 & SSH) & ACME server for secure automated certificate management, so you can use TLS everywhere & SSO for SSH";
+    description = "Private certificate authority (X.509 & SSH) & ACME server for secure automated certificate management, so you can use TLS everywhere & SSO for SSH";
     homepage = "https://smallstep.com/certificates/";
     changelog = "https://github.com/smallstep/certificates/releases/tag/v${version}";
     license = licenses.asl20;

@@ -1,9 +1,10 @@
-{ lib
-, stdenv
-, buildPythonPackage
-, fetchFromGitHub
-, mpv
-, setuptools
+{
+  lib,
+  stdenv,
+  buildPythonPackage,
+  fetchFromGitHub,
+  mpv,
+  setuptools,
 }:
 
 buildPythonPackage rec {
@@ -18,9 +19,7 @@ buildPythonPackage rec {
     hash = "sha256-qP5Biw4sTLioAhmMZX+Pemue2PWc3N7afAe38dwJv3U=";
   };
 
-  nativeBuildInputs = [
-    setuptools
-  ];
+  nativeBuildInputs = [ setuptools ];
 
   buildInputs = [ mpv ];
 
@@ -35,7 +34,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "mpv" ];
 
   meta = with lib; {
-    description = "A python interface to the mpv media player";
+    description = "Python interface to the mpv media player";
     homepage = "https://github.com/jaseg/python-mpv";
     license = licenses.agpl3Plus;
     maintainers = with maintainers; [ onny ];

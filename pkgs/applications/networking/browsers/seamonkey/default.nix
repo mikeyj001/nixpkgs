@@ -3,20 +3,17 @@ with import <nixpkgs>{};
 { stdenv, lib, bzip2, glib, dbus-glib, xorg, gtk3, gcc-unwrapped,libXdamage, fetchurl, autoPatchelfHook }:
 
 stdenv.mkDerivation rec {
-  version = "2.53.18";
+  version = "2.53.18.2";
   name = "seamonkey-${version}";
 
   src = fetchurl {
-	url = "https://archive.mozilla.org/pub/seamonkey/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
-	#2.53.17
-#	sha256 = "sha256-SZFcMbuWb6O7lggc1ZRPcdbM1Ca2MIE2PbZjtaijvH8=";
+#	url = "https://archive.mozilla.org/pub/seamonkey/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
+	url = "https://archive.seamonkey-project.org/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
 
-	# 2.53.17.1
-#	sha256 = "sha256-JGI6objGvH7gwBAqBm1XRtVLfW7MynhpecxKm61yCbQ=";
-
-	# 2.53.18
+	# 2.53.18.2
 #	sha256 = "";
-	sha256 = "sha256-SqiPnnFuZ7IEXhBwecxus4NUePQNWR/P9z2xka8bPdM=";
+  sha256 = "sha256-6bVw//tka7g2lE8146YR+Gbp0Q7xH3wEpfL5CPGn1Ak=";
+
   };
 
   unpacked = ''
