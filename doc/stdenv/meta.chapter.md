@@ -5,7 +5,7 @@ Nix packages can declare *meta-attributes* that contain information about a pack
 ```nix
 {
   meta = {
-    description = "A program that produces a familiar, friendly greeting";
+    description = "Program that produces a familiar, friendly greeting";
     longDescription = ''
       GNU Hello is a program that prints "Hello, world!" when you run it.
       It is fully customizable.
@@ -22,6 +22,10 @@ Meta-attributes are not passed to the builder of the package. Thus, a change to 
 
 ## Standard meta-attributes {#sec-standard-meta-attributes}
 
+If the package is to be submitted to Nixpkgs, please check out the
+[requirements for meta attributes](https://github.com/NixOS/nixpkgs/tree/master/pkgs#meta-attributes)
+in the contributing documentation.
+
 It is expected that each meta-attribute is one of the following:
 
 ### `description` {#var-meta-description}
@@ -29,11 +33,21 @@ It is expected that each meta-attribute is one of the following:
 A short (one-line) description of the package.
 This is displayed on [search.nixos.org](https://search.nixos.org/packages).
 
-Don’t include a period at the end. Don’t include newline characters. Capitalise the first character. For brevity, don’t repeat the name of package --- just describe what it does.
+The general requirements of a description are:
+
+- Be short, just one sentence.
+- Be capitalized.
+- Not start with definite ("The") or indefinite ("A"/"An") article.
+- Not start with the package name.
+  - More generally, it should not refer to the package name.
+- Not end with a period (or any punctuation for that matter).
+- Provide factual information.
+  - Avoid subjective language.
+
 
 Wrong: `"libpng is a library that allows you to decode PNG images."`
 
-Right: `"A library for decoding PNG images"`
+Right: `"Library for decoding PNG images"`
 
 ### `longDescription` {#var-meta-longDescription}
 
@@ -66,6 +80,12 @@ The license, or licenses, for the package. One from the attribute set defined in
 - Multiple licenses referenced as a space delimited string of attribute shortNames (frowned upon) `"asl20 free ofl"`.
 
 For details, see [Licenses](#sec-meta-license).
+
+### `sourceProvenance` {#var-meta-sourceProvenance}
+
+A list containing the type or types of source inputs from which the package is built, e.g. original source code, pre-built binaries, etc.
+
+For details, see [Source provenance](#sec-meta-sourceProvenance).
 
 ### `maintainers` {#var-meta-maintainers}
 
@@ -109,107 +129,6 @@ The [`lib.meta.availableOn`](https://github.com/NixOS/nixpkgs/blob/b03ac42b0734d
 Some packages use this to automatically detect the maximum set of features with which they can be built.
 For example, `systemd` [requires dynamic linking](https://github.com/systemd/systemd/issues/20600#issuecomment-912338965), and [has a `meta.badPlatforms` setting](https://github.com/NixOS/nixpkgs/blob/b03ac42b0734da3e7be9bf8d94433a5195734b19/pkgs/os-specific/linux/systemd/default.nix#L752) similar to the one above.
 Packages which can be built with or without `systemd` support will use `lib.meta.availableOn` to detect whether or not `systemd` is available on the [`hostPlatform`](#ssec-cross-platform-parameters) for which they are being built; if it is not available (e.g. due to a statically-linked host platform like `pkgsStatic`) this support will be disabled by default.
-
-### `tests` {#var-meta-tests}
-
-::: {.warning}
-This attribute is special in that it is not actually under the `meta` attribute set but rather under the `passthru` attribute set. This is due to how `meta` attributes work, and the fact that they are supposed to contain only metadata, not derivations.
-:::
-
-An attribute set with tests as values. A test is a derivation that builds when the test passes and fails to build otherwise.
-
-You can run these tests with:
-
-```ShellSession
-$ cd path/to/nixpkgs
-$ nix-build -A your-package.tests
-```
-
-Note that Hydra and [`nixpkgs-review`](https://github.com/Mic92/nixpkgs-review) don't build these derivations by default, and that ([`@ofborg`](https://github.com/NixOS/ofborg)) only builds them when evaluating PRs for that particular package (or when manually instructed).
-
-#### Package tests {#var-meta-tests-packages}
-
-Tests that are part of the source package are often executed in the `installCheckPhase`. This phase is also suitable for performing a `--version` test for packages that support such flag. Here's an example:
-
-```nix
-# Say the package is git
-stdenv.mkDerivation(finalAttrs: {
-  pname = "git";
-  version = "...";
-  # ...
-
-  doInstallCheck = true;
-  installCheckPhase = ''
-    runHook preInstallCheck
-
-    echo checking if 'git --version' mentions ${finalAttrs.version}
-    $out/bin/git --version | grep ${finalAttrs.version}
-
-    runHook postInstallCheck
-  '';
-  # ...
-})
-```
-
-Most programs distributed by Nixpkgs support such a `--version` flag, and it can help give confidence that the package at least got compiled properly. However, tests that are slightly non trivial will better fit into `passthru.tests`, because:
-
-* `passthru.tests` tests the 'real' package, independently from the environment in which it was built
-* We can run and debug a `passthru.tests` independently, after the package was built (useful if it takes a long time).
-* `installCheckPhase` adds overhead to each build
-
-It is also possible to still use `passthru.tests` to test the version, with [testVersion](#tester-testVersion).
-
-For more on how to write and run package tests, see [`pkgs/README.md`](https://github.com/NixOS/nixpkgs/blob/master/pkgs/README.md#package-tests).
-
-#### NixOS tests {#var-meta-tests-nixos}
-
-The NixOS tests are available as `nixosTests` in parameters of derivations. For instance, the OpenSMTPD derivation includes lines similar to:
-
-```nix
-{ /* ... , */ nixosTests }:
-{
-  # ...
-  passthru.tests = {
-    basic-functionality-and-dovecot-integration = nixosTests.opensmtpd;
-  };
-}
-```
-
-NixOS tests run in a VM, so they are slower than regular package tests. For more information see [NixOS module tests](https://nixos.org/manual/nixos/stable/#sec-nixos-tests).
-
-Alternatively, you can specify other derivations as tests. You can make use of
-the optional parameter to inject the correct package without
-relying on non-local definitions, even in the presence of `overrideAttrs`.
-Here that's `finalAttrs.finalPackage`, but you could choose a different name if
-`finalAttrs` already exists in your scope.
-
-`(mypkg.overrideAttrs f).passthru.tests` will be as expected, as long as the
-definition of `tests` does not rely on the original `mypkg` or overrides it in
-all places.
-
-```nix
-# my-package/default.nix
-{ stdenv, callPackage }:
-stdenv.mkDerivation (finalAttrs: {
-  # ...
-  passthru.tests.example = callPackage ./example.nix { my-package = finalAttrs.finalPackage; };
-})
-```
-
-```nix
-# my-package/example.nix
-{ runCommand, lib, my-package, ... }:
-runCommand "my-package-test" {
-  nativeBuildInputs = [ my-package ];
-  src = lib.sources.sourcesByRegex ./. [ ".*.in" ".*.expected" ];
-} ''
-  my-package --help
-  my-package <example.in >example.actual
-  diff -U3 --color=auto example.expected example.actual
-  mkdir $out
-''
-```
-
 
 ### `timeout` {#var-meta-timeout}
 

@@ -35,14 +35,14 @@
 
 buildPythonPackage rec {
   pname = "jupyter-server";
-  version = "2.14.0";
+  version = "2.14.2";
   pyproject = true;
   disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     pname = "jupyter_server";
     inherit version;
-    hash = "sha256-ZZFUzqUSCDQ0/XyTt/4Il696L9C53UdJKCtC6qxK5nc=";
+    hash = "sha256-ZglQIaqWOM7SdsJIsdgYYuTFDyktV1kgu+lg3hxWsSs=";
   };
 
   nativeBuildInputs = [

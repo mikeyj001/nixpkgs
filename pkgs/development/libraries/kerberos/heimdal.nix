@@ -26,7 +26,7 @@
 , SystemConfiguration
 
 , curl
-, jdk
+, jdk_headless
 , unzip
 , which
 
@@ -83,12 +83,14 @@ stdenv.mkDerivation {
   doCheck = true;
   nativeCheckInputs = [
     curl
-    jdk
+    jdk_headless
     unzip
     which
   ];
 
   configureFlags = [
+    "--with-hdbdir=/var/lib/heimdal"
+
     "--with-libedit-include=${libedit.dev}/include"
     "--with-libedit-lib=${libedit}/lib"
     "--with-berkeley-db-include=${db.dev}/include"

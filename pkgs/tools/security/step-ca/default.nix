@@ -13,16 +13,16 @@
 
 buildGoModule rec {
   pname = "step-ca";
-  version = "0.26.1";
+  version = "0.27.2";
 
   src = fetchFromGitHub {
     owner = "smallstep";
     repo = "certificates";
     rev = "refs/tags/v${version}";
-    hash = "sha256-yej7gzhaUPbcvqbse7Hh7Im38+DUfC9UZkpjpuG8ctk=";
+    hash = "sha256-G+oahvBbMW8vs1DublFAC1rREmQ7Q1r7rNNS0+gnfPE=";
   };
 
-  vendorHash = "sha256-XlfdIg8YHCeCvc7kZczUxlxUonyZSQATgsxLTMvNDk4=";
+  vendorHash = "sha256-gQEGCbVgtKIaUgBkfpVwLXoUg1EUhaQFn9JZvV5Rjhc=";
 
   ldflags = [
     "-w"
@@ -68,7 +68,6 @@ buildGoModule rec {
     license = licenses.asl20;
     maintainers = with maintainers; [
       cmcdragonkai
-      mohe2015
       techknowlogick
     ];
   };

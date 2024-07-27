@@ -30,18 +30,19 @@
   xcffib,
   xkbcommon,
   nixosTests,
+  extraPackages ? [ ],
 }:
 
 buildPythonPackage rec {
   pname = "qtile";
-  version = "0.26.0";
+  version = "0.27.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "qtile";
     repo = "qtile";
     rev = "refs/tags/v${version}";
-    hash = "sha256-htgrfGBGRlJSm88mmwW92ikXR/M1lr0OTom16TIvdpo=";
+    hash = "sha256-FO83i6nnMGY4eGsPYFfLuQPbN9ngUWXQMguBYqGrehg=";
   };
 
   patches = [
@@ -66,7 +67,7 @@ buildPythonPackage rec {
     pkg-config
   ];
 
-  dependencies = [
+  dependencies = extraPackages ++ [
     (cairocffi.override { withXcffib = true; })
     dbus-next
     iwlib
@@ -96,6 +97,11 @@ buildPythonPackage rec {
     tests.qtile = nixosTests.qtile;
     providedSessions = [ "qtile" ];
   };
+
+  postInstall = ''
+    install resources/qtile.desktop -Dt $out/share/xsessions
+    install resources/qtile-wayland.desktop -Dt $out/share/wayland-sessions
+  '';
 
   meta = with lib; {
     homepage = "http://www.qtile.org/";

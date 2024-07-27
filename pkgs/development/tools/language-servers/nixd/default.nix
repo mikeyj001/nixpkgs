@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  cmake,
   boost182,
   gtest,
   llvmPackages,
@@ -19,13 +20,13 @@
 
 let
   common = rec {
-    version = "2.2.0";
+    version = "2.2.3";
 
     src = fetchFromGitHub {
       owner = "nix-community";
       repo = "nixd";
       rev = version;
-      hash = "sha256-/8Ty1I130vWFidedt+WEaaFHS/zMFVu9vpq4Z3EBjGw=";
+      hash = "sha256-1i4U012vqw84NuD5cjgfVX/he4vW9MyEeIetJ55g280=";
     };
 
     nativeBuildInputs = [
@@ -35,6 +36,8 @@ let
     ];
 
     mesonBuildType = "release";
+
+    strictDeps = true;
 
     doCheck = true;
 
@@ -128,6 +131,8 @@ in
         gtest
         boost182
       ];
+
+      nativeBuildInputs = common.nativeBuildInputs ++ [ cmake ];
 
       env.CXXFLAGS = "-include ${nix.dev}/include/nix/config.h";
 

@@ -9,13 +9,12 @@
   copyDesktopItems,
   makeDesktopItem,
   python3,
-  boost,
   SDL2,
   pkg-config,
   libpulseaudio,
   libpng,
   imagemagick,
-  gnome,
+  zenity,
   makeWrapper,
   imgui,
   stormlib,
@@ -122,7 +121,7 @@ stdenv.mkDerivation (finalAttrs: {
     SDL2
     libpulseaudio
     libpng
-    gnome.zenity
+    zenity
     imgui'
     stormlib'
     libzip
@@ -183,7 +182,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   fixupPhase = ''
-    wrapProgram $out/2s2h/2s2h.elf --prefix PATH ":" ${lib.makeBinPath [ gnome.zenity ]}
+    wrapProgram $out/2s2h/2s2h.elf --prefix PATH ":" ${lib.makeBinPath [ zenity ]}
   '';
 
   desktopItems = [

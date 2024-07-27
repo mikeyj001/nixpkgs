@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchurl
+, updateAutotoolsGnuConfigScriptsHook
 , guileSupport ? false, guile
 # avoid guile depend on bootstrap to prevent dependency cycles
 , inBootstrap ? false
@@ -31,7 +32,7 @@ stdenv.mkDerivation rec {
     ./0002-remove-impure-dirs.patch
   ];
 
-  nativeBuildInputs = lib.optionals guileEnabled [ pkg-config ];
+  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ] ++ lib.optionals guileEnabled [ pkg-config ];
   buildInputs = lib.optionals guileEnabled [ guile ];
 
   configureFlags = lib.optional guileEnabled "--with-guile"
@@ -68,7 +69,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.gnu.org/software/make/";
 
     license = licenses.gpl3Plus;
-    maintainers = [ maintainers.vrthra ];
+    maintainers = [ ];
     mainProgram = "make";
     platforms = platforms.all;
   };

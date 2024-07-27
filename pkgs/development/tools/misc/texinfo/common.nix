@@ -1,7 +1,7 @@
 { version, sha256, patches ? [] }:
 
-{ lib, stdenv, buildPackages, fetchurl, perl, xz, libintl, bash
-, gnulib, gawk, freebsd, libiconv
+{ lib, stdenv, buildPackages, fetchurl, perl, libintl, bash
+, updateAutotoolsGnuConfigScriptsHook, gnulib, gawk, freebsd, libiconv
 
 # we are a dependency of gcc, this simplifies bootstraping
 , interactive ? false, ncurses, procps
@@ -49,7 +49,8 @@ stdenv.mkDerivation {
   # A native compiler is needed to build tools needed at build time
   depsBuildBuild = [ buildPackages.stdenv.cc perl ];
 
-  buildInputs = [ xz.bin bash libintl ]
+  nativeBuildInputs = [ updateAutotoolsGnuConfigScriptsHook ];
+  buildInputs = [ bash libintl ]
     ++ optionals stdenv.isSunOS [ libiconv gawk ]
     ++ optional interactive ncurses;
 
@@ -89,7 +90,7 @@ stdenv.mkDerivation {
     changelog = "https://git.savannah.gnu.org/cgit/texinfo.git/plain/NEWS";
     license = licenses.gpl3Plus;
     platforms = platforms.all;
-    maintainers = with maintainers; [ vrthra oxij ];
+    maintainers = with maintainers; [ oxij ];
     # see comment above in patches section
     broken = stdenv.hostPlatform.isPower64 && lib.strings.versionOlder version "6.0";
 

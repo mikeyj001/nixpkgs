@@ -7,7 +7,7 @@
 , python3
 , giflib
 , darwin
-, ghostscript
+, ghostscript_headless
 , imagemagickBig
 , jbig2enc
 , optipng
@@ -24,13 +24,13 @@
 }:
 
 let
-  version = "2.9.0";
+  version = "2.11.0";
 
   src = fetchFromGitHub {
     owner = "paperless-ngx";
     repo = "paperless-ngx";
     rev = "refs/tags/v${version}";
-    hash = "sha256-7dcZbuz3yi0sND6AEqIwIo9byeZheOpIAhmBpOW5lhU=";
+    hash = "sha256-lKPjvWc6FcEOwDgIUW8Eki8h8C19G618o1rhXnrlw/E=";
   };
 
   # subpath installation is broken with uvicorn >= 0.26
@@ -55,7 +55,7 @@ let
 
 
   path = lib.makeBinPath [
-    ghostscript
+    ghostscript_headless
     imagemagickBig
     jbig2enc
     optipng
@@ -74,7 +74,7 @@ let
       cd src-ui
     '';
 
-    npmDepsHash = "sha256-gLEzifZK8Ok1SOo3YIIV5pTx4cbedQh025VqkodYrYQ=";
+    npmDepsHash = "sha256-gbHavMUmsZaRSfBkdrrNpTO0R8zacb8110U8n5Y09oU=";
 
     nativeBuildInputs = [
       pkg-config
@@ -138,6 +138,7 @@ python.pkgs.buildPythonApplication rec {
     django-filter
     django-guardian
     django-multiselectfield
+    django-soft-delete
     djangorestframework
     djangorestframework-guardian2
     drf-writable-nested
@@ -153,7 +154,7 @@ python.pkgs.buildPythonApplication rec {
     ocrmypdf
     pathvalidate
     pdf2image
-    psycopg2
+    psycopg
     python-dateutil
     python-dotenv
     python-gnupg
@@ -218,6 +219,7 @@ python.pkgs.buildPythonApplication rec {
     pytest-django
     pytest-env
     pytest-httpx
+    pytest-mock
     pytest-rerunfailures
     pytest-xdist
     pytestCheckHook
@@ -248,6 +250,8 @@ python.pkgs.buildPythonApplication rec {
     # AssertionError: 10 != 4 (timezone/time issue)
     # Due to getting local time from modification date in test_consumer.py
     "testNormalOperation"
+    # Something broken with new Tesseract and inline RTL/LTR overrides?
+    "test_rtl_language_detection"
   ];
 
   doCheck = !stdenv.isDarwin;

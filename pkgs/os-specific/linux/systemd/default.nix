@@ -196,7 +196,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "systemd";
     repo = "systemd-stable";
-    rev = "v${version}";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-ah0678iNfy0c5NhHhjn0roY6RoM8OE0hWyEt+qEGKRQ=";
   };
 
@@ -407,6 +407,7 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   outputs = [ "out" "dev" ] ++ (lib.optional (!buildLibsOnly) "man");
+  separateDebugInfo = true;
 
   hardeningDisable = [
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=111523
@@ -491,7 +492,7 @@ stdenv.mkDerivation (finalAttrs: {
     #   https://github.com/systemd/systemd/blob/60e930fc3e6eb8a36fbc184773119eb8d2f30364/NEWS#L258-L266
     (lib.mesonOption "time-epoch" releaseTimestamp)
 
-    (lib.mesonOption "version-tag" version)
+    (lib.mesonOption "version-tag" finalAttrs.version)
     (lib.mesonOption "mode" "release")
     (lib.mesonOption "tty-gid" "3") # tty in NixOS has gid 3
     (lib.mesonOption "debug-shell" "${bashInteractive}/bin/bash")
@@ -499,6 +500,12 @@ stdenv.mkDerivation (finalAttrs: {
     # Use cgroupsv2. This is already the upstream default, but better be explicit.
     (lib.mesonOption "default-hierarchy" "unified")
     (lib.mesonOption "kmod-path" "${kmod}/bin/kmod")
+
+    # Attempts to check /usr/sbin and that fails in macOS sandbox because
+    # permission is denied. If /usr/sbin is not a symlink, it defaults to true.
+    # We set it to false since stdenv moves sbin/* to bin and creates a symlink,
+    # that is, we do not have split bin.
+    (lib.mesonOption "split-bin" "false")
 
     # D-Bus
     (lib.mesonOption "dbuspolicydir" "${placeholder "out"}/share/dbus-1/system.d")
@@ -517,8 +524,8 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.mesonOption "sbat-distro" "nixos")
     (lib.mesonOption "sbat-distro-summary" "NixOS")
     (lib.mesonOption "sbat-distro-url" "https://nixos.org/")
-    (lib.mesonOption "sbat-distro-pkgname" pname)
-    (lib.mesonOption "sbat-distro-version" version)
+    (lib.mesonOption "sbat-distro-pkgname" finalAttrs.pname)
+    (lib.mesonOption "sbat-distro-version" finalAttrs.version)
 
     # Users
     (lib.mesonOption "system-uid-max" "999")
@@ -813,6 +820,9 @@ stdenv.mkDerivation (finalAttrs: {
     for i in $out/share/dbus-1/system-services/*.service; do
       substituteInPlace $i --replace /bin/false ${coreutils}/bin/false
     done
+
+    # For compatibility with dependents that use sbin instead of bin.
+    ln -s bin "$out/sbin"
 
     rm -rf $out/etc/rpm
   '' + lib.optionalString (!withKernelInstall) ''
