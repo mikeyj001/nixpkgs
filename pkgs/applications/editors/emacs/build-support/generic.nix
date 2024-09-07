@@ -1,11 +1,11 @@
 # generic builder for Emacs packages
 
-{ lib, stdenv, emacs, texinfo, writeText, gcc, ... }:
+{ lib, stdenv, emacs, texinfo, writeText, ... }:
 
 let
-  inherit (lib) optionalAttrs getLib;
-  handledArgs = [ "buildInputs" "packageRequires" "propagatedUserEnvPkgs" "meta" ]
-    ++ lib.optionals (emacs.withNativeCompilation or false) [ "nativeBuildInputs" "postInstall" ];
+  inherit (lib) optionalAttrs;
+  handledArgs = [ "buildInputs" "nativeBuildInputs" "packageRequires" "propagatedUserEnvPkgs" "meta" ]
+    ++ lib.optionals (emacs.withNativeCompilation or false) [ "postInstall" ];
 
   setupHook = writeText "setup-hook.sh" ''
     source ${./emacs-funcs.sh}
@@ -31,6 +31,8 @@ in
 , propagatedUserEnvPkgs ? []
 , postInstall ? ""
 , meta ? {}
+, turnCompilationWarningToError ? false
+, ignoreCompilationError ? true
 , ...
 }@args:
 
@@ -53,7 +55,8 @@ stdenv.mkDerivation (finalAttrs: ({
     esac
   '';
 
-  buildInputs = [emacs texinfo] ++ packageRequires ++ buildInputs;
+  buildInputs = packageRequires ++ buildInputs;
+  nativeBuildInputs = [ emacs texinfo ] ++ nativeBuildInputs;
   propagatedBuildInputs = packageRequires;
   propagatedUserEnvPkgs = packageRequires ++ propagatedUserEnvPkgs;
 
@@ -71,11 +74,9 @@ stdenv.mkDerivation (finalAttrs: ({
 
 // optionalAttrs (emacs.withNativeCompilation or false) {
 
-  LIBRARY_PATH = "${getLib stdenv.cc.libc}/lib";
-
-  nativeBuildInputs = [ gcc ] ++ nativeBuildInputs;
-
   addEmacsNativeLoadPath = true;
+
+  inherit turnCompilationWarningToError ignoreCompilationError;
 
   postInstall = ''
     # Besides adding the output directory to the native load path, make sure
@@ -86,8 +87,13 @@ stdenv.mkDerivation (finalAttrs: ({
     addEmacsVars "$out"
 
     find $out/share/emacs -type f -name '*.el' -print0 \
-      | xargs -0 -I {} -n 1 -P $NIX_BUILD_CORES sh -c \
-          "emacs --batch --eval '(setq large-file-warning-threshold nil)' -f batch-native-compile {} || true"
+      | xargs --verbose -0 -I {} -n 1 -P $NIX_BUILD_CORES sh -c \
+          "emacs \
+             --batch \
+             --eval '(setq large-file-warning-threshold nil)' \
+             --eval '(setq byte-compile-error-on-warn ${if finalAttrs.turnCompilationWarningToError then "t" else "nil"})' \
+             -f batch-native-compile {} \
+           || exit ${if finalAttrs.ignoreCompilationError then "0" else "\\$?"}"
   '' + postInstall;
 }
 

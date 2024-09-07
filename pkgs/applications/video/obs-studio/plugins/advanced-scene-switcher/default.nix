@@ -23,13 +23,13 @@
 
 stdenv.mkDerivation rec {
   pname = "advanced-scene-switcher";
-  version = "1.26.4";
+  version = "1.27.1";
 
   src = fetchFromGitHub {
     owner = "WarmUpTill";
     repo = "SceneSwitcher";
     rev = version;
-    hash = "sha256-qUKywOfUiGKBmyREns2LnWECGeFhdA4ecpgGJQAIKpU=";
+    hash = "sha256-KP3aYSGjEsytiA7toLSkqKcxgT+2Wu3SKyOG4uga2RI=";
   };
 
   nativeBuildInputs = [
@@ -68,6 +68,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/WarmUpTill/SceneSwitcher";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ ];
+    maintainers = [ ];
   };
 }
