@@ -123,6 +123,7 @@ let
       QuickChick = callPackage ../development/coq-modules/QuickChick {};
       reglang = callPackage ../development/coq-modules/reglang {};
       relation-algebra = callPackage ../development/coq-modules/relation-algebra {};
+      rewriter = callPackage ../development/coq-modules/rewriter {};
       semantics = callPackage ../development/coq-modules/semantics {};
       serapi = callPackage ../development/coq-modules/serapi {};
       simple-io = callPackage ../development/coq-modules/simple-io { };
@@ -159,6 +160,7 @@ let
             paco = self.paco.override { version = "4.1.2"; };
           };
        }));
+      waterproof = callPackage ../development/coq-modules/waterproof {};
       zorns-lemma = callPackage ../development/coq-modules/zorns-lemma {};
       filterPackages = doesFilter: if doesFilter then filterCoqPackages self else self;
     };
@@ -230,6 +232,6 @@ in rec {
   coqPackages_8_19 = mkCoqPackages coq_8_19;
   coqPackages_8_20 = mkCoqPackages coq_8_20;
 
-  coqPackages = recurseIntoAttrs coqPackages_8_19;
+  coqPackages = recurseIntoAttrs coqPackages_8_20;
   coq = coqPackages.coq;
 }
