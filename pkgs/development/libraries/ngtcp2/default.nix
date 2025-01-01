@@ -1,20 +1,20 @@
 { lib, stdenv, fetchFromGitHub
 , cmake
 , brotli, libev, nghttp3, quictls
-, CoreServices
+, apple-sdk_11
 , withJemalloc ? false, jemalloc
 , curlHTTP3
 }:
 
 stdenv.mkDerivation rec {
   pname = "ngtcp2";
-  version = "1.7.0";
+  version = "1.10.0";
 
   src = fetchFromGitHub {
     owner = "ngtcp2";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-P9l7J4JMSO40YoFIHlv9kmKJeJGV5Y4hXkKA3rM0lTI=";
+    hash = "sha256-W9DLG9PXXuXe3rdtrbAvZZU2d7WsZ9vw/A6c3cFHBFM=";
     fetchSubmodules = true;
   };
 
@@ -26,8 +26,8 @@ stdenv.mkDerivation rec {
     libev
     nghttp3
     quictls
-  ] ++ lib.optionals stdenv.isDarwin [
-    CoreServices
+  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    apple-sdk_11
   ] ++ lib.optional withJemalloc jemalloc;
 
   cmakeFlags = [

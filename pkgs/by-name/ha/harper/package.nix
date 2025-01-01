@@ -6,16 +6,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "harper";
-  version = "0.10.0";
+  version = "0.13.0";
 
   src = fetchFromGitHub {
     owner = "elijah-potter";
     repo = "harper";
     rev = "v${version}";
-    hash = "sha256-DpBCTljIigpyZdiFm8x/bqDn+kzK8ILHpzGqX0d1mI8=";
+    hash = "sha256-X1mTqaqOqeAM7mq3nNrE2ULZ1zaAxZIqp0p1wdlDwgk=";
   };
 
-  cargoHash = "sha256-ZMZq/HRvr+JO/fHBJcyRtKXSzCabxkJRBe6OQjij77g=";
+  cargoHash = "sha256-0RJ0Kpht4gqZTBdjld1Wi5r9FN5RB74KboxODmlHoko=";
 
   meta = {
     description = "Grammar Checker for Developers";

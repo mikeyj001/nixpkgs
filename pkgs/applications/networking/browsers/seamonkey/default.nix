@@ -3,16 +3,16 @@ with import <nixpkgs>{};
 { stdenv, lib, bzip2, glib, dbus-glib, xorg, gtk3, gcc-unwrapped,libXdamage, fetchurl, autoPatchelfHook }:
 
 stdenv.mkDerivation rec {
-  version = "2.53.18.2";
+  version = "2.53.19";
   name = "seamonkey-${version}";
 
   src = fetchurl {
-#	url = "https://archive.mozilla.org/pub/seamonkey/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
+#	url = "https:/7/archive.mozilla.org/pub/seamonkey/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
 	url = "https://archive.seamonkey-project.org/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
 
-	# 2.53.18.2
+	# 2.53.19
 #	sha256 = "";
-  sha256 = "sha256-6bVw//tka7g2lE8146YR+Gbp0Q7xH3wEpfL5CPGn1Ak=";
+  sha256 = "sha256-vxSrd5kdpDTP/Xri8GpkEecpi5NLZhAtcb5cvyn1+0o=";
 
   };
 
@@ -42,10 +42,14 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
+    mkdir -p $out/.local/share/Seamonkey
 #    mkdir -p $out
 #    cp -av seamonkey $out/bin
     cp -av * $out/bin
+    cp $out/bin/chrome/icons/default/default48.png  $out/.local/share/Seamonkey/default48.png
+    'InstallDesktopFile seamonkey.desktop'
   '';
+
 #  preFixup = let
 #    # we prepare our library path in the let clause to avoid it become part of the input of mkDerivation
 #    libPath = lib.makeLibraryPath [ 

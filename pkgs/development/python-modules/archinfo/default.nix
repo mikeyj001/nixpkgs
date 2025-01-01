@@ -10,7 +10,7 @@
 
 buildPythonPackage rec {
   pname = "archinfo";
-  version = "9.2.117";
+  version = "9.2.134";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -19,7 +19,7 @@ buildPythonPackage rec {
     owner = "angr";
     repo = "archinfo";
     rev = "refs/tags/v${version}";
-    hash = "sha256-eMhj+OQEfkD4AgwNEEVil7p/XoaREsM+72/bN72XnzE=";
+    hash = "sha256-3NfiK75RyEFz2Pe+NPLMrbyvwgZxD7fKCGg4o8SpO40=";
   };
 
   build-system = [ setuptools ];

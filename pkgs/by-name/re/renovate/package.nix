@@ -7,11 +7,11 @@
   overrideSDK,
   pnpm_9,
   python3,
-  renovate,
   testers,
   xcbuild,
   nixosTests,
   nix-update-script,
+  yq-go,
 }:
 
 let
@@ -21,13 +21,13 @@ let
 in
 stdenv'.mkDerivation (finalAttrs: {
   pname = "renovate";
-  version = "38.62.0";
+  version = "39.82.6";
 
   src = fetchFromGitHub {
     owner = "renovatebot";
     repo = "renovate";
-    rev = "refs/tags/${finalAttrs.version}";
-    hash = "sha256-Wv7kSKuiyqVpl0EQIygF0R8h9PMH6yI5ezXhz1hbzd8=";
+    tag = finalAttrs.version;
+    hash = "sha256-RV3rOzs0dPQK0rYGU6URqTcvqGMXCrke5wSSVo/Wd5s=";
   };
 
   postPatch = ''
@@ -40,11 +40,12 @@ stdenv'.mkDerivation (finalAttrs: {
     nodejs
     pnpm_9.configHook
     python3
+    yq-go
   ] ++ lib.optional stdenv'.hostPlatform.isDarwin xcbuild;
 
   pnpmDeps = pnpm_9.fetchDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-n2CnyjabKQ9D72OBdEqeHoxOJsKlLD2rJPRs50AWCXU=";
+    hash = "sha256-c8bnNBkWyJspRvwoQTlExChM1PXi6Hw466xqT11s7Ys=";
   };
 
   env.COREPACK_ENABLE_STRICT = 0;
@@ -52,6 +53,9 @@ stdenv'.mkDerivation (finalAttrs: {
   buildPhase =
     ''
       runHook preBuild
+
+      # relax nodejs version
+      yq '.engines.node = "${nodejs.version}"' -i package.json
 
       pnpm build
       pnpm prune --prod --ignore-scripts
@@ -91,7 +95,7 @@ stdenv'.mkDerivation (finalAttrs: {
 
   passthru = {
     tests = {
-      version = testers.testVersion { package = renovate; };
+      version = testers.testVersion { package = finalAttrs.finalPackage; };
       vm-test = nixosTests.renovate;
     };
     updateScript = nix-update-script { };

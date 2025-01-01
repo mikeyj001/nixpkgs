@@ -13,7 +13,7 @@
 let
   # 0.18.12 was yanked from PyPI, it refers to this issue:
   # https://github.com/deschler/django-modeltranslation/issues/701
-  version = "0.19.8";
+  version = "0.19.11";
 in
 buildPythonPackage {
   pname = "django-modeltranslation";
@@ -23,7 +23,7 @@ buildPythonPackage {
     owner = "deschler";
     repo = "django-modeltranslation";
     rev = "refs/tags/v${version}";
-    hash = "sha256-23htGjPtupmg/oSO/5SuxOfbDmRQKrqx2/lvfqYp7dA=";
+    hash = "sha256-J/D0rHhxJMpOSGu9LQ6tPKnjBZhqTX6I5YcSkx5+qXk=";
   };
 
   disabled = pythonOlder "3.6";

@@ -17,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "glyphslib";
-  version = "6.7.2";
+  version = "6.9.5";
 
   format = "pyproject";
 
@@ -25,7 +25,7 @@ buildPythonPackage rec {
     owner = "googlefonts";
     repo = "glyphsLib";
     rev = "refs/tags/v${version}";
-    hash = "sha256-wiDLFRoP7MBzZuDA5drdXPS58Mhrw83xUKES3b1tBow=";
+    hash = "sha256-9b4nPiGyBsTplEhfmPdhjalV0fexYXerdRqUbOUXlh0=";
   };
 
   nativeBuildInputs = [ setuptools-scm ];

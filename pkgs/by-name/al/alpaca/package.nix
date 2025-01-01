@@ -13,18 +13,19 @@
   gtksourceview5,
   xdg-utils,
   ollama,
+  vte-gtk4,
 }:
 
 python3Packages.buildPythonApplication rec {
   pname = "alpaca";
-  version = "1.1.1";
+  version = "3.1.0";
   pyproject = false; # Built with meson
 
   src = fetchFromGitHub {
     owner = "Jeffser";
     repo = "Alpaca";
-    rev = version;
-    hash = "sha256-FFMclm+IUEU4cQZ0+uJHDCHytgW8+fygooWw3Nc1jxM=";
+    tag = version;
+    hash = "sha256-KPab5TU+Ra1o0FWpD5pkhtP7ylno903GQTqqWlir26s=";
   };
 
   nativeBuildInputs = [
@@ -40,6 +41,7 @@ python3Packages.buildPythonApplication rec {
   buildInputs = [
     libadwaita
     gtksourceview5
+    vte-gtk4
   ];
 
   dependencies = with python3Packages; [
@@ -47,15 +49,23 @@ python3Packages.buildPythonApplication rec {
     requests
     pillow
     pypdf
-    pytube
     html2text
+    youtube-transcript-api
+    pydbus
+    odfpy
+    pyicu
   ];
 
   dontWrapGApps = true;
 
   makeWrapperArgs = [
     "\${gappsWrapperArgs[@]}"
-    "--prefix PATH : ${lib.makeBinPath [ xdg-utils ollama ]}"
+    "--prefix PATH : ${
+      lib.makeBinPath [
+        xdg-utils
+        ollama
+      ]
+    }"
     # Declared but not used in src/window.py, for later reference
     # https://github.com/flatpak/flatpak/issues/3229
     "--set FLATPAK_DEST ${placeholder "out"}"
@@ -75,7 +85,10 @@ python3Packages.buildPythonApplication rec {
     homepage = "https://jeffser.com/alpaca";
     license = lib.licenses.gpl3Plus;
     mainProgram = "alpaca";
-    maintainers = with lib.maintainers; [ aleksana ];
+    maintainers = with lib.maintainers; [
+      aleksana
+      Gliczy
+    ];
     platforms = lib.platforms.linux;
   };
 }

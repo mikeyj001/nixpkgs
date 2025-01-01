@@ -17,7 +17,7 @@
 
 buildPythonPackage rec {
   pname = "peewee";
-  version = "3.17.6";
+  version = "3.17.8";
   pyproject = true;
 
   disabled = pythonOlder "3.7";
@@ -26,7 +26,7 @@ buildPythonPackage rec {
     owner = "coleifer";
     repo = "peewee";
     rev = "refs/tags/${version}";
-    hash = "sha256-HluoCXblqwaOb+gtAhvaYshTj9CtHoegn0QUaq0V+eA=";
+    hash = "sha256-2mViwo39adzzhpFS056C1JU5fXr3zKorzkVyJrKKRhI=";
   };
 
   build-system = [ setuptools ];

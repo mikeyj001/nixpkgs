@@ -1,19 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, gtest
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  gtest,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "parallel-hashmap";
-  version = "1.3.12";
+  version = "1.4.1";
 
   src = fetchFromGitHub {
     owner = "greg7mdp";
     repo = "parallel-hashmap";
     rev = "refs/tags/v${finalAttrs.version}";
-    hash = "sha256-6KhzXUxa4WOsRrPmSSgguFxRGTOTIaxiJBFFSzOhch0=";
+    hash = "sha256-QDRy6YPoE34VpldN66V4mcF3PqK43RSlXThm+SzxRQ4=";
   };
 
   postPatch = ''

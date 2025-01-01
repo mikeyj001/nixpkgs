@@ -10,7 +10,6 @@
   z3,
   aiger,
   btor2tools,
-  python3Packages,
   nix-update-script,
 }:
 
@@ -20,13 +19,13 @@ in
 
 stdenv.mkDerivation rec {
   pname = "sby";
-  version = "0.44";
+  version = "0.47";
 
   src = fetchFromGitHub {
     owner = "YosysHQ";
     repo = "sby";
     rev = "yosys-${version}";
-    hash = "sha256-/oDbbdZuWPdg0Xrh+c4i283vML9QTfyWVu8kryb4WaE=";
+    hash = "sha256-Il2pXw2doaoZrVme2p0dSUUa8dCQtJJrmYitn1MkTD4=";
   };
 
   nativeBuildInputs = [ bash ];

@@ -18,7 +18,7 @@
 
 buildPythonPackage rec {
   pname = "bellows";
-  version = "0.40.5";
+  version = "0.42.5";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -27,7 +27,7 @@ buildPythonPackage rec {
     owner = "zigpy";
     repo = "bellows";
     rev = "refs/tags/${version}";
-    hash = "sha256-VOeoIv1tVcgLfDAH8NKtqyL3x5puDwdxlJ2gqw213t8=";
+    hash = "sha256-RdNJmIhJR4Ubb4hppFkde8EeYHtFSoJp3CJPGj0463U=";
   };
 
   postPatch = ''

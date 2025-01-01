@@ -1,11 +1,12 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, swig4
-, lua
-, elastix
-, itk
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  swig,
+  lua,
+  elastix,
+  itk,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -21,7 +22,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     cmake
-    swig4
+    swig
   ];
   buildInputs = [
     elastix

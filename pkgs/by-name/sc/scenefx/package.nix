@@ -13,7 +13,7 @@
   pixman,
   wayland-protocols,
   libGL,
-  mesa,
+  libgbm,
   validatePkgConfig,
   testers,
   wayland-scanner,
@@ -47,7 +47,7 @@ stdenv.mkDerivation (finalAttrs: {
     libdrm
     libGL
     libxkbcommon
-    mesa
+    libgbm
     pixman
     wayland
     wayland-protocols
@@ -60,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Drop-in replacement for the wlroots scene API that allows wayland compositors to render surfaces with eye-candy effects";
     homepage = "https://github.com/wlrfx/scenefx";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ eclairevoyant ];
+    maintainers = with lib.maintainers; [ ];
     mainProgram = "scenefx";
     pkgConfigModules = [ "scenefx" ];
     platforms = lib.platforms.all;

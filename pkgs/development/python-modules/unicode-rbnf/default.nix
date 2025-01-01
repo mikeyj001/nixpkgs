@@ -12,14 +12,14 @@
 
 buildPythonPackage rec {
   pname = "unicode-rbnf";
-  version = "1.1.0";
+  version = "2.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "rhasspy";
     repo = "unicode-rbnf";
-    rev = "v${version}";
-    hash = "sha256-PquPoiaO1rEDMz7jaN9MUB0UQGH07M0O9mlrUCsfhm4=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-1kq8qTzFYYRRjlxBdvIiBuXbprA0bF4zMFOVbpgCR3c=";
   };
 
   nativeBuildInputs = [ setuptools ];
