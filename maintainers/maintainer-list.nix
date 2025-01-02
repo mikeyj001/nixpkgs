@@ -11135,11 +11135,11 @@
     githubId = 13179;
   };
   jopejoe1 = {
-    email = "johannes@joens.email";
+    email = "nixpkgs@missing.ninja";
     matrix = "@jopejoe1:matrix.org";
     github = "jopejoe1";
     githubId = 34899572;
-    name = "Johannes Jöns";
+    name = "jopejoe1";
   };
   jordanisaacs = {
     name = "Jordan Isaacs";
@@ -15627,6 +15627,12 @@
     githubId = 38578268;
     name = "Morgan Wolfe";
   };
+  mx2uller = {
+    email = "mx2uller@pm.me";
+    github = "mx2uller";
+    githubId = 93703653;
+    name = "Marko Müller";
+  };
   mxkrsv = {
     email = "mxkrsv@disroot.org";
     github = "mxkrsv";
@@ -15654,6 +15660,12 @@
     github = "Myrl";
     githubId = 9636071;
     name = "Myrl Hex";
+  };
+  myypo = {
+    email = "nikirsmcgl@gmail.com";
+    github = "myypo";
+    githubId = 110892040;
+    name = "Mykyta Polchanov";
   };
   mzacho = {
     email = "nixpkgs@martinzacho.net";
@@ -18637,6 +18649,12 @@
     github = "qwqawawow";
     githubId = 40905037;
     name = "qwqawawow";
+  };
+  qxrein = {
+    email = "mnv07@proton.me";
+    github = "qxrein";
+    githubId = 101001298;
+    name = "qxrein";
   };
   qyliss = {
     email = "hi@alyssa.is";
