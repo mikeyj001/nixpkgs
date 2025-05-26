@@ -14,15 +14,15 @@
   nixosTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "solanum";
-  version = "0-unstable-2024-07-24";
+  version = "0-unstable-2025-05-11";
 
   src = fetchFromGitHub {
     owner = "solanum-ircd";
     repo = "solanum";
-    rev = "4e89f6603d63b2f8dfdec7a83161fb0343236349";
-    hash = "sha256-kUgB0Q+U6jx8Xyh1DSv8D7+Q9tC2wK3aaNt4At5chFQ=";
+    rev = "b3d3796e690ce2482c1365d99e3329d5587b75d5";
+    hash = "sha256-hRiBcX2KDAdtx4G3jJyQlLvhfUutHoy85Upni1RfOHY=";
   };
 
   patches = [

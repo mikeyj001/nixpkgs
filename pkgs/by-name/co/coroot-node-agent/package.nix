@@ -7,16 +7,16 @@
 
 buildGoModule rec {
   pname = "coroot-node-agent";
-  version = "1.23.1";
+  version = "1.23.23";
 
   src = fetchFromGitHub {
     owner = "coroot";
     repo = "coroot-node-agent";
     rev = "v${version}";
-    hash = "sha256-kisYm0bM+IZJ9qRx1lDlcFtZIdjsNfu6Ao75q84ruDM=";
+    hash = "sha256-LLRAKmtHDsYzo17NW2/fkUu7z4dr3OlXe/QyUDypQOM=";
   };
 
-  vendorHash = "sha256-EXI4xpo4j/EzugW8zyu0Dvk2i6bYFBIF+SsL6GZ+J2Q=";
+  vendorHash = "sha256-11gj+s1fG6uOUTiezNk+/eS4g/bdth09Gl5jcOa9joo=";
 
   buildInputs = [ systemdLibs ];
 

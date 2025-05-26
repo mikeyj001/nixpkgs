@@ -4,8 +4,6 @@
   rustPlatform,
   pkg-config,
   openssl,
-  stdenv,
-  darwin,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -19,17 +17,12 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-vQ6MBbzmOBgD1kcF62NmQys737QEN9isvFN7L7mP8mk=";
   };
 
-  cargoHash = "sha256-yelDzx/5SxZ+DT9Rvx3tuSp/yDLfVOYmexa9ZqeUT88=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-GwSf/o90RO6LURIcm/kYA8oXmnCJ1OkM+eHkyZduOt0=";
 
   nativeBuildInputs = [ pkg-config ];
 
-  buildInputs =
-    [ openssl ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      darwin.apple_sdk.frameworks.CoreFoundation
-      darwin.apple_sdk.frameworks.Security
-      darwin.apple_sdk.frameworks.SystemConfiguration
-    ];
+  buildInputs = [ openssl ];
 
   # There is no tests
   doCheck = false;

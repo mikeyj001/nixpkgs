@@ -16,19 +16,18 @@
   flex,
   bison,
   util-linux,
-  fetchpatch,
   nixosTests,
 }:
 
 stdenv.mkDerivation rec {
   pname = "bpftrace";
-  version = "0.21.3";
+  version = "0.23.3";
 
   src = fetchFromGitHub {
     owner = "bpftrace";
     repo = "bpftrace";
     rev = "v${version}";
-    hash = "sha256-cmKm2g1lzl625t4z7ZM04QgqDubBsCMqtibXmg+3y9w=";
+    hash = "sha256-Jvl8Up3IH2/G0QMb0pZmQ2SSXOmjTj08KXoJXOR3Z48=";
   };
 
   buildInputs = with llvmPackages; [
@@ -57,10 +56,6 @@ stdenv.mkDerivation rec {
     "-DINSTALL_TOOL_DOCS=OFF"
     "-DSYSTEM_INCLUDE_PATHS=${glibc.dev}/include"
   ];
-
-  postPatch = ''
-    substituteInPlace CMakeLists.txt --replace "set(MAX_LLVM_MAJOR 18)" "set(MAX_LLVM_MAJOR 19)"
-  '';
 
   # Pull BPF scripts into $PATH (next to their bcc program equivalents), but do
   # not move them to keep `${pkgs.bpftrace}/share/bpftrace/tools/...` working.

@@ -25,7 +25,7 @@ let
 
   proxmox-backup_src = fetchgit {
     url = "git://git.proxmox.com/git/proxmox-backup.git";
-    rev = "ed8bc69a50301ad420366d8431a7891b4992408d"; # no version tag unfortunately
+    tag = "v${version}";
     name = "proxmox-backup";
     hash = "sha256-0piUftzuK9e8KbOe+bc3SXWa0DlnEgk5iNGWGn4fw7Y=";
   };
@@ -171,7 +171,7 @@ rustPlatform.buildRustPackage {
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
-  versionCheckProgramArg = [ "version" ];
+  versionCheckProgramArg = "version";
 
   meta = with lib; {
     description = "Command line client for Proxmox Backup Server";

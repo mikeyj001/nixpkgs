@@ -10,7 +10,7 @@
   libsodium,
   libunistring,
   pkg-config,
-  postgresql,
+  libpq,
   autoreconfHook,
   python3,
   recutils,
@@ -18,24 +18,30 @@
   jq,
   gettext,
   texinfo,
+  libtool,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "taler-exchange";
-  version = "0.13.0";
+  version = "0.14.6-unstable-2025-03-02";
 
   src = fetchgit {
     url = "https://git.taler.net/exchange.git";
-    rev = "v${finalAttrs.version}";
+    rev = "13e058a902a3dbee9d7fe327030b88c2d126675b";
     fetchSubmodules = true;
-    hash = "sha256-elVZUuiIMLOG058n+Egpy9oD9T2sLDC4TUCYZTCi0bw=";
+    hash = "sha256-fqlYpFggQkB/IqD6V01ec+G4EtoNaA/FXigM+jqIMe0=";
   };
 
   patches = [ ./0001-add-TALER_TEMPLATING_init_path.patch ];
 
   nativeBuildInputs = [
     autoreconfHook
+    recutils # recfix
     pkg-config
+    python3.pkgs.jinja2
+    texinfo # makeinfo
+    # jq is necessary for some tests and is checked by configure script
+    jq
   ];
 
   buildInputs = [
@@ -43,16 +49,14 @@ stdenv.mkDerivation (finalAttrs: {
     libmicrohttpd
     jansson
     libsodium
-    postgresql
+    libpq
+    libtool
     curl
-    recutils
     gettext
-    texinfo # Fix 'makeinfo' is missing on your system.
     libunistring
-    python3.pkgs.jinja2
-    # jq is necessary for some tests and is checked by configure script
-    jq
   ];
+
+  strictDeps = true;
 
   propagatedBuildInputs = [ gnunet ];
 
@@ -89,6 +93,10 @@ stdenv.mkDerivation (finalAttrs: {
     chmod -w Makefile.am
     popd
   '';
+
+  configureFlags = [
+    "ac_cv_path__libcurl_config=${lib.getDev curl}/bin/curl-config"
+  ];
 
   enableParallelBuilding = true;
 

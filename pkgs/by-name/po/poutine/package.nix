@@ -13,7 +13,7 @@ buildGoModule rec {
   src = fetchFromGitHub {
     owner = "boostsecurityio";
     repo = "poutine";
-    rev = "refs/tags/v${version}";
+    tag = "v${version}";
     hash = "sha256-YBoGsexYT2/lAWEajMVa/xNRBv1R1i0hB6pTAlk43E0=";
   };
 
@@ -40,5 +40,6 @@ buildGoModule rec {
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];
     mainProgram = "poutine";
+    broken = stdenv.hostPlatform.isDarwin;
   };
 }

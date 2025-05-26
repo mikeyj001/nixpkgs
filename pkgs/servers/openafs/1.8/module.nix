@@ -1,17 +1,18 @@
-{ lib
-, stdenv
-, fetchurl
-, which
-, autoconf
-, automake
-, flex
-, bison
-, kernel
-, glibc
-, perl
-, libtool_2
-, libkrb5
-, fetchpatch
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  which,
+  autoconf,
+  automake,
+  flex,
+  bison,
+  kernel,
+  glibc,
+  perl,
+  libtool_2,
+  libkrb5,
 }:
 
 let
@@ -27,28 +28,29 @@ stdenv.mkDerivation {
   inherit src;
 
   patches = [
-    # Linux: Define Clear/Set PageError macros as NOPs
+    # LINUX: Refactor afs_linux_dentry_revalidate()
     (fetchpatch {
-      url = "https://gerrit.openafs.org/changes/15964/revisions/917d071a1b3c3e23c984ca8e5501ddccd62a01b6/patch";
+      url = "https://gerrit.openafs.org/changes/16276/revisions/c1d074317e5c8cb8212e0b19a29f7d710bcabb32/patch";
       decode = "base64 -d";
-      hash = "sha256-WqAHRN1YZj7Cz4X4iF1K3DJC1h8nXlnA9gveClL3KHc=";
+      hash = "sha256-8ga9ks9pr6pWaV2t67v+FaG0yVExhqELkvkpdLvO8Nc=";
     })
-    # Linux: Refactor afs_linux_write_begin() variants
+    # Linux-6.14: Handle dops.d_revalidate with parent
     (fetchpatch {
-      url = "https://gerrit.openafs.org/changes/15965/revisions/c955b666b904b96620df10328a9a37c2fb5f2ed6/patch";
+      url = "https://gerrit.openafs.org/changes/16277/revisions/0051bd0ee82b05e8caacdc0596e5b62609bebd2e/patch";
       decode = "base64 -d";
-      hash = "sha256-U2W+8YrD1K7Pb/Jq08uBcuPnGkVvcSyTpwaWWcTbq0w=";
-    })
-    # Linux: Use folios for aops->write_begin/end
-    (fetchpatch {
-      url = "https://gerrit.openafs.org/changes/15966/revisions/d1706bdc5080b86b1876d10f062c369e8d898188/patch";
-      decode = "base64 -d";
-      hash = "sha256-jY+r9LO/4g6K9J1stxNCa38nyr1/J3beOhG9YilEbzg=";
+      hash = "sha256-08jedwZ1KX1RSs8y9sh7BUvv5xK9tlzZ6uBOR4kS0Jo=";
     })
   ];
 
-  nativeBuildInputs = [ autoconf automake flex libtool_2 perl which bison ]
-    ++ kernel.moduleBuildDependencies;
+  nativeBuildInputs = [
+    autoconf
+    automake
+    flex
+    libtool_2
+    perl
+    which
+    bison
+  ] ++ kernel.moduleBuildDependencies;
 
   buildInputs = [ libkrb5 ];
 
@@ -88,7 +90,11 @@ stdenv.mkDerivation {
     homepage = "https://www.openafs.org";
     license = licenses.ipl10;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ andersk maggesi spacefrogg ];
+    maintainers = with maintainers; [
+      andersk
+      maggesi
+      spacefrogg
+    ];
     broken = kernel.isHardened;
   };
 }

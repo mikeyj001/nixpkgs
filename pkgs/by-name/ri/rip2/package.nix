@@ -10,16 +10,17 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "rip2";
-  version = "0.9.2";
+  version = "0.9.4";
 
   src = fetchFromGitHub {
     owner = "MilesCranmer";
     repo = "rip2";
     rev = "v${version}";
-    hash = "sha256-OZsiAh0sQygLdVdA1QxCf7FTvP5CrlDNeOQLv2G2X3U=";
+    hash = "sha256-lNMFbc0TItvVuzwpVbe7qWlSCzIaFi0/cQwfq2itzbY=";
   };
 
-  cargoHash = "sha256-9wbHXgjOWyQS8JOMQQTVetMacdjWD9C4NBWxUpcjbdg=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-KUVybOCtc66AubXjei0YCkXirfuIDgK3xSxjNODun98=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -43,7 +44,10 @@ rustPlatform.buildRustPackage rec {
     description = "Safe and ergonomic alternative to rm";
     homepage = "https://github.com/MilesCranmer/rip2";
     license = lib.licenses.gpl3Plus;
-    maintainers = with lib.maintainers; [ milescranmer ];
+    maintainers = with lib.maintainers; [
+      milescranmer
+      matthiasbeyer
+    ];
     mainProgram = "rip";
   };
 }

@@ -9,13 +9,17 @@
 
 stdenv.mkDerivation rec {
   pname = "dinit";
-  version = "0.19.2";
+  version = "0.19.4";
 
   src = fetchFromGitHub {
     owner = "davmac314";
     repo = "dinit";
     rev = "v${version}";
-    hash = "sha256-AgUfU8cKAumICwLg2LvcSiS3YCP5I687Po3vj+ZOSSQ=";
+    # fix for case-insensitive filesystems
+    postFetch = ''
+      [ -f "$out/BUILD" ] && rm "$out/BUILD"
+    '';
+    hash = "sha256-IKT4k2eXCOCXtiypGbsIpN0OHS+WKqXvr4Mb61fbl0M=";
   };
 
   postPatch = ''

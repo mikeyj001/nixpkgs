@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 { lib
 , rustPlatform
 , fetchFromGitHub
@@ -21,14 +22,45 @@ let
     repo = "openobserve";
     rev = "v${version}";
     hash = "sha256-BFLQL3msDuurRSFOCbqN0vK4NrTS9M6k1hNwet/9mnw=";
+=======
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  pkg-config,
+  protobuf,
+  bzip2,
+  oniguruma,
+  sqlite,
+  xz,
+  zlib,
+  zstd,
+  buildNpmPackage,
+  gitUpdater,
+}:
+
+let
+  version = "0.14.0";
+  src = fetchFromGitHub {
+    owner = "openobserve";
+    repo = "openobserve";
+    tag = "v${version}";
+    hash = "sha256-rTp+DkADqYkJg1zJog1yURE082V5kCqgid/oUd81SN8=";
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
   };
   web = buildNpmPackage {
     inherit src version;
     pname = "openobserve-ui";
 
+<<<<<<< HEAD
     sourceRoot = "source/web";
 
     npmDepsHash = "sha256-eYrspgejb5VR51wAXdGr+pSXDdGnRyX5cwwopK3Kex8=";
+=======
+    sourceRoot = "${src.name}/web";
+
+    npmDepsHash = "sha256-awfQR1wZBX3ggmD0uJE9Fur4voPydeygrviRijKnBTE=";
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 
     preBuild = ''
       # Patch vite config to not open the browser to visualize plugin composition
@@ -37,6 +69,10 @@ let
     '';
 
     env = {
+<<<<<<< HEAD
+=======
+      NODE_OPTIONS = "--max-old-space-size=8192";
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
       # cypress tries to download binaries otherwise
       CYPRESS_INSTALL_BINARY = 0;
     };
@@ -53,14 +89,20 @@ rustPlatform.buildRustPackage {
   pname = "openobserve";
   inherit version src;
 
+<<<<<<< HEAD
   # prevent using git to determine version info during build time
   patches = [
+=======
+  patches = [
+    # prevent using git to determine version info during build time
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
     ./build.rs.patch
   ];
 
   preBuild = ''
     cp -r ${web}/share/openobserve-ui web/dist
   '';
+<<<<<<< HEAD
   cargoLock = {
     lockFile = ./Cargo.lock;
     outputHashes = {
@@ -68,6 +110,11 @@ rustPlatform.buildRustPackage {
       "datafusion-33.0.0" = "sha256-RZAgk7up83zxPbmNzdnzB6M0yjjK9MYms+6TpXVDJ1o=";
     };
   };
+=======
+
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-FWMUPghx9CxuzP7jFZYSIwZsylApWzQsfx8DuwS4GTo=";
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 
   nativeBuildInputs = [
     pkg-config
@@ -81,12 +128,16 @@ rustPlatform.buildRustPackage {
     xz
     zlib
     zstd
+<<<<<<< HEAD
   ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
     CoreFoundation
     IOKit
     Security
     SystemConfiguration
   ]);
+=======
+  ];
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 
   env = {
     RUSTONIG_SYSTEM_LIBONIG = true;
@@ -95,13 +146,18 @@ rustPlatform.buildRustPackage {
     RUSTC_BOOTSTRAP = 1; # uses experimental features
 
     # the patched build.rs file sets these variables
+<<<<<<< HEAD
     GIT_VERSION = src.rev;
+=======
+    GIT_VERSION = src.tag;
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
     GIT_COMMIT_HASH = "builtByNix";
     GIT_BUILD_DATE = "1970-01-01T00:00:00Z";
   };
 
   # requires network access or filesystem mutations
   checkFlags = [
+<<<<<<< HEAD
     "--skip handler::http::auth::tests::test_validate"
     "--skip handler::http::router::ui::tests::test_index_not_ok"
     "--skip handler::http::router::ui::tests::test_index_ok"
@@ -134,6 +190,23 @@ rustPlatform.buildRustPackage {
     homepage = "https://github.com/openobserve/openobserve";
     license = licenses.asl20;
     maintainers = with maintainers; [ happysalada ];
+=======
+    "--skip=handler::http::router::tests::test_get_proxy_routes"
+    "--skip=tests::e2e_test"
+  ];
+
+  passthru.updateScript = gitUpdater {
+    rev-prefix = "v";
+    ignoredVersions = "rc";
+  };
+
+  meta = {
+    description = "Cloud-native observability platform built specifically for logs, metrics, traces, analytics & realtime user-monitoring";
+    homepage = "https://github.com/openobserve/openobserve";
+    changelog = "https://github.com/openobserve/openobserve/releases/tag/v${version}";
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ happysalada ];
+>>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
     mainProgram = "openobserve";
   };
 }

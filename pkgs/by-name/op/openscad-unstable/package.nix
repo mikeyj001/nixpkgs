@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   clangStdenv,
   llvmPackages,
   fetchFromGitHub,
@@ -40,16 +41,17 @@
   xorg,
   mimalloc,
   opencsg,
+  ctestCheckHook,
 }:
 # clang consume much less RAM than GCC
 clangStdenv.mkDerivation rec {
   pname = "openscad-unstable";
-  version = "2024-12-21";
+  version = "2025-02-07";
   src = fetchFromGitHub {
     owner = "openscad";
     repo = "openscad";
-    rev = "30cbdf6c7214be7cc00b4cca2cef8396e1d69498";
-    hash = "sha256-wpw4JStAWNcHU6PoHGcIKAeVjtlTJsS4ZFMkTpj6xRk=";
+    rev = "1308a7d476facb466bf9fae1e77666c35c8e3c8f";
+    hash = "sha256-+0cQ5mgRzOPfP6nl/rfC/hnw3V7yvGJCyLU8hOmlGOc=";
     # Unfortunately, we can't selectively fetch submodules. It would be good
     # to see that we don't accidentally depend on it.
     fetchSubmodules = true; # Only really need sanitizers-cmake and MCAD
@@ -124,18 +126,33 @@ clangStdenv.mkDerivation rec {
     # IPO
     "-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld"
     "-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON"
+
+    # The sources enable this for only apple. We turn it off globally anyway to stay
+    # consistent.
+    "-DUSE_QT6=OFF"
   ];
 
-  doCheck = true;
+  # tests rely on sysprof which is not available on darwin
+  doCheck = !stdenv.hostPlatform.isDarwin;
+
+  postInstall = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    mkdir $out/Applications
+    mv $out/bin/*.app $out/Applications
+    rmdir $out/bin
+  '';
 
   nativeCheckInputs = [
     mesa.llvmpipeHook
+    ctestCheckHook
   ];
 
-  checkPhase = ''
+  dontUseNinjaCheck = true;
+  checkFlags = [
+    "-E"
     # some fontconfig issues cause pdf output to have wrong font
-    ctest -j$NIX_BUILD_CORES -E pdfexporttest.\*
-  '';
+    "pdfexporttest"
+  ];
+
   meta = with lib; {
     description = "3D parametric model compiler (unstable)";
     longDescription = ''

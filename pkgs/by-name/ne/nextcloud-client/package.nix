@@ -1,34 +1,40 @@
-{ lib
-, gitUpdater
-, fetchFromGitHub
-, qt6Packages
-, cmake
-, extra-cmake-modules
-, inotify-tools
-, kdePackages
-, libcloudproviders
-, librsvg
-, libsecret
-, openssl
-, pcre
-, pkg-config
-, sphinx
-, sqlite
-, xdg-utils
-, libsysprof-capture
+{
+  lib,
+  gitUpdater,
+  fetchFromGitHub,
+  qt6Packages,
+  stdenv,
+  cmake,
+  extra-cmake-modules,
+  inotify-tools,
+  kdePackages,
+  libcloudproviders,
+  libp11,
+  librsvg,
+  libsecret,
+  openssl,
+  pcre,
+  pkg-config,
+  sphinx,
+  sqlite,
+  xdg-utils,
+  libsysprof-capture,
 }:
 
-qt6Packages.stdenv.mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "nextcloud-client";
-  version = "3.15.2";
+  version = "3.16.4";
 
-  outputs = [ "out" "dev" ];
+  outputs = [
+    "out"
+    "dev"
+  ];
 
   src = fetchFromGitHub {
     owner = "nextcloud-releases";
     repo = "desktop";
     tag = "v${version}";
-    hash = "sha256-JA6ke9tBS4IiuDWJ8Efa76+5os+RT0L/zv00ncgH+IU=";
+    hash = "sha256-8P73YitjuU9SGDBNimqJsvSfGOE9lNCVUNN3f4KXWSY=";
   };
 
   patches = [
@@ -55,6 +61,7 @@ qt6Packages.stdenv.mkDerivation rec {
     inotify-tools
     kdePackages.kio
     libcloudproviders
+    libp11
     libsecret
     openssl
     pcre
@@ -72,7 +79,7 @@ qt6Packages.stdenv.mkDerivation rec {
 
   qtWrapperArgs = [
     "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ libsecret ]}"
-    # make xdg-open overrideable at runtime
+    # make xdg-open overridable at runtime
     "--suffix PATH : ${lib.makeBinPath [ xdg-utils ]}"
   ];
 
@@ -93,7 +100,10 @@ qt6Packages.stdenv.mkDerivation rec {
     description = "Desktop sync client for Nextcloud";
     homepage = "https://nextcloud.com";
     license = lib.licenses.gpl2Plus;
-    maintainers = with lib.maintainers; [ kranzes SuperSandro2000 ];
+    maintainers = with lib.maintainers; [
+      kranzes
+      SuperSandro2000
+    ];
     platforms = lib.platforms.linux;
     mainProgram = "nextcloud";
   };

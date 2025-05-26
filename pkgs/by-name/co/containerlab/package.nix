@@ -3,29 +3,30 @@
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
+  versionCheckHook,
 }:
 
 buildGoModule rec {
   pname = "containerlab";
-  version = "0.60.1";
+  version = "0.67.0";
 
   src = fetchFromGitHub {
     owner = "srl-labs";
     repo = "containerlab";
     rev = "v${version}";
-    hash = "sha256-VueDf87kruLB1PCzknQO57eHrwJeGUDah1KaXaNsSlY=";
+    hash = "sha256-wTVGvaosHhQleRDytCdA1R4YKlzgGN4nWRZx6Ok+O3U=";
   };
 
-  vendorHash = "sha256-YX2JDDZ1jx32zfFj/2fY61zqxPIzmwntN+7kiGDxxV4=";
+  vendorHash = "sha256-Bba2Lt43I9jKg6zWhXWE0yJsVx7SlQ2GmrK++cZ9TrM=";
 
   nativeBuildInputs = [ installShellFiles ];
 
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/srl-labs/containerlab/cmd.version=${version}"
-    "-X github.com/srl-labs/containerlab/cmd.commit=${src.rev}"
-    "-X github.com/srl-labs/containerlab/cmd.date=1970-01-01T00:00:00Z"
+    "-X github.com/srl-labs/containerlab/cmd/version.Version=${version}"
+    "-X github.com/srl-labs/containerlab/cmd/version.commit=${src.rev}"
+    "-X github.com/srl-labs/containerlab/cmd/version.date=1970-01-01T00:00:00Z"
   ];
 
   preCheck = ''
@@ -40,6 +41,12 @@ buildGoModule rec {
       --fish <($out/bin/containerlab completion fish) \
       --zsh <($out/bin/containerlab completion zsh)
   '';
+
+  nativeInstallCheckInputs = [
+    versionCheckHook
+  ];
+  doInstallCheck = true;
+  versionCheckProgramArg = "version";
 
   meta = {
     description = "Container-based networking lab";

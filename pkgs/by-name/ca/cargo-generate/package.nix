@@ -2,12 +2,12 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
+  fetchpatch,
   pkg-config,
   libgit2,
   openssl,
   stdenv,
-  darwin,
-  git,
+  gitMinimal,
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -21,20 +21,26 @@ rustPlatform.buildRustPackage rec {
     sha256 = "sha256-iOZCSd6jF1OF7ScjpsMlvMjsFHyg6QJJ6qk0OxrARho=";
   };
 
-  cargoHash = "sha256-ZLzJpD3bIuNtGl5kzhvpE07jtfEV+lgnTiPcFM7MHdE=";
+  useFetchCargoVendor = true;
+
+  cargoPatches = [
+    (fetchpatch {
+      name = "git2-version.patch";
+      url = "https://github.com/cargo-generate/cargo-generate/commit/be2237177ee7ae996e2991189b07a5d211cd0d01.patch";
+      hash = "sha256-F/o1EeDBfRhIB8atpOHoc6ZnUFCyD1QkCERv4m/YeWE=";
+    })
+  ];
+
+  cargoHash = "sha256-5cfROJQWIhQNMbDhaCs2bfv4I3KDWcXBsmbbbDQ331s=";
 
   nativeBuildInputs = [ pkg-config ];
 
-  buildInputs =
-    [
-      libgit2
-      openssl
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      darwin.apple_sdk.frameworks.Security
-    ];
+  buildInputs = [
+    libgit2
+    openssl
+  ];
 
-  nativeCheckInputs = [ git ];
+  nativeCheckInputs = [ gitMinimal ];
 
   # disable vendored libgit2 and openssl
   buildNoDefaultFeatures = true;

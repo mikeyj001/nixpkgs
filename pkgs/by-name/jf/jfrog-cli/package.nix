@@ -8,25 +8,19 @@
 
 buildGoModule rec {
   pname = "jfrog-cli";
-  version = "2.72.5";
+  version = "2.76.0";
 
   src = fetchFromGitHub {
     owner = "jfrog";
     repo = "jfrog-cli";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-owE3mWzVogESko4SeysobC3VmmH37ikk7llJv65ZTfU=";
+    tag = "v${version}";
+    hash = "sha256-DZJLIIigX4/gzGaVVhyJmk+TN6wnNlH+NWkB6dc0aoU=";
   };
 
   proxyVendor = true;
-  vendorHash = "sha256-cxuNlIXD4LIBWxbTdC/ygiF/ti4eHYQBR6kZRhhgJtY=";
+  vendorHash = "sha256-Ouz1nac3+u8AYzqLaax6Nw6qunTN/hCRjEf9koDM75A=";
 
-  postPatch = ''
-    # Patch out broken test cleanup.
-    substituteInPlace artifactory_test.go \
-      --replace-fail \
-      'deleteReceivedReleaseBundle(t, "cli-tests", "2")' \
-      '// deleteReceivedReleaseBundle(t, "cli-tests", "2")'
-  '';
+  checkFlags = "-skip=^TestReleaseBundle";
 
   postInstall = ''
     # Name the output the same way as the original build script does

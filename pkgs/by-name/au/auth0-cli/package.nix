@@ -1,20 +1,23 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  stdenv,
 }:
 
 buildGoModule rec {
   pname = "auth0-cli";
-  version = "1.6.1";
+  version = "1.13.0";
 
   src = fetchFromGitHub {
     owner = "auth0";
     repo = "auth0-cli";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-IuL/x7gcZj7RVRI3RhnsYgFo1XJ0CRF7sNvgMlLsPd0=";
+    tag = "v${version}";
+    hash = "sha256-RcRJBW8FgCi9Lxz/KARql7ArozqYgttpQ9IXIKzvo6s=";
   };
 
-  vendorHash = "sha256-Yxjpc/DBt8TQF92RcfMa0IPDlWT9K2fw2cPEfsMOVfw=";
+  vendorHash = "sha256-6y2iGxaromnMYIU2rnvwmQwn8f1PdihB4DH9r5sRT68=";
 
   ldflags = [
     "-s"
@@ -31,6 +34,15 @@ buildGoModule rec {
     # Test requires network access
     substituteInPlace internal/cli/universal_login_customize_test.go \
       --replace-fail "TestFetchUniversalLoginBrandingData" "SkipFetchUniversalLoginBrandingData"
+  '';
+
+  nativeBuildInputs = [ installShellFiles ];
+
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    installShellCompletion --cmd auth0 \
+      --bash <($out/bin/auth0 completion bash) \
+      --fish <($out/bin/auth0 completion fish) \
+      --zsh <($out/bin/auth0 completion zsh)
   '';
 
   subPackages = [ "cmd/auth0" ];

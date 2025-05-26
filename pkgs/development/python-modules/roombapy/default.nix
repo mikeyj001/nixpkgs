@@ -16,7 +16,7 @@
 
 buildPythonPackage rec {
   pname = "roombapy";
-  version = "1.8.2";
+  version = "1.9.0";
   pyproject = true;
 
   disabled = pythonOlder "3.10";
@@ -24,8 +24,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "pschmitt";
     repo = "roombapy";
-    rev = "refs/tags/${version}";
-    hash = "sha256-plmdGVfrkdz7pyyAztzZKlDpUjKxBIRtDVeBXoqaB5s=";
+    tag = version;
+    hash = "sha256-fcCK6yby9Jfc4lSSETn13Y+4A3qjvYfm4Ps3T5yG4Rc=";
   };
 
   nativeBuildInputs = [

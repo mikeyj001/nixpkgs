@@ -2,28 +2,28 @@
   lib,
   stdenv,
   buildPackages,
-  buildGoModule,
+  buildGo124Module,
   fetchFromGitHub,
   installShellFiles,
   testers,
   trivy,
 }:
 
-buildGoModule rec {
+buildGo124Module rec {
   pname = "trivy";
-  version = "0.58.1";
+  version = "0.62.1";
 
   src = fetchFromGitHub {
     owner = "aquasecurity";
     repo = "trivy";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-YKeNIi6PBIfzd/Kuv5cgxeAEbqfFXWwmK9JTOBsRLsw=";
+    tag = "v${version}";
+    hash = "sha256-STu/xkKC2Ci5HbUi+gdz3ZXB+xgpkh6bs/lB/pG2Uig=";
   };
 
   # Hash mismatch on across Linux and Darwin
   proxyVendor = true;
 
-  vendorHash = "sha256-e5tNyV5EHYlXS0EPvEEjHEOaH/jY8yQ8hT7vK8FOvkI=";
+  vendorHash = "sha256-0/nM0mcTWF4OPIZvHd6fOPfYMMDw5d96acNuw4kM7Tw=";
 
   subPackages = [ "cmd/trivy" ];
 

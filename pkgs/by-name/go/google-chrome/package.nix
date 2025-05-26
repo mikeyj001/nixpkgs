@@ -93,6 +93,9 @@
   # For Vulkan support (--enable-features=Vulkan)
   addDriverRunpath,
   undmg,
+
+  # For QT support
+  qt6,
 }:
 
 let
@@ -162,15 +165,17 @@ let
     ++ [
       gtk3
       gtk4
+      qt6.qtbase
+      qt6.qtwayland
     ];
 
   linux = stdenv.mkDerivation (finalAttrs: {
     inherit pname meta passthru;
-    version = "131.0.6778.139";
+    version = "136.0.7103.113";
 
     src = fetchurl {
       url = "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${finalAttrs.version}-1_amd64.deb";
-      hash = "sha256-JEJnOawnz6BIXm+pbjz0u1BQOUwm+2hBCMh5NnN2aII=";
+      hash = "sha256-BnKKu7X34g+zg4rDqjVXT3Kx2E8Gn5ELqs3LQS3GCkg=";
     };
 
     # With strictDeps on, some shebangs were not being patched correctly
@@ -220,6 +225,8 @@ let
 
       substituteInPlace $out/share/google/$appname/google-$appname \
         --replace-fail 'CHROME_WRAPPER' 'WRAPPER'
+      substituteInPlace $out/share/applications/com.google.Chrome.desktop \
+        --replace-fail /usr/bin/google-chrome-$dist $exe
       substituteInPlace $out/share/applications/google-$appname.desktop \
         --replace-fail /usr/bin/google-chrome-$dist $exe
       substituteInPlace $out/share/gnome-control-center/default-apps/google-$appname.xml \
@@ -243,6 +250,9 @@ let
 
       # "--simulate-outdated-no-au" disables auto updates and browser outdated popup
       makeWrapper "$out/share/google/$appname/google-$appname" "$exe" \
+        --prefix QT_PLUGIN_PATH  : "${qt6.qtbase}/lib/qt-6/plugins" \
+        --prefix QT_PLUGIN_PATH  : "${qt6.qtwayland}/lib/qt-6/plugins" \
+        --prefix NIXPKGS_QT6_QML_IMPORT_PATH : "${qt6.qtwayland}/lib/qt-6/qml" \
         --prefix LD_LIBRARY_PATH : "$rpath" \
         --prefix PATH            : "$binpath" \
         --suffix PATH            : "${lib.makeBinPath [ xdg-utils ]}" \
@@ -266,11 +276,11 @@ let
 
   darwin = stdenvNoCC.mkDerivation (finalAttrs: {
     inherit pname meta passthru;
-    version = "131.0.6778.140";
+    version = "137.0.7151.41";
 
     src = fetchurl {
-      url = "http://dl.google.com/release2/chrome/ijobeyqsjtnv35wplq3dh5ngae_131.0.6778.140/GoogleChrome-131.0.6778.140.dmg";
-      hash = "sha256-LK5OSVxPtqgKMvg+AS2Q36RLBT8C3XRuPelCWTogXgY=";
+      url = "http://dl.google.com/release2/chrome/acracoudzvaateoc4hi5umv6pobq_137.0.7151.41/GoogleChrome-137.0.7151.41.dmg";
+      hash = "sha256-egOl4mjsIxjWxYTLI38U2LqrIs85+cmZG9oEXe/bF7Q=";
     };
 
     dontPatch = true;

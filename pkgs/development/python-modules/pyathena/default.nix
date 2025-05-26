@@ -17,14 +17,14 @@
 
 buildPythonPackage rec {
   pname = "pyathena";
-  version = "3.12.0";
+  version = "3.14.0";
   pyproject = true;
 
   disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-QASQXfDcReVNN1cRLmndhgY8Xkx5Q+z0lJXYdYV903E=";
+    hash = "sha256-Dgst0gFmHsQwhScz83cIE7B1xbcSKcYslfCGtm3yuh0=";
   };
 
   build-system = [ hatchling ];

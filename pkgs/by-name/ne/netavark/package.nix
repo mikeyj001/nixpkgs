@@ -1,27 +1,34 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, installShellFiles
-, mandown
-, protobuf
-, nixosTests
-, go-md2man
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  installShellFiles,
+  mandown,
+  protobuf,
+  nixosTests,
+  go-md2man,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "netavark";
-  version = "1.13.1";
+  version = "1.15.0";
 
   src = fetchFromGitHub {
     owner = "containers";
-    repo = pname;
+    repo = "netavark";
     rev = "v${version}";
-    hash = "sha256-Vz2/Y8o6fiVdLElgytUqLfa1oK/kyu1+dks4aiDHMAY=";
+    hash = "sha256-V+JwfKWo8gqVq/lF0MMt8sovPRyb3saBxsUhdMo4C5g=";
   };
 
-  cargoHash = "sha256-8qDeOY4yfDE7YX06W3QKSOws+F53XM8M3dclEbYMRsI=";
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-C2+N3jPdqh/cmJ2efrUnScXo1rFBEec6w4r8M6OfcPo=";
 
-  nativeBuildInputs = [ installShellFiles mandown protobuf go-md2man ];
+  nativeBuildInputs = [
+    installShellFiles
+    mandown
+    protobuf
+    go-md2man
+  ];
 
   postBuild = ''
     make -C docs netavark.1
@@ -35,7 +42,7 @@ rustPlatform.buildRustPackage rec {
     description = "Rust based network stack for containers";
     homepage = "https://github.com/containers/netavark";
     license = licenses.asl20;
-    maintainers = with maintainers; [ ] ++ teams.podman.members;
+    teams = [ teams.podman ];
     platforms = platforms.linux;
   };
 }

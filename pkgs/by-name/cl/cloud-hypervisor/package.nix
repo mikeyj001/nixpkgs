@@ -2,7 +2,6 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchpatch,
   rustPlatform,
   pkg-config,
   dtc,
@@ -11,17 +10,17 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "cloud-hypervisor";
-  version = "43.0";
+  version = "46.0";
 
   src = fetchFromGitHub {
     owner = "cloud-hypervisor";
-    repo = pname;
+    repo = "cloud-hypervisor";
     rev = "v${version}";
-    hash = "sha256-drxJtlvBpkK3I7Ob3+pH4KLUq53GWXe1pmv7CI3bbP4=";
+    hash = "sha256-3jFZgcTyjbAB4Ka8ZHeqorlVTkAvXJ2No32038xK0Pc=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-wifctp30ApnxtRMlzksoSGrIJUT1cB0p1RBxfyITuZI=";
+  cargoHash = "sha256-Zllj6HGRgI1tT8EODGOpSgmw3F89ie9Y1hChTrvwskg=";
 
   separateDebugInfo = true;
 
@@ -58,6 +57,7 @@ rustPlatform.buildRustPackage rec {
     ];
     platforms = [
       "aarch64-linux"
+      "riscv64-linux"
       "x86_64-linux"
     ];
   };

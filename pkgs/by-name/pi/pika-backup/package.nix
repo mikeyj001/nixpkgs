@@ -33,10 +33,9 @@ stdenv.mkDerivation rec {
     hash = "sha256-DtLGD7+Ydj2fvEHU+bDQDMC/E/9VgrlVNMCG6OlPmfg=";
   };
 
-  cargoDeps = rustPlatform.fetchCargoTarball {
-    inherit src;
-    name = "${pname}-${version}";
-    hash = "sha256-8nFkc77FiLxMA1hMm8k5VB84l+pQeL0JSzYDytXrNUE=";
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit pname version src;
+    hash = "sha256-1JFXSVs9HPPzh+IjH4RGugrZEifPVcQho9B3hLSTL6s=";
   };
 
   patches = [
@@ -78,7 +77,8 @@ stdenv.mkDerivation rec {
     homepage = "https://apps.gnome.org/app/org.gnome.World.PikaBackup";
     changelog = "https://gitlab.gnome.org/World/pika-backup/-/blob/v${version}/CHANGELOG.md";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ dotlambda ] ++ lib.teams.gnome-circle.members;
+    maintainers = with maintainers; [ dotlambda ];
+    teams = [ teams.gnome-circle ];
     platforms = platforms.linux;
   };
 }

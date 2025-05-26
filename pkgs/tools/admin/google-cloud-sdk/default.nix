@@ -12,7 +12,7 @@
   lib,
   fetchurl,
   makeWrapper,
-  python,
+  python3,
   openssl,
   jq,
   callPackage,
@@ -21,7 +21,7 @@
 }:
 
 let
-  pythonEnv = python.withPackages (
+  pythonEnv = python3.withPackages (
     p:
     with p;
     [
@@ -50,7 +50,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl (sources stdenv.hostPlatform.system);
 
-  buildInputs = [ python ];
+  buildInputs = [ python3 ];
 
   nativeBuildInputs = [
     jq
@@ -63,8 +63,6 @@ stdenv.mkDerivation rec {
     ./gcloud-path.patch
     # Disable checking for updates for the package
     ./gsutil-disable-updates.patch
-    # Revert patch including extended Python version constraint
-    ./gsutil-revert-version-constraint.patch
   ];
 
   installPhase = ''
@@ -87,7 +85,7 @@ stdenv.mkDerivation rec {
         wrapProgram "$programPath" \
             --set CLOUDSDK_PYTHON "${pythonEnv}/bin/python" \
             --set CLOUDSDK_PYTHON_ARGS "-S -W ignore" \
-            --prefix PYTHONPATH : "${pythonEnv}/${python.sitePackages}" \
+            --prefix PYTHONPATH : "${pythonEnv}/${python3.sitePackages}" \
             --prefix PATH : "${openssl.bin}/bin"
 
         mkdir -p $out/bin

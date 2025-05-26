@@ -13,13 +13,13 @@
 
 stdenv.mkDerivation rec {
   pname = "zziplib";
-  version = "0.13.78";
+  version = "0.13.79";
 
   src = fetchFromGitHub {
     owner = "gdraheim";
-    repo = pname;
+    repo = "zziplib";
     rev = "v${version}";
-    hash = "sha256-8QxQrxqYO4LtB8prMqgz5a0QqvSKL7KzTkgi+VdHp6A=";
+    hash = "sha256-PUG6MAglYJXJzQMWM7KfLFbHG3bva7FyaP+HdCsRnZQ=";
   };
 
   nativeBuildInputs = [
@@ -63,7 +63,7 @@ stdenv.mkDerivation rec {
       lgpl2Plus
       mpl11
     ];
-    maintainers = with maintainers; [ AndersonTorres ];
+    maintainers = with maintainers; [ ];
     platforms = platforms.unix;
   };
 }

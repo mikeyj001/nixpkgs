@@ -36,6 +36,17 @@ let
               from selenium.webdriver.firefox.options import Options
               from selenium.webdriver.support.ui import WebDriverWait
               from selenium.webdriver.support import expected_conditions as EC
+              from selenium.common.exceptions import ElementClickInterceptedException
+
+
+              def click_when_unobstructed(mark):
+                  while True:
+                      try:
+                          wait.until(EC.element_to_be_clickable(mark)).click()
+                          break
+                      except ElementClickInterceptedException:
+                          continue
+
 
               options = Options()
               options.add_argument('--headless')
@@ -69,14 +80,13 @@ let
 
               driver.find_element(By.XPATH, "//button[contains(., 'Continue')]").click()
 
-              driver.find_element(By.CSS_SELECTOR, 'input#login_input_master-password').send_keys(
+              driver.find_element(By.XPATH, '//input[@type="password"]').send_keys(
                   '${userPassword}'
               )
-              driver.find_element(By.XPATH, "//button[contains(., 'Log in')]").click()
+              driver.find_element(By.XPATH, "//button[contains(., 'Log in with master password')]").click()
 
-              wait.until(EC.title_contains("Vaults"))
-
-              driver.find_element(By.XPATH, "//button[contains(., 'New item')]").click()
+              click_when_unobstructed((By.CSS_SELECTOR, 'button#newItemDropdown'))
+              driver.find_element(By.XPATH, "//button[contains(., 'Item')]").click()
 
               driver.find_element(By.CSS_SELECTOR, 'input#name').send_keys(
                   'secrets'
@@ -179,6 +189,8 @@ let
             testScript
           else
             ''
+              import json
+
               start_all()
               server.wait_for_unit("vaultwarden.service")
               server.wait_for_open_port(8080)
@@ -203,11 +215,9 @@ let
                   client.succeed(f"bw --nointeraction --raw --session {key} sync -f")
 
               with subtest("get the password with the cli"):
-                  password = client.wait_until_succeeds(
-                      f"bw --nointeraction --raw --session {key} list items | ${pkgs.jq}/bin/jq -r .[].login.password",
-                      timeout=60
-                  )
-                  assert password.strip() == "${storedPassword}"
+                  output = json.loads(client.succeed(f"bw --nointeraction --raw --session {key} list items"))
+
+                  assert output[0]['login']['password'] == "${storedPassword}"
 
               with subtest("Check systemd unit hardening"):
                   server.log(server.succeed("systemd-analyze security vaultwarden.service | grep -v ✓"))

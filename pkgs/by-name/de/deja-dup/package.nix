@@ -11,6 +11,7 @@
   itstool,
   desktop-file-utils,
   glib,
+  glib-networking,
   gtk4,
   coreutils,
   libsoup_3,
@@ -56,6 +57,7 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     libsoup_3
     glib
+    glib-networking
     gtk4
     libsecret
     libadwaita
@@ -88,7 +90,8 @@ stdenv.mkDerivation (finalAttrs: {
     '';
     homepage = "https://apps.gnome.org/DejaDup/";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ jtojnar ] ++ lib.teams.gnome-circle.members;
+    maintainers = with maintainers; [ jtojnar ];
+    teams = [ teams.gnome-circle ];
     platforms = platforms.linux;
     mainProgram = "deja-dup";
   };

@@ -15,6 +15,7 @@
       system.activationScripts.etc = lib.stringAfter [
         "users"
         "groups"
+        "specialfs"
       ] config.system.build.etcActivationCommands;
     }
 
@@ -48,10 +49,10 @@
       boot.initrd.systemd = {
         mounts = [
           {
-            where = "/run/etc-metadata";
+            where = "/run/nixos-etc-metadata";
             what = "/etc-metadata-image";
             type = "erofs";
-            options = "loop,ro";
+            options = "loop,ro,nodev,nosuid";
             unitConfig = {
               # Since this unit depends on the nix store being mounted, it cannot
               # be a dependency of local-fs.target, because if it did, we'd have
@@ -80,10 +81,12 @@
             type = "overlay";
             options = lib.concatStringsSep "," (
               [
+                "nodev"
+                "nosuid"
                 "relatime"
                 "redirect_dir=on"
                 "metacopy=on"
-                "lowerdir=/run/etc-metadata::/etc-basedir"
+                "lowerdir=/run/nixos-etc-metadata::/etc-basedir"
               ]
               ++ lib.optionals config.system.etc.overlay.mutable [
                 "rw"
@@ -113,7 +116,7 @@
             unitConfig = {
               RequiresMountsFor = [
                 "/sysroot/nix/store"
-                "/run/etc-metadata"
+                "/run/nixos-etc-metadata"
               ];
               DefaultDependencies = false;
             };

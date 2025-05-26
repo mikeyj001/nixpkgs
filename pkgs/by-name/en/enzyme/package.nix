@@ -7,28 +7,35 @@
 }:
 llvmPackages.stdenv.mkDerivation rec {
   pname = "enzyme";
-  version = "0.0.170";
+  version = "0.0.180";
 
   src = fetchFromGitHub {
     owner = "EnzymeAD";
     repo = "Enzyme";
     rev = "v${version}";
-    hash = "sha256-8ljzf/opZnZMOcXi5IBMiS2KYlvIjrtSq/Aee2/IUdU=";
+    hash = "sha256-jQ9IiE9cM/UhdB36vvmNxnvuDtFbzR5WbDzysdpQR9E=";
   };
 
   postPatch = ''
     patchShebangs enzyme
   '';
 
-  nativeBuildInputs = [
+  llvm = llvmPackages.llvm;
+  clang = llvmPackages.clang-unwrapped;
+
+  buildInputs = [
     cmake
     git
-    llvmPackages.llvm
+    llvm
+    clang
   ];
 
   cmakeDir = "../enzyme";
 
-  cmakeFlags = [ "-DLLVM_DIR=${llvmPackages.llvm.dev}" ];
+  cmakeFlags = [
+    "-DLLVM_DIR=${llvm.dev}"
+    "-DClang_DIR=${clang.dev}"
+  ];
 
   enableParallelBuilding = true;
 
@@ -37,6 +44,9 @@ llvmPackages.stdenv.mkDerivation rec {
     description = "High-performance automatic differentiation of LLVM and MLIR";
     maintainers = with lib.maintainers; [ kiranshila ];
     platforms = lib.platforms.all;
-    license = lib.licenses.asl20-llvm;
+    license = with lib.licenses; [
+      asl20
+      llvm-exception
+    ];
   };
 }
