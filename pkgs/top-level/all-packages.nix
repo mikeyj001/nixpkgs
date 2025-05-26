@@ -14017,7 +14017,6 @@ with pkgs;
 
   protonup-qt = python3Packages.callPackage ../applications/misc/protonup-qt { };
 
-<<<<<<< HEAD
   pmbootstrap = python3Packages.callPackage ../tools/misc/pmbootstrap { };
 
   seamonkey = callPackage ../applications/networking/browsers/seamonkey { };
@@ -14030,8 +14029,6 @@ with pkgs;
 
   pureref = callPackage ../applications/graphics/pureref { };
 
-=======
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60
   inherit (callPackage ../applications/virtualization/singularity/packages.nix { })
     apptainer
     singularity
