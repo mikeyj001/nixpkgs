@@ -138,7 +138,7 @@ python3.pkgs.buildPythonApplication {
 
 buildPythonPackage rec {
   pname = "xonsh";
-  version = "0.19.4";
+  version = "0.19.9";
   pyproject = true;
 
   # PyPI package ships incomplete tests
@@ -146,7 +146,7 @@ buildPythonPackage rec {
     owner = "xonsh";
     repo = "xonsh";
     tag = version;
-    hash = "sha256-gOk0BZNuKsEzs72Lukq7+7vltmtPE75gEs+JyLqBDdc=";
+    hash = "sha256-7A6V2lfJHpjrp3AWSnfNuvPy02GvjNUXZqBBSomHJew=";
   };
 <<<<<<< HEAD
 in

@@ -127,6 +127,7 @@ let
         bitXor
         bitNot
         boolToString
+        boolToYesNo
         mergeAttrs
         flip
         defaultTo
@@ -206,7 +207,10 @@ let
         concatMapAttrs
         mapAttrsRecursive
         mapAttrsRecursiveCond
+        mapAttrsToListRecursive
+        mapAttrsToListRecursiveCond
         genAttrs
+        genAttrs'
         isDerivation
         toDerivation
         optionalAttrs
@@ -287,6 +291,7 @@ let
         init
         crossLists
         unique
+        uniqueStrings
         allUnique
         intersectLists
         subtractLists
@@ -309,6 +314,7 @@ let
         stringLength
         substring
         isString
+        replaceString
         replaceStrings
         intersperse
         concatStringsSep
@@ -325,6 +331,7 @@ let
         hasInfix
         hasPrefix
         hasSuffix
+        join
         stringToCharacters
         stringAsChars
         escape
@@ -432,6 +439,8 @@ let
         pathHasContext
         canCleanSource
         pathIsGitRepo
+        revOrTag
+        repoRevToName
         ;
       inherit (self.modules)
         evalModules
@@ -563,6 +572,9 @@ let
         ;
       inherit (self.versions)
         splitVersion
+        ;
+      inherit (self.network.ipv6)
+        mkEUI64Suffix
         ;
     }
   );

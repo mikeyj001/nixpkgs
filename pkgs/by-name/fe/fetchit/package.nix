@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   buildGoModule,
   fetchFromGitHub,
   installShellFiles,
@@ -58,7 +59,7 @@ buildGoModule rec {
   # There are no tests for cmd/fetchit.
   doCheck = false;
 
-  postInstall = ''
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
     for i in bash fish zsh; do
       installShellCompletion --cmd fetchit \
         --$i <($out/bin/fetchit completion $i)
@@ -80,7 +81,7 @@ buildGoModule rec {
     homepage = "https://fetchit.readthedocs.io";
     changelog = "https://github.com/containers/fetchit/releases/tag/${src.rev}";
     license = licenses.agpl3Plus;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ guylamar2006 ];
     platforms = platforms.linux;
   };
 }

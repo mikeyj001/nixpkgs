@@ -78,13 +78,18 @@ let
 in
 {
   jetty_11 = common {
-    version = "11.0.25";
-    hash = "sha256-KaceKN/iu0QCv9hVmoXYvN7TxK9DwhiCcbjEnqcKSzs=";
+    version = "11.0.26";
+    hash = "sha256-uJgh/+/uGjchTgtoF38f7jIvbdrwdToAsqqVOlYtMIM=";
   };
 
   jetty_12 = common {
+<<<<<<< HEAD
     version = "12.0.21";
     hash = "sha256-U/W6h0S7b0zLoYahDGo/pkKa+NIMKR0tiX3pyRl40zg=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
+=======
+    version = "12.1.1";
+    hash = "sha256-VHmPhVEqq4eoOwo9O7sbdv6bJB9dCFkN+64jTlnFarM=";
+>>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
   };
 }

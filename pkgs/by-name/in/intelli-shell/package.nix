@@ -20,7 +20,6 @@ rustPlatform.buildRustPackage rec {
     hash = "sha256-D7hB1vKi54L7hU3TqTvzxXIr6XohfYLUTidR6wFJmfo=";
   };
 
-  useFetchCargoVendor = true;
   cargoHash = "sha256-vzmUmznY5uqPhaTzfT0KR+k2nvPmB0Jm9/N4lgzEe2E=";
 
   nativeBuildInputs = [
@@ -42,7 +41,7 @@ rustPlatform.buildRustPackage rec {
     description = "Like IntelliSense, but for shells";
     homepage = "https://github.com/lasantosr/intelli-shell";
     license = licenses.asl20;
-    maintainers = with maintainers; [ iogamaster ];
+    maintainers = [ ];
     mainProgram = "intelli-shell";
   };
 }

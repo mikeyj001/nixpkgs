@@ -42,6 +42,36 @@ rec {
     ;
 
   /**
+    Concatenates a list of strings with a separator between each element.
+
+    # Inputs
+
+    `sep`
+    : Separator to add between elements
+
+    `list`
+    : List of strings that will be joined
+
+    # Type
+
+    ```
+    join :: string -> [ string ] -> string
+    ```
+
+    # Examples
+    :::{.example}
+    ## `lib.strings.join` usage example
+
+    ```nix
+    join ", " ["foo" "bar"]
+    => "foo, bar"
+    ```
+
+    :::
+  */
+  join = builtins.concatStringsSep;
+
+  /**
     Concatenate a list of strings.
 
     # Type
@@ -331,6 +361,41 @@ rec {
     :::
   */
   concatLines = concatMapStrings (s: s + "\n");
+
+  /**
+    Given string `s`, replace every occurrence of the string `from` with the string `to`.
+
+    # Inputs
+
+    `from`
+    : The string to be replaced
+
+    `to`
+    : The string to replace with
+
+    `s`
+    : The original string where replacements will be made
+
+    # Type
+
+    ```
+    replaceString :: string -> string -> string -> string
+    ```
+
+    # Examples
+    :::{.example}
+    ## `lib.strings.replaceString` usage example
+
+    ```nix
+    replaceString "world" "Nix" "Hello, world!"
+    => "Hello, Nix!"
+    replaceString "." "_" "v1.2.3"
+    => "v1_2_3"
+    ```
+
+    :::
+  */
+  replaceString = from: to: replaceStrings [ from ] [ to ];
 
   /**
     Repeat a string `n` times,
@@ -1100,7 +1165,7 @@ rec {
         "."
         "~"
       ];
-      toEscape = builtins.removeAttrs asciiTable unreserved;
+      toEscape = removeAttrs asciiTable unreserved;
     in
     replaceStrings (builtins.attrNames toEscape) (
       lib.mapAttrsToList (_: c: "%${fixedWidthString 2 "0" (lib.toHexString c)}") toEscape
@@ -1138,7 +1203,7 @@ rec {
       string = toString arg;
     in
     if match "[[:alnum:],._+:@%/-]+" string == null then
-      "'${replaceStrings [ "'" ] [ "'\\''" ] string}'"
+      "'${replaceString "'" "'\\''" string}'"
     else
       string;
 

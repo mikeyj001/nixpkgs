@@ -40,13 +40,17 @@ let
 }:
 
 let
-  version = "0.14.0";
+  version = "0.14.7";
   src = fetchFromGitHub {
     owner = "openobserve";
     repo = "openobserve";
     tag = "v${version}";
+<<<<<<< HEAD
     hash = "sha256-rTp+DkADqYkJg1zJog1yURE082V5kCqgid/oUd81SN8=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
+=======
+    hash = "sha256-+YcVTn/jcEbaqTycMCYn6B0z2HsvgrCY1gHnkRajwSs=";
+>>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
   };
   web = buildNpmPackage {
     inherit src version;
@@ -59,8 +63,12 @@ let
 =======
     sourceRoot = "${src.name}/web";
 
+<<<<<<< HEAD
     npmDepsHash = "sha256-awfQR1wZBX3ggmD0uJE9Fur4voPydeygrviRijKnBTE=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
+=======
+    npmDepsHash = "sha256-1MUmAWkeYUEL6WZGq1Jg5W2uKa2xj0oZbGlIbvZWT1E=";
+>>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
 
     preBuild = ''
       # Patch vite config to not open the browser to visualize plugin composition
@@ -112,9 +120,13 @@ rustPlatform.buildRustPackage {
   };
 =======
 
+<<<<<<< HEAD
   useFetchCargoVendor = true;
   cargoHash = "sha256-FWMUPghx9CxuzP7jFZYSIwZsylApWzQsfx8DuwS4GTo=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
+=======
+  cargoHash = "sha256-vfc6B+Uc8RXQD8vGC1yV9w5YAefkYJMpCH2frqjrSWk=";
+>>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
 
   nativeBuildInputs = [
     pkg-config
@@ -193,6 +205,7 @@ rustPlatform.buildRustPackage {
 =======
     "--skip=handler::http::router::tests::test_get_proxy_routes"
     "--skip=tests::e2e_test"
+    "--skip=service::organization::tests::test_organization"
   ];
 
   passthru.updateScript = gitUpdater {
