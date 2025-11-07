@@ -40,17 +40,21 @@ let
 }:
 
 let
-  version = "0.14.7";
+  version = "0.15.3";
   src = fetchFromGitHub {
     owner = "openobserve";
     repo = "openobserve";
     tag = "v${version}";
+<<<<<<< HEAD
 <<<<<<< HEAD
     hash = "sha256-rTp+DkADqYkJg1zJog1yURE082V5kCqgid/oUd81SN8=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 =======
     hash = "sha256-+YcVTn/jcEbaqTycMCYn6B0z2HsvgrCY1gHnkRajwSs=";
 >>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
+=======
+    hash = "sha256-GHyfIVUSX7evP3LaHZClD1RjZ6somYcMNBFdkaZL7lg=";
+>>>>>>> 241735a9dbf547df582eaf393eb52d911aae7325
   };
   web = buildNpmPackage {
     inherit src version;
@@ -64,11 +68,15 @@ let
     sourceRoot = "${src.name}/web";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     npmDepsHash = "sha256-awfQR1wZBX3ggmD0uJE9Fur4voPydeygrviRijKnBTE=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 =======
     npmDepsHash = "sha256-1MUmAWkeYUEL6WZGq1Jg5W2uKa2xj0oZbGlIbvZWT1E=";
 >>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
+=======
+    npmDepsHash = "sha256-5bXEC48m3FbtmLwVYYvEdMV3qWA7KNEKVxkMZ94qEpA=";
+>>>>>>> 241735a9dbf547df582eaf393eb52d911aae7325
 
     preBuild = ''
       # Patch vite config to not open the browser to visualize plugin composition
@@ -121,12 +129,16 @@ rustPlatform.buildRustPackage {
 =======
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   useFetchCargoVendor = true;
   cargoHash = "sha256-FWMUPghx9CxuzP7jFZYSIwZsylApWzQsfx8DuwS4GTo=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 =======
   cargoHash = "sha256-vfc6B+Uc8RXQD8vGC1yV9w5YAefkYJMpCH2frqjrSWk=";
 >>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
+=======
+  cargoHash = "sha256-j/bx4qoWcSh2/yJ9evnzSfyUd0tLAk4M310A89k4wy8=";
+>>>>>>> 241735a9dbf547df582eaf393eb52d911aae7325
 
   nativeBuildInputs = [
     pkg-config
@@ -205,10 +217,13 @@ rustPlatform.buildRustPackage {
 =======
     "--skip=handler::http::router::tests::test_get_proxy_routes"
     "--skip=tests::e2e_test"
-    # test_export_operator unit test panics when run on the 0.14.7 release
-    # see this issue for more details : https://github.com/NixOS/nixpkgs/issues/447106
-    "--skip=tests::test_export_operator"
-    "--skip=service::organization::tests::test_organization"
+    "--skip=tests::test_setup_logs"
+    "--skip=handler::http::router::middlewares::compress::Compress"
+    # Tests are not threadsafe. Most likely can only run one test at a time,
+    # due to altering shared database state.
+    # This option already in upstream code: https://github.com/openobserve/openobserve/pull/7084
+    # Also see: https://github.com/NixOS/nixpkgs/pull/457421
+    "--test-threads=1"
   ];
 
   passthru.updateScript = gitUpdater {

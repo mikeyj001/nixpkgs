@@ -33,6 +33,7 @@ let
     "TestCloneIfRequired"
     "TestActionCache"
     "TestRunContext_GetGitHubContext"
+    "TestSetJobResult_SkipsBannerInChildReusableWorkflow"
 
     # These tests rely on outbound IP address
     "TestHandler"
@@ -41,17 +42,17 @@ let
 in
 buildGoModule rec {
   pname = "forgejo-runner";
-  version = "11.1.2";
+  version = "11.3.0";
 
   src = fetchFromGitea {
     domain = "code.forgejo.org";
     owner = "forgejo";
     repo = "runner";
     rev = "v${version}";
-    hash = "sha256-/rkBrG8hRn52M1ybjbWtSDFYsJ4fHzw9qAoc5325g9A=";
+    hash = "sha256-tbP6S4suHT8eEIg+Gd2d7Su2cgwWNALcHnue9UpDnKU=";
   };
 
-  vendorHash = "sha256-eVOmUozNLHRiNwIhbf7ebVNdRiMAtLMdYI7pnALvl8U=";
+  vendorHash = "sha256-QokVTTfMGAJG4Jqfs7mfGXrC4QSZfOXesfF2OeN0L9M=";
 
   # See upstream Makefile
   # https://code.forgejo.org/forgejo/runner/src/branch/main/Makefile
@@ -91,6 +92,8 @@ buildGoModule rec {
   };
 
   meta = with lib; {
+    # Cannot process container options: '--pid=host --device=/dev/sda': 'unknown server OS: darwin'
+    broken = stdenv.hostPlatform.isDarwin;
     description = "Runner for Forgejo based on act";
     homepage = "https://code.forgejo.org/forgejo/runner";
     changelog = "https://code.forgejo.org/forgejo/runner/releases/tag/${src.rev}";

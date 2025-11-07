@@ -85,6 +85,7 @@ in
   jetty_12 = common {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     version = "12.0.21";
     hash = "sha256-U/W6h0S7b0zLoYahDGo/pkKa+NIMKR0tiX3pyRl40zg=";
 >>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
@@ -96,5 +97,9 @@ in
     version = "12.1.2";
     hash = "sha256-GtaEIXqOSutgrSJJ/+oFuGSe7y8omVX7sBgcG3GJzvs=";
 >>>>>>> 021c00514579a265e0d8f97969c433f2fae0413a
+=======
+    version = "12.1.3";
+    hash = "sha256-+DCfP0tFBouTZqOEzCFaQ4dl78xPFudUzS9hAzUkc7Y=";
+>>>>>>> 241735a9dbf547df582eaf393eb52d911aae7325
   };
 }
