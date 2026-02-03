@@ -27,6 +27,7 @@ buildPythonPackage rec {
 
   nativeCheckInputs = [ pynose ];
 
+<<<<<<< HEAD
   # https://github.com/clarete/forbiddenfruit/pull/47 required to switch to pytest
   checkPhase = ''
     runHook preCheck
@@ -38,10 +39,13 @@ buildPythonPackage rec {
   '';
   doCheck = false; # uses nose
   meta = with lib; {
+=======
+  meta = {
+>>>>>>> 30154124f004884b3846d043eef0f6770c41332d
     description = "Patch python built-in objects";
     homepage = "https://github.com/clarete/forbiddenfruit";
     changelog = "https://github.com/clarete/forbiddenfruit/releases/tag/${version}";
-    license = with licenses; [
+    license = with lib.licenses; [
       mit
       gpl3Plus
     ];

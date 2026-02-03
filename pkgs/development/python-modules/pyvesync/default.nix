@@ -12,14 +12,14 @@
 
 buildPythonPackage rec {
   pname = "pyvesync";
-  version = "3.1.4";
+  version = "3.4.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "webdjoe";
     repo = "pyvesync";
     tag = version;
-    hash = "sha256-l+b53B8Bdd/WnM2Oe9srST2T2KXaQfXtfc5+BwNte90=";
+    hash = "sha256-G1Ov8xXIVkklxfLqhHiYbRgHEsjTQhG7k1V6Amtc+w4=";
   };
 
   build-system = [ setuptools ];
@@ -38,11 +38,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "pyvesync" ];
 
-  meta = with lib; {
+  meta = {
     description = "Python library to manage Etekcity Devices and Levoit Air Purifier";
     homepage = "https://github.com/webdjoe/pyvesync";
     changelog = "https://github.com/webdjoe/pyvesync/releases/tag/${src.tag}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ fab ];
   };
 }

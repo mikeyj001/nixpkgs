@@ -4,16 +4,16 @@
   python3Packages,
 }:
 
-python3Packages.buildPythonApplication rec {
+python3Packages.buildPythonApplication (finalAttrs: {
   pname = "nemorosa";
-  version = "0.3.0";
+  version = "0.4.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "KyokoMiki";
     repo = "nemorosa";
-    tag = version;
-    hash = "sha256-UBvtff5fU3kH/+Kw426+yyoyJ3aASBIYDPX+X5jqkA8=";
+    tag = finalAttrs.version;
+    hash = "sha256-AqFjpEakEZ21iXmIIxhX+ez2aI/RMsLaUoECipQcaM4=";
   };
 
   # Upstream uses overly strict, fresh version specifiers
@@ -62,4 +62,4 @@ python3Packages.buildPythonApplication rec {
     maintainers = with lib.maintainers; [ ambroisie ];
     mainProgram = "nemorosa";
   };
-}
+})

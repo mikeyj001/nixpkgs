@@ -28,14 +28,14 @@ let
 in
 stdenv'.mkDerivation (finalAttrs: {
   pname = "ctranslate2";
-  version = "4.6.0";
+  version = "4.7.0";
 
   src = fetchFromGitHub {
     owner = "OpenNMT";
     repo = "CTranslate2";
     tag = "v${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-EM2kunqtxo0BTIzrEomfaRsdav7sx6QEOhjDtjjSoYY=";
+    hash = "sha256-aH2sm7GkHbjy0/KwgyCIpAFNHDmJURd4xyn+51MCr+Y=";
   };
 
   # Fix CMake 4 compatibility
@@ -49,6 +49,8 @@ stdenv'.mkDerivation (finalAttrs: {
       --replace-fail \
         'CMAKE_MINIMUM_REQUIRED(VERSION 3.1 FATAL_ERROR)' \
         'CMAKE_MINIMUM_REQUIRED(VERSION 3.10 FATAL_ERROR)'
+
+    sed -e '1i #include <cstdint>' -i third_party/cxxopts/include/cxxopts.hpp
   '';
 
   nativeBuildInputs = [
@@ -72,6 +74,9 @@ stdenv'.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     (lib.cmakeBool "WITH_ACCELERATE" true)
+  ]
+  ++ lib.optionals (stdenv.hostPlatform.gcc.arch or null != null) [
+    (lib.cmakeBool "ENABLE_CPU_DISPATCH" false)
   ];
 
   buildInputs =

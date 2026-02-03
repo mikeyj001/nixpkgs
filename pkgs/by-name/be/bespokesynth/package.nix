@@ -3,7 +3,6 @@
   stdenv,
   fetchFromGitHub,
   gitUpdater,
-  apple-sdk_11,
   cmake,
   pkg-config,
   ninja,
@@ -31,7 +30,6 @@
   webkitgtk_4_1,
   python3,
   curl,
-  pcre,
   mount,
   zenity,
   # It is not allowed to distribute binaries with the VST2 SDK plugin without a license
@@ -118,11 +116,7 @@ stdenv.mkDerivation (finalAttrs: {
     libxkbcommon
     xcbutilkeysyms
     xcb-util-cursor
-    pcre
     mount
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    apple-sdk_11
   ];
 
   postInstall =
