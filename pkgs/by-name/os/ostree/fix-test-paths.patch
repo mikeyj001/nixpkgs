@@ -1,15 +1,12 @@
 diff --git a/tests/libtest.sh b/tests/libtest.sh
-<<<<<<< HEAD
 index ca457fa2..c0a529ff 100755
 --- a/tests/libtest.sh
 +++ b/tests/libtest.sh
 @@ -709,12 +709,12 @@ gen_ed25519_keys ()
-=======
 index 2c2a33f0..4e9d3fa2 100755
 --- a/tests/libtest.sh
 +++ b/tests/libtest.sh
 @@ -761,12 +761,12 @@ gen_ed25519_keys ()
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
  {
    # Generate private key in PEM format
    pemfile="$(mktemp -p ${test_tmpdir} ed25519_XXXXXX.pem)"
@@ -25,11 +22,8 @@ index 2c2a33f0..4e9d3fa2 100755
    # Secret key is concantination of SEED and PUBLIC
    ED25519SECRET="$(echo ${ED25519SEED}${ED25519PUBLIC} | base64 -d | base64 -w 0)"
  
-<<<<<<< HEAD
 @@ -725,7 +725,7 @@ gen_ed25519_keys ()
-=======
 @@ -777,7 +777,7 @@ gen_ed25519_keys ()
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
  
  gen_ed25519_random_public()
  {
@@ -39,17 +33,14 @@ index 2c2a33f0..4e9d3fa2 100755
  
  is_bare_user_only_repo () {
 diff --git a/tests/test-basic-user-only.sh b/tests/test-basic-user-only.sh
-<<<<<<< HEAD
 index f65094fd..105be893 100755
 --- a/tests/test-basic-user-only.sh
 +++ b/tests/test-basic-user-only.sh
 @@ -29,7 +29,7 @@ extra_basic_tests=5
-=======
 index f6e8606d..1fed2465 100755
 --- a/tests/test-basic-user-only.sh
 +++ b/tests/test-basic-user-only.sh
 @@ -27,7 +27,7 @@ extra_basic_tests=7
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
  . $(dirname $0)/basic-test.sh
  
  $CMD_PREFIX ostree --version > version.yaml
@@ -59,17 +50,14 @@ index f6e8606d..1fed2465 100755
  
  # Reset things so we don't inherit a lot of state from earlier tests
 diff --git a/tests/test-remote-headers.sh b/tests/test-remote-headers.sh
-<<<<<<< HEAD
 index a41d087a..77b34c90 100755
 --- a/tests/test-remote-headers.sh
 +++ b/tests/test-remote-headers.sh
 @@ -26,7 +26,7 @@ echo '1..2'
-=======
 index d3bf4f97..0d2331ba 100755
 --- a/tests/test-remote-headers.sh
 +++ b/tests/test-remote-headers.sh
 @@ -24,7 +24,7 @@ echo '1..2'
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
  . $(dirname $0)/libtest.sh
  
  V=$($CMD_PREFIX ostree --version | \

@@ -1,14 +1,11 @@
-<<<<<<< HEAD
 --- a/tests/basic-test.sh
 +++ b/tests/basic-test.sh
 @@ -226,7 +226,7 @@ cd ${test_tmpdir}
-=======
 diff --git a/tests/basic-test.sh b/tests/basic-test.sh
 index c8f853f8..a58ad3de 100644
 --- a/tests/basic-test.sh
 +++ b/tests/basic-test.sh
 @@ -242,7 +242,7 @@ cd ${test_tmpdir}
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
  if $OSTREE commit ${COMMIT_ARGS} -b test-bootable --bootable $test_tmpdir/checkout-test2-4 2>err.txt; then
      fatal "committed non-bootable tree"
  fi
@@ -18,11 +15,8 @@ index c8f853f8..a58ad3de 100644
  
  cd ${test_tmpdir}
 diff --git a/tests/pull-test.sh b/tests/pull-test.sh
-<<<<<<< HEAD
 index f4084290..4af5ec6f 100644
-=======
 index d61735a0..9e751d82 100644
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
 --- a/tests/pull-test.sh
 +++ b/tests/pull-test.sh
 @@ -297,7 +297,7 @@ ostree_repo_init mirrorrepo-local --mode=archive

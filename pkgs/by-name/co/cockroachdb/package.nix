@@ -1,5 +1,3 @@
-<<<<<<< HEAD:pkgs/servers/sql/cockroachdb/default.nix
-<<<<<<< HEAD
 { lib, stdenv, buildGoPackage, fetchurl
 , cmake, xz, which, autoconf
 , ncurses6, libedit, libunwind
@@ -67,18 +65,15 @@ buildGoPackage rec {
     description = "A scalable, survivable, strongly-consistent SQL database";
     license     = licenses.bsl11;
     platforms   = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" ];
-=======
 { lib
 , stdenv
 , fetchzip
 , buildFHSEnv
-=======
 {
   lib,
   stdenv,
   fetchzip,
   buildFHSEnv,
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60:pkgs/by-name/co/cockroachdb/package.nix
 }:
 
 let
@@ -123,11 +118,8 @@ buildFHSEnv {
       cockroachdb-community-license
     ];
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-<<<<<<< HEAD:pkgs/servers/sql/cockroachdb/default.nix
     platforms = [ "aarch64-linux" "x86_64-linux" ];
->>>>>>> 43e9221a7afaecac78fc4d59a26a05e323d6495e
     maintainers = with maintainers; [ rushmorem thoughtpolice ];
-=======
     platforms = [
       "aarch64-linux"
       "x86_64-linux"
@@ -136,6 +128,5 @@ buildFHSEnv {
       rushmorem
       thoughtpolice
     ];
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60:pkgs/by-name/co/cockroachdb/package.nix
   };
 }

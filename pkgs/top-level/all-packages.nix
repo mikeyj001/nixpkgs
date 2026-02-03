@@ -11283,7 +11283,6 @@ with pkgs;
 
   pixel2svg = python310Packages.callPackage ../tools/graphics/pixel2svg { };
 
-<<<<<<< HEAD
   pixinsight = callPackage ../applications/graphics/pixinsight { };
 
   pmbootstrap = python3Packages.callPackage ../tools/misc/pmbootstrap { };
@@ -11298,8 +11297,6 @@ with pkgs;
 
   pureref = callPackage ../applications/graphics/pureref { };
 
-=======
->>>>>>> 95e041bd9cbfa4d8a4efb322b9111779f2c64465
   inherit (callPackage ../applications/virtualization/singularity/packages.nix { })
     apptainer
     singularity

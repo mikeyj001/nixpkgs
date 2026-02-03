@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 { callPackage, ... } @ args:
 
 callPackage ./generic.nix (args // {
@@ -16,7 +15,6 @@ callPackage ./generic.nix (args // {
     rm -r "$out"/docs
   '';
 })
-=======
 { callPackage, ... }@args:
 
 callPackage ./generic.nix (
@@ -33,4 +31,3 @@ callPackage ./generic.nix (
     ];
   }
 )
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60

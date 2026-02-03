@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 { lib
 , coreutils
 , fetchFromGitHub
@@ -107,7 +106,6 @@ python3.pkgs.buildPythonApplication {
     maintainers = with lib.maintainers; [ AndersonTorres ];
   };
 }
-=======
 {
   lib,
   buildPythonPackage,
@@ -148,11 +146,8 @@ buildPythonPackage rec {
     tag = version;
     hash = "sha256-7A6V2lfJHpjrp3AWSnfNuvPy02GvjNUXZqBBSomHJew=";
   };
-<<<<<<< HEAD
 in
 pythonPackages.buildPythonPackage argset
->>>>>>> e5f138e033e11e8865dbe918d1fe771955274f4d
-=======
 
   build-system = [
     setuptools
@@ -251,4 +246,3 @@ pythonPackages.buildPythonPackage argset
     maintainers = with lib.maintainers; [ samlukeyes123 ];
   };
 }
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a

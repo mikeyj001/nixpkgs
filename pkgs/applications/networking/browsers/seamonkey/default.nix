@@ -3,16 +3,16 @@ with import <nixpkgs>{};
 { stdenv, lib, bzip2, glib, dbus-glib, xorg, gtk3, gcc-unwrapped,libXdamage, fetchurl, autoPatchelfHook }:
 
 stdenv.mkDerivation rec {
-  version = "2.53.21";
+  version = "2.53.23";
   name = "seamonkey-${version}";
 
   src = fetchurl {
 #	url = "https:/7/archive.mozilla.org/pub/seamonkey/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
 	url = "https://archive.seamonkey-project.org/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
 
-	# 2.53.22
+	# 2.53.23
 	sha256 = "";
-#   	sha256 = "sha256-Vp9IF1ZLfrJdlxb0XuRyR33R57lidyR+IKEVoOJAiP8=";
+#   	sha256 = "sha256-DWj+xTelCXOX9TmSH/EiqvX71U5EAN0CKufbNjPpRFo=";
   };
 
   unpacked = ''

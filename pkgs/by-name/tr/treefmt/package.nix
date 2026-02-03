@@ -1,9 +1,7 @@
-<<<<<<< HEAD
 { lib, rustPlatform, fetchFromGitHub }:
 rustPlatform.buildRustPackage rec {
   pname = "treefmt";
   version = "0.6.1";
-=======
 {
   lib,
   buildGoModule,
@@ -12,19 +10,13 @@ rustPlatform.buildRustPackage rec {
 }:
 buildGoModule rec {
   pname = "treefmt";
-<<<<<<< HEAD
   version = "2.3.1";
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
-=======
   version = "2.4.0";
->>>>>>> 241735a9dbf547df582eaf393eb52d911aae7325
 
   src = fetchFromGitHub {
     owner = "numtide";
     repo = "treefmt";
     rev = "v${version}";
-<<<<<<< HEAD
-<<<<<<< HEAD
     hash = "sha256-icAe54Mv1xpOjUPSk8QDZaMk2ueNvjER6UyJ9uyUL6s=";
   };
 
@@ -35,11 +27,8 @@ buildGoModule rec {
     homepage = "https://github.com/numtide/treefmt";
     license = lib.licenses.mit;
     maintainers = [ lib.maintainers.zimbatm ];
-=======
     hash = "sha256-Z1AGLaGrRrUd75aQJc/UKwzMGb9gI/p5WxQ5XUgp98o=";
-=======
     hash = "sha256-Okwwu5ls3BwLtm8qaq+QX3P+6uwuodV82F3j38tuszk=";
->>>>>>> 241735a9dbf547df582eaf393eb52d911aae7325
   };
 
   vendorHash = "sha256-fiBpyhbkzyhv7i4iHDTsgFcC/jx6onOzGP/YMcUAe9I=";
@@ -93,7 +82,6 @@ buildGoModule rec {
       MattSturgeon
       zimbatm
     ];
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
     mainProgram = "treefmt";
   };
 }

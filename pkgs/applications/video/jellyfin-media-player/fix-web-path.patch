@@ -1,5 +1,4 @@
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-<<<<<<< HEAD
 index 5abca9b..d09176b 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
@@ -10,7 +9,6 @@ index 5abca9b..d09176b 100644
 -  if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../dist/)
 -    add_resources(TARGET ${MAIN_TARGET} SOURCES ${CMAKE_CURRENT_BINARY_DIR}/../dist/ DEST ${RESOURCE_ROOT}/web-client/desktop)
 -  endif()
-=======
 index 9df49da..be1c479 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
@@ -18,14 +16,12 @@ index 9df49da..be1c479 100644
  set(RESOURCE_ROOT .)
  if(APPLE)
    set(RESOURCE_ROOT Resources)
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60
 -  add_resources(TARGET ${MAIN_TARGET} SOURCES ${CMAKE_SOURCE_DIR}/native/ DEST ${RESOURCE_ROOT}/web-client/extension)
 +  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../../jellyfin-web/ DESTINATION ${RESOURCE_ROOT}/web-client/desktop)
 +  install(DIRECTORY ${CMAKE_SOURCE_DIR}/native/ DESTINATION ${RESOURCE_ROOT}/web-client/extension)
  endif()
  
  if(NOT APPLE)
-<<<<<<< HEAD
 @@ -123,9 +121,7 @@ if(NOT APPLE)
        install(FILES ${loc}/qtwebengine_devtools_resources.pak DESTINATION resources)
      endif()
@@ -33,18 +29,14 @@ index 9df49da..be1c479 100644
 -  if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/../dist/)
 -    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../dist/ DESTINATION ${INSTALL_RESOURCE_DIR}/web-client/desktop)
 -  endif()
-=======
 @@ -119,6 +120,7 @@ if(NOT APPLE)
        install(FILES ${loc}/qtwebengine_devtools_resources.pak DESTINATION resources)
      endif()
    endforeach()
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60
 +  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../../jellyfin-web/ DESTINATION ${INSTALL_RESOURCE_DIR}/web-client/desktop)
    install(DIRECTORY ${CMAKE_SOURCE_DIR}/native/ DESTINATION ${INSTALL_RESOURCE_DIR}/web-client/extension)
  endif()
  
-<<<<<<< HEAD
-=======
 diff --git a/src/settings/SettingsComponent.cpp b/src/settings/SettingsComponent.cpp
 index c398523..7023948 100644
 --- a/src/settings/SettingsComponent.cpp
@@ -61,4 +53,3 @@ index c398523..7023948 100644
 -- 
 2.36.0
 
->>>>>>> 831eb3618dd71835c60e2b7b72f1978cd7c32f60

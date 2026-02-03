@@ -47,7 +47,6 @@ buildGoModule rec {
     homepage = "https://github.com/itchio/butler";
     license = licenses.mit;
     maintainers = with maintainers; [ martfont ];
-=======
 {
   buildGoModule,
   brotli,
@@ -88,6 +87,5 @@ buildGoModule rec {
     homepage = "http://itch.io";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ naelstrof ];
->>>>>>> 21f764487f63dff0f5b1dfcdecfecf9e96c13e4a
   };
 }
