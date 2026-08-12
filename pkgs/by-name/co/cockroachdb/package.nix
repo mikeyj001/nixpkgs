@@ -117,13 +117,10 @@ buildFHSEnv {
       mit
       cockroachdb-community-license
     ];
-<<<<<<< HEAD
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     platforms = [ "aarch64-linux" "x86_64-linux" ];
     maintainers = with maintainers; [ rushmorem thoughtpolice ];
-=======
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
     platforms = [
       "aarch64-linux"
       "x86_64-linux"

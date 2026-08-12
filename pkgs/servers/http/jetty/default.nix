@@ -81,7 +81,6 @@ in
   };
 
   jetty_12 = common {
-<<<<<<< HEAD
     version = "12.0.21";
     hash = "sha256-U/W6h0S7b0zLoYahDGo/pkKa+NIMKR0tiX3pyRl40zg=";
     version = "12.1.1";
@@ -90,9 +89,7 @@ in
     hash = "sha256-GtaEIXqOSutgrSJJ/+oFuGSe7y8omVX7sBgcG3GJzvs=";
     version = "12.1.3";
     hash = "sha256-+DCfP0tFBouTZqOEzCFaQ4dl78xPFudUzS9hAzUkc7Y=";
-=======
     version = "12.1.5";
     hash = "sha256-tjZO7OtQ7FZQAGA9lI4YIKwm+ZW0eJgGTaNd+ZasDY4=";
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
   };
 }

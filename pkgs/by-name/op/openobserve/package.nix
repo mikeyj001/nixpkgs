@@ -39,7 +39,6 @@ let
   gitUpdater,
 }:
 
-<<<<<<< HEAD
 let
   version = "0.15.3";
   src = fetchFromGitHub {
@@ -62,7 +61,6 @@ let
     npmDepsHash = "sha256-awfQR1wZBX3ggmD0uJE9Fur4voPydeygrviRijKnBTE=";
     npmDepsHash = "sha256-1MUmAWkeYUEL6WZGq1Jg5W2uKa2xj0oZbGlIbvZWT1E=";
     npmDepsHash = "sha256-5bXEC48m3FbtmLwVYYvEdMV3qWA7KNEKVxkMZ94qEpA=";
-=======
 rustPlatform.buildRustPackage (
   finalAttrs:
   let
@@ -73,7 +71,6 @@ rustPlatform.buildRustPackage (
       sourceRoot = "${finalAttrs.src.name}/web";
 
       npmDepsHash = "sha256-UNdFqUJI/pdHJjjA5Aebnvq1T7oITJ1R96rEQOBxTug=";
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
 
       preBuild = ''
         # Patch vite config to not open the browser to visualize plugin composition
@@ -115,7 +112,6 @@ rustPlatform.buildRustPackage (
       cp -r ${web}/share/openobserve-ui web/dist
     '';
 
-<<<<<<< HEAD
   # prevent using git to determine version info during build time
   patches = [
   patches = [
@@ -138,7 +134,6 @@ rustPlatform.buildRustPackage (
   cargoHash = "sha256-FWMUPghx9CxuzP7jFZYSIwZsylApWzQsfx8DuwS4GTo=";
   cargoHash = "sha256-vfc6B+Uc8RXQD8vGC1yV9w5YAefkYJMpCH2frqjrSWk=";
   cargoHash = "sha256-j/bx4qoWcSh2/yJ9evnzSfyUd0tLAk4M310A89k4wy8=";
-=======
     cargoHash = "sha256-d67ZeAth0Q8h8xXJZl+2Z2/+M54Ef4xFlsPT9CnrwK4=";
 
     nativeBuildInputs = [
@@ -154,13 +149,11 @@ rustPlatform.buildRustPackage (
       zlib
       zstd
     ];
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
 
     env = {
       RUSTONIG_SYSTEM_LIBONIG = true;
       ZSTD_SYS_USE_PKG_CONFIG = true;
 
-<<<<<<< HEAD
   buildInputs = [
     bzip2
     oniguruma
@@ -175,9 +168,7 @@ rustPlatform.buildRustPackage (
     SystemConfiguration
   ]);
   ];
-=======
       RUSTC_BOOTSTRAP = 1; # uses experimental features
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
 
       # the patched build.rs file sets these variables
       GIT_VERSION = finalAttrs.src.tag;
@@ -186,7 +177,6 @@ rustPlatform.buildRustPackage (
 
       RUSTFLAGS = "-C target-feature=+aes,+sse2";
 
-<<<<<<< HEAD
     # the patched build.rs file sets these variables
     GIT_VERSION = src.rev;
     GIT_VERSION = src.tag;
@@ -238,7 +228,6 @@ rustPlatform.buildRustPackage (
     # Also see: https://github.com/NixOS/nixpkgs/pull/457421
     "--test-threads=1"
   ];
-=======
       SWAGGER_UI_DOWNLOAD_URL =
         # When updating:
         # - Look for the version of `utoipa-swagger-ui` at:
@@ -260,7 +249,6 @@ rustPlatform.buildRustPackage (
     preCheck = ''
       rm -rf target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/build/
     '';
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
 
     # Skip doctests: upstream release build for v0.50.3 runs cargo build only,
     # and the doctest examples currently fail due to async context.

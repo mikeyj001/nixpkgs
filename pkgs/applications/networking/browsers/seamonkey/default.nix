@@ -11,8 +11,8 @@ stdenv.mkDerivation rec {
 	url = "https://archive.seamonkey-project.org/releases/${version}/linux-x86_64/en-GB/seamonkey-${version}.en-GB.linux-x86_64.tar.bz2";
 
 	# 2.53.23
-	sha256 = "";
-#   	sha256 = "sha256-DWj+xTelCXOX9TmSH/EiqvX71U5EAN0CKufbNjPpRFo=";
+#	sha256 = "";
+   	sha256 = "sha256-kwh58v+fpyMO0nrDBDv4MPAtokKiHGx8NPdTfSY37YA=";
   };
 
   unpacked = ''

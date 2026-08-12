@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 { lib
 , buildPlatform
 , hostPlatform
@@ -119,7 +118,6 @@ in
     CPP = "gcc -E -D MES_BOOTSTRAP=1 -D BOOTSTRAP_GLIBC=1";
   };
 }
-=======
 {
   lib,
   buildPlatform,
@@ -235,4 +233,3 @@ bash.runCommand "${pname}-${version}"
     ln -s $(ls -d ${linux-headers}/include/* | grep -v scsi\$) $out/include/
     find $out/{bin,sbin,lib,libexec} -type f -exec strip --strip-unneeded {} + || true
   ''
->>>>>>> 30154124f004884b3846d043eef0f6770c41332d
